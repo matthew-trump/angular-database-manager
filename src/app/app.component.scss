@@ -1,0 +1,66 @@
+#content{
+    display: flex;
+
+    #left{
+        flex-shrink: 0;
+
+        .navigationlinks{
+            list-style-type: none;
+            li{
+                margin-bottom: 0.2em;
+                a{
+                    text-decoration: none;
+                    font-size: 0.9em;
+                }
+                a:link{
+                    color: #333;
+                }
+                a:visited{
+                    color: #333;
+                }
+                a:hover{
+                    color: #c90;
+                }
+            }
+           
+        }
+    }
+    #right{
+        margin-left: 4em;
+    }
+}
+.hqlogo{
+    margin-top: 1em;
+    margin-left: 2em;
+}
+mat-toolbar{
+    .login{
+        font-weight: normal;
+        font-size: 0.75em;
+        margin-right: 1em;
+        a{
+            text-decoration: none;
+            
+           
+        }
+        a:link{
+            color: #33f;
+        }
+        a:visited{
+            color: #33f;
+        }
+        a:hover{
+            color: #c90;
+        }
+    }
+   
+}
+
+  
+.loggedout{
+    border: 1px solid #333;
+    padding: 2em;
+}
+.environmentName{
+    color: blue;
+}

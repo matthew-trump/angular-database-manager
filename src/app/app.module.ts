@@ -2,15 +2,21 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from './auth.interceptor';
-import { AuthGuard } from './auth.guard';
-import { AppRoutingModule } from './app-routing.module';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+
+import { AuthInterceptor } from './auth.interceptor';
+import { AuthGuard } from './auth.guard';
+import { AppRoutingModule } from './app-routing.module';
+
+
+import { LoginComponent } from './login/login.component';
+import { TestApiComponent } from './test-api/test-api.component';
 
 /**
 import { MatCheckboxModule} from '@angular/material';
@@ -23,7 +29,7 @@ import { MatSelectModule} from '@angular/material/select';
 import { MatMenuModule} from '@angular/material/menu'
 
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatIconModule } from '@angular/material/icon';
+
 
 import { MatRadioModule } from '@angular/material/radio';
  */
@@ -32,7 +38,9 @@ import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent,
+    TestApiComponent
   ],
   imports: [
     BrowserModule,
@@ -45,6 +53,7 @@ import { AppComponent } from './app.component';
     MatProgressSpinnerModule,
     MatButtonModule,
     MatTooltipModule,
+    MatIconModule,
     /** 
     MatCheckboxModule,
     MatInputModule,
@@ -56,7 +65,7 @@ import { AppComponent } from './app.component';
     MatMenuModule,
     
     MatTabsModule,
-    MatIconModule,
+   
    
     MatRadioModule
     */
