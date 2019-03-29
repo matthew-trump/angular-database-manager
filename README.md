@@ -1,4 +1,4 @@
-# Dialogflow Admin Client
+# Actions on Google Admin Client
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.9.
 
