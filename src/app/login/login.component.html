@@ -1,0 +1,21 @@
+
+<div class="loginform">
+      <form [formGroup]="form">
+        <ul class="formwrapper">
+          <li class="form-row">
+            <label for="name">Username</label>
+            <input name="email" formControlName="email">
+          </li>
+          <li class="form-row">
+            <label>Password</label>
+            <input name="password" formControlName="password" type="password">
+          </li>
+          <li class="form-row">
+            <mat-spinner *ngIf="inProgress" diameter="30" strokeWidth="5" color="accent"></mat-spinner>
+            <button class="loginbutton" *ngIf="!inProgress" (click)="login()" [disabled]="inProgress">Login</button>
+          </li>
+          <li class="error" *ngIf="loginError">Login was unsuccessful.</li>
+        </ul>
+      </form>
+</div>
+      
