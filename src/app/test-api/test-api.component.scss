@@ -1,0 +1,19 @@
+.actions{
+    list-style-type: none;
+    padding-left: 1em;
+
+    li{
+        display: flex;
+        flex-direction: row;
+        flex: 1 auto;
+
+        justify-content: flex-end;
+        margin-bottom: 0.5em;
+
+        .button{
+            mat-icon{
+                transform: scale(0.7);
+            }
+        }
+    }
+}

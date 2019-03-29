@@ -1,0 +1,49 @@
+<!-- for testing only -->
+<div>
+    <h2>Test API</h2>
+    <div>See console for output.</div>
+    <ul class="actions">
+        <li>
+            <div class="button">
+                <button mat-raised-button matTooltip="should always succeed" (click)="ping()">Ping</button>
+            </div>
+            <div class="output">
+                {{output.ping}}
+            </div>
+        </li>
+        <li>
+            <div class="button">
+                <button mat-raised-button matTooltip="should succeed only when logged in" (click)="protected()">
+                    <mat-icon>lock</mat-icon>
+                    Protected
+                </button>
+            </div>
+            <div class="output">
+                {{output.protected}}
+            </div>
+        </li>
+        <li>
+            <div class="button">
+                <button mat-raised-button matTooltip="insert a ping into the database" (click)="databasePing()">
+                    <mat-icon>lock</mat-icon>
+                    Database Ping
+                </button>
+            </div>
+            <div class="output">
+                {{output.databasePing}}
+            </div>
+        </li>
+        <li>
+            <div class="button">
+                <button mat-raised-button matTooltip="retrieve pings from the database" (click)="databasePings()">
+                    <mat-icon>lock</mat-icon>
+                    Database Pings
+                </button>
+            </div>
+            <div class="output">
+                {{output.databasePings}}
+            </div>
+        </li>
+    </ul>
+
+</div>
