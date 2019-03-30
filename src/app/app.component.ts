@@ -11,7 +11,9 @@ export class AppComponent {
   title = 'Actions on Google Admin Client';
   constructor(
     public authService: AuthService,
-    private router: Router) { }
+    private router: Router) {
+
+  }
 
   logout() {
     this.authService.logout();

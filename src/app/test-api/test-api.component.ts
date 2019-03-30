@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BackendApiService } from '../backend-api.service';
+import { AuthService } from '../auth.service';
 import { catchError, tap, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
 
@@ -15,11 +16,11 @@ export class TestApiComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<null> = new Subject();
 
-  constructor(private backendApiService: BackendApiService) { }
+  constructor(private backendApiService: BackendApiService, private authService: AuthService) { }
 
   ngOnInit() { }
   ping() {
-    this.backendApiService.ping()
+    this.backendApiService.ping(this.authService.getCurrentTarget())
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['message'], error: 0 })
@@ -35,7 +36,7 @@ export class TestApiComponent implements OnInit, OnDestroy {
 
   }
   protected() {
-    this.backendApiService.protected()
+    this.backendApiService.protected(this.authService.getCurrentTarget())
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['message'], error: 0 })
@@ -50,7 +51,7 @@ export class TestApiComponent implements OnInit, OnDestroy {
       .subscribe(_ => { })
   }
   databasePing() {
-    this.backendApiService.databasePing('test')
+    this.backendApiService.databasePing(this.authService.getCurrentTarget(), 'test')
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['message'], error: 0 })
@@ -65,7 +66,7 @@ export class TestApiComponent implements OnInit, OnDestroy {
       .subscribe(_ => { })
   }
   databasePings() {
-    this.backendApiService.databasePings()
+    this.backendApiService.databasePings(this.authService.getCurrentTarget())
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['result'].length + " pings returned", error: 0 })

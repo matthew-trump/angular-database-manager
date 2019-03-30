@@ -3,10 +3,12 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './auth.guard';
 import { LoginComponent } from './login/login.component';
 import { TestApiComponent } from './test-api/test-api.component';
+import { ConfigSchemaComponent } from './config-schema/config-schema.component';
 
 const routes: Routes = [
     { path: 'login', pathMatch: 'full', component: LoginComponent },
     { path: 'test-api', pathMatch: 'full', component: TestApiComponent },
+    { path: 'config-schema', pathMatch: 'full', component: ConfigSchemaComponent },
     {
         path: 'admin', canActivate: [AuthGuard],
         children: [

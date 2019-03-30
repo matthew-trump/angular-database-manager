@@ -26,12 +26,18 @@
     <ul class="navigationlinks">
       <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
         true}">
-        <span class='arrow'>&#9654;</span>
+        <span class='arrow'>&#9656;</span>
         <a [routerLink]="['']">Home</a>
       </li>
-      <li routerLinkActive="active-link">
-        <span class='arrow'>&#9654;</span>
+      <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+        true}">
+        <span class='arrow'>&#9656;</span>
         <a [routerLink]="['test-api']">API Test</a>
+      </li>
+      <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+        true}">
+        <span class='arrow'>&#9656;</span>
+        <a [routerLink]="['config-schema']">Config Schema</a>
       </li>
     </ul>
   </div>

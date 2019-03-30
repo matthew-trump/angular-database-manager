@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
+import { ConfigSchemaService } from './config-schema.service';
 
 import * as moment from "moment";
 
@@ -15,7 +16,7 @@ export class AuthService {
 
   currentTarget: string = DEFAULT_TARGET;
   targetNames: string[] = Object.keys(TARGETS);
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private configSchemaService: ConfigSchemaService) {
 
   }
 
@@ -28,7 +29,9 @@ export class AuthService {
         tap(res => this.setSession(res)),
         tap(_ => {
           this.currentTarget = target;
-          console.log('Successfully logged in: ' + target);
+          this.configSchemaService.loadSchema(target).then((schema: any) => {
+            console.log("SCHEMA loaded for target", target, schema);
+          })
         }),
         shareReplay(1)
       );

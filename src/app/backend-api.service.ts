@@ -7,36 +7,38 @@ import { environment } from '../environments/environment';
     providedIn: 'root'
 })
 export class BackendApiService {
-    constructor(public authService: AuthService, public http: HttpClient) { }
+    constructor(public http: HttpClient) { }
 
     /** Testing methods */
-    ping() {
-        const target: string = this.authService.getCurrentTarget();
+    ping(target: string) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
         console.log("ping");
         return this.http.get(url + apiPath + 'ping');
     }
-    databasePing(value: string) {
-        const target: string = this.authService.getCurrentTarget();
+    databasePing(target: string, value: string) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
         console.log("database ping", value);
         return this.http.post(url + apiPath + 'database/ping',
             { key: value });
     }
-    databasePings() {
-        const target: string = this.authService.getCurrentTarget();
+    databasePings(target: string) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
         return this.http.get(url + apiPath + 'database/ping');
     }
-    protected() {
-        const target: string = this.authService.getCurrentTarget();
+    protected(target: string) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
         console.log("protected");
         return this.http.get(url + apiPath + 'protected');
+    }
+    configSchema(target: string, ) {
+        const url: string = environment.targets[target].url;
+        const apiPath: string = environment.targets[target].apiPath;
+        console.log("config schema");
+        return this.http.get(url + apiPath + 'config/schema');
     }
     /**
     testWebhook(route: String, body: any, options: any ){

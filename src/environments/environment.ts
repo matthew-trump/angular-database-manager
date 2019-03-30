@@ -6,7 +6,8 @@ export const environment = {
   targets: {
     local: {
       url: "http://localhost:8082",
-      apiPath: "/api/"
+      apiPath: "/api/",
+      schemaPath: 'config/schema'
     },
     staging: {
       url: "http://localhost:8083",
