@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
-
-
 
 @Component({
   selector: 'app-root',
@@ -12,7 +9,6 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
   title = 'Actions on Google Admin Client';
-
   constructor(
     public authService: AuthService,
     private router: Router) { }

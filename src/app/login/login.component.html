@@ -2,7 +2,9 @@
   <form [formGroup]="form">
     <ul class="formwrapper">
       <li class="form-row">
+
         <label for="target"></label>
+
         <mat-form-field>
           <mat-select placeholder="environment" name="target" formControlName="target">
             <mat-option *ngFor="let targetName of targetNames" [value]="targetName">
@@ -10,11 +12,6 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <!--
-        <select name="target" formControlName="target">
-          <option *ngFor="let targetName of targetNames" [ngValue]="targetName">{{targetName}}</option>
-        </select>
-        -->
 
       </li>
 
