@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 
 import { AuthInterceptor } from './auth.interceptor';
 import { AuthGuard } from './auth.guard';
@@ -25,8 +26,7 @@ import { MatInputModule} from '@angular/material/input';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import { MatDatepickerModule} from '@angular/material/datepicker';
 import { MatMomentDateModule } from "@angular/material-moment-adapter";
-import { MatSelectModule} from '@angular/material/select';
-import { MatMenuModule} from '@angular/material/menu'
+
 
 import { MatTabsModule } from '@angular/material/tabs';
 
@@ -54,6 +54,7 @@ import { AppComponent } from './app.component';
     MatButtonModule,
     MatTooltipModule,
     MatIconModule,
+    MatSelectModule,
     /** 
     MatCheckboxModule,
     MatInputModule,

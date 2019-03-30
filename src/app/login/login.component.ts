@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { catchError, tap, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { environment } from 'src/environments/environment';
+
+
 
 @Component({
     selector: 'app-login',
@@ -11,6 +14,10 @@ import { AuthService } from '../auth.service';
     styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
+
+    targetNames: string[];
+
+
 
     form: FormGroup;
 
@@ -22,9 +29,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     constructor(private fb: FormBuilder,
         private authService: AuthService,
         private router: Router) {
+        this.targetNames = this.authService.getTargetNames();
 
         this.form = this.fb.group({
-            email: ['', Validators.required],
+            target: [authService.getCurrentTarget(), Validators.required],
+            username: ['', Validators.required],
             password: ['', Validators.required]
         });
     }
@@ -34,13 +43,15 @@ export class LoginComponent implements OnInit, OnDestroy {
         const val = this.form.value;
         this.inProgress = true;
         this.loginError = false;
-        if (val.email && val.password) {
-            this.authService.login(val.email, val.password)
+
+        console.log(val);
+        if (val.target && val.username && val.password) {
+            this.authService.login(val.target, val.username, val.password)
                 .pipe(
                     tap((result) => {
                         this.inProgress = false;
                         if (result) {
-                            console.log("User is logged in");
+                            console.log("User is logged in to " + val.target);
                             this.router.navigateByUrl('/');
                         }
                     }),
@@ -54,6 +65,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                 )
                 .subscribe(_ => { });
         }
+
     }
 
 

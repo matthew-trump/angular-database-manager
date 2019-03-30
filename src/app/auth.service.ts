@@ -5,18 +5,31 @@ import { environment } from '../environments/environment';
 
 import * as moment from "moment";
 
+const TARGETS: any = environment.targets;
+const DEFAULT_TARGET: any = environment.defaultTarget;
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient) { }
+  currentTarget: string = DEFAULT_TARGET;
+  targetNames: string[] = Object.keys(TARGETS);
+  constructor(private http: HttpClient) {
 
-  login(username: String, password: String) {
-    return this.http.post<any>(environment.backendUrl + environment.apiPath + 'login', { username, password })
+  }
+
+  login(target: string, username: String, password: String) {
+    const url: string = environment.targets[target].url;
+    const apiPath: string = environment.targets[target].apiPath;
+    console.log(target, username, password, url, apiPath);
+    return this.http.post<any>(url + apiPath + 'login', { username, password })
       .pipe(
         tap(res => this.setSession(res)),
-        tap(_ => console.log('Successfully logged in')),
+        tap(_ => {
+          this.currentTarget = target;
+          console.log('Successfully logged in: ' + target);
+        }),
         shareReplay(1)
       );
   }
@@ -50,5 +63,11 @@ export class AuthService {
     const expiration = localStorage.getItem("expires_at");
     const expiresAt = JSON.parse(expiration);
     return moment(expiresAt);
+  }
+  getCurrentTarget() {
+    return this.currentTarget;
+  }
+  getTargetNames() {
+    return this.targetNames;
   }
 }

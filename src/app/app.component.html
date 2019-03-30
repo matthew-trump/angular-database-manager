@@ -5,13 +5,17 @@
       <img src="assets/logo-gold.png">
   </a>
   -->
-  <h1 style="margin-left: 1em;">Dialogflow Admin Client</h1>
-  <span class="environmentName"> {{environmentName}}</span>
+  <h1 style="margin-left: 1em;">Actions on Google Admin</h1>
+
+
+
+
+  <span class="environmentName" *ngIf="authService.getLoggedInUser()">{{authService.getCurrentTarget()}}</span>
   <span class="example-fill-remaining-space"></span>
 
   <div class="login" *ngIf="authService.isLoggedIn()">
     Logged in as {{authService.getLoggedInUser()}}
-    | <a (click)="logout()" href>Logout</a>
+    | <a (click)="logout()">Logout</a>
   </div>
   <div class="login" *ngIf="authService.isLoggedOut()"><a [routerLink]="['login']">Login</a></div>
 
@@ -35,9 +39,12 @@
    -->
     </ul>
 
-    <!-- for testing only: remove for production deployment-->
+    <!-- for testing only: remove for production deployment &#9654;-->
     <ul class="navigationlinks">
-      <li><a [routerLink]="['test-api']">API Test</a></li>
+      <li routerLinkActive="active-link">
+        <span class='arrow'>&#9654;</span>
+        <a [routerLink]="['test-api']">API Test</a>
+      </li>
       <!--
   <li *ngIf="authService.isLoggedIn()"><a [routerLink]="['admin','webhook']">Webhook Test</a></li>
   -->
@@ -48,8 +55,11 @@
 
   <div id="right" class="column">
     <div class="loggedout" *ngIf="!authService.isLoggedIn()">
-      You are currently logged out. Please <a [routerLink]="['/login']">log in</a>.
+      You are currently logged out. Please log in.
     </div>
+
+
+
     <router-outlet></router-outlet>
   </div>
 

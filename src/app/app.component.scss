@@ -8,6 +8,9 @@
             list-style-type: none;
             li{
                 margin-bottom: 0.2em;
+                span.arrow{
+                    color: white;
+                }
                 a{
                     text-decoration: none;
                     font-size: 0.9em;
@@ -21,9 +24,19 @@
                 a:hover{
                     color: #c90;
                 }
+                
+            }
+            li.active-link{
+                span.arrow{
+                    color:#333;
+                }
+                a:hover{
+                    color: #333;
+                }
             }
            
         }
+
     }
     #right{
         margin-left: 4em;
