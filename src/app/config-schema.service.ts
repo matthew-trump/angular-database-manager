@@ -3,12 +3,14 @@ import { BackendApiService } from './backend-api.service';
 import { environment } from '../environments/environment';
 import { Store } from '@ngrx/store';
 import { ConfigStateAction } from './config-state.action';
+import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 export class ConfigSchemaService {
 
   public schema: any;
+  public entities$: BehaviorSubject<any> = new BehaviorSubject(null);
 
   constructor(private backendApiService: BackendApiService,
     private store: Store<any>
@@ -19,6 +21,10 @@ export class ConfigSchemaService {
       this.backendApiService.configSchema(target).toPromise().then((schema: any) => {
         this.schema = schema;
         //console.log("DISPATCHING SCHEMA", schema);
+        if (schema) {
+          this.entities$.next(schema.entities)
+        }
+
         this.store.dispatch(new ConfigStateAction({
           target: target,
           schema: schema

@@ -29,18 +29,33 @@
         <span class='arrow'>&#9656;</span>
         <a [routerLink]="['']">Home</a>
       </li>
-      <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
-        true}">
-        <span class='arrow'>&#9656;</span>
-        <a [routerLink]="['test-api']">API Test</a>
-      </li>
+
       <ng-container *ngIf="authService.isLoggedIn()">
+
+        <ng-container *ngIf="(configSchemaService.entities$|async) as entities">
+          <ng-container *ngFor="let entity of entities">
+            <li class="entity" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+                  true}">
+              <span class='arrow'>&#9656;</span>
+              <a [routerLink]="['entities',entity.plural]">{{entity.plural}}</a>
+            </li>
+          </ng-container>
+        </ng-container>
+
         <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
             true}">
           <span class='arrow'>&#9656;</span>
           <a [routerLink]="['config-schema']">Config Schema</a>
         </li>
+
+
       </ng-container>
+
+      <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+        true}">
+        <span class='arrow'>&#9656;</span>
+        <a [routerLink]="['test-api']">API Test</a>
+      </li>
 
     </ul>
   </div>

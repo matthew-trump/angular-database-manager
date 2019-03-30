@@ -35,13 +35,15 @@ import { MatRadioModule } from '@angular/material/radio';
 
 import { AppComponent } from './app.component';
 import { ConfigSchemaComponent } from './config-schema/config-schema.component';
+import { EntitiesComponent } from './entities/entities.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     TestApiComponent,
-    ConfigSchemaComponent
+    ConfigSchemaComponent,
+    EntitiesComponent
   ],
   imports: [
     BrowserModule,

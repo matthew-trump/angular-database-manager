@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
+import { ConfigSchemaService } from './config-schema.service';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ export class AppComponent {
   title = 'Actions on Google Admin Client';
   constructor(
     public authService: AuthService,
+    public configSchemaService: ConfigSchemaService,
     private router: Router) {
     this.authService.loadCurrentSchema();
 
