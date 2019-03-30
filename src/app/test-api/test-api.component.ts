@@ -10,7 +10,8 @@ import { of, Subject } from 'rxjs';
 })
 export class TestApiComponent implements OnInit, OnDestroy {
 
-  output: any = {}
+  output: any[] = []
+
 
   unsubscribe$: Subject<null> = new Subject();
 
@@ -20,8 +21,12 @@ export class TestApiComponent implements OnInit, OnDestroy {
   ping() {
     this.backendApiService.ping()
       .pipe(
-        tap(res => console.log(res)),
+        tap(res => {
+          this.output.unshift({ text: res['message'], error: 0 })
+          console.log(res)
+        }),
         catchError(err => {
+          this.output.unshift({ text: err.message, error: 1 })
           return of(null);
         }),
         takeUntil(this.unsubscribe$)
@@ -32,8 +37,12 @@ export class TestApiComponent implements OnInit, OnDestroy {
   protected() {
     this.backendApiService.protected()
       .pipe(
-        tap(res => console.log(res)),
+        tap(res => {
+          this.output.unshift({ text: res['message'], error: 0 })
+          console.log(res)
+        }),
         catchError(err => {
+          this.output.unshift({ text: err.message, error: 1 })
           return of(null);
         }),
         takeUntil(this.unsubscribe$)
@@ -43,8 +52,12 @@ export class TestApiComponent implements OnInit, OnDestroy {
   databasePing() {
     this.backendApiService.databasePing('test')
       .pipe(
-        tap(res => console.log(res)),
+        tap(res => {
+          this.output.unshift({ text: res['message'], error: 0 })
+          console.log(res)
+        }),
         catchError(err => {
+          this.output.unshift({ text: err.message, error: 1 })
           return of(null);
         }),
         takeUntil(this.unsubscribe$)
@@ -54,8 +67,12 @@ export class TestApiComponent implements OnInit, OnDestroy {
   databasePings() {
     this.backendApiService.databasePings()
       .pipe(
-        tap(res => console.log(res)),
+        tap(res => {
+          this.output.unshift({ text: res['result'].length + " pings returned", error: 0 })
+          console.log(res)
+        }),
         catchError(err => {
+          this.output.unshift({ text: err.message, error: 1 })
           return of(null);
         }),
         takeUntil(this.unsubscribe$)

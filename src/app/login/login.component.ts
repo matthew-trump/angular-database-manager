@@ -4,8 +4,6 @@ import { Router } from '@angular/router';
 import { catchError, tap, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
 import { AuthService } from '../auth.service';
-import { environment } from 'src/environments/environment';
-
 
 
 @Component({
@@ -19,19 +17,20 @@ export class LoginComponent implements OnInit, OnDestroy {
 
 
 
-    form: FormGroup;
+    loginform: FormGroup;
 
     loginError: boolean = false;
     inProgress: boolean = false;
 
     unsubscribe$: Subject<null> = new Subject();
 
-    constructor(private fb: FormBuilder,
+    constructor(
+        private fb: FormBuilder,
         private authService: AuthService,
         private router: Router) {
         this.targetNames = this.authService.getTargetNames();
 
-        this.form = this.fb.group({
+        this.loginform = this.fb.group({
             target: [authService.getCurrentTarget(), Validators.required],
             username: ['', Validators.required],
             password: ['', Validators.required]
@@ -40,7 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     ngOnInit() { }
 
     login() {
-        const val = this.form.value;
+        const val = this.loginform.value;
         this.inProgress = true;
         this.loginError = false;
 

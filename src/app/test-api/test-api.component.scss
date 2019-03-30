@@ -17,3 +17,14 @@
         }
     }
 }
+.output{
+    list-style-type: none;
+    padding: 0.5em;
+    
+    li{
+        font-size: 0.8em;
+        .error{
+            color: red;
+        }
+    }
+}

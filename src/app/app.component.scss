@@ -1,3 +1,26 @@
+mat-toolbar{
+    .login{
+        font-weight: normal;
+        font-size: 0.75em;
+        margin-right: 1em;
+        a{
+            text-decoration: none;
+            
+           
+        }
+        a:link{
+            color: #33f;
+        }
+        a:visited{
+            color: #33f;
+        }
+        a:hover{
+            color: #c90;
+        }
+    }
+   
+}
+
 #content{
     display: flex;
 
@@ -46,30 +69,7 @@
     margin-top: 1em;
     margin-left: 2em;
 }
-mat-toolbar{
-    .login{
-        font-weight: normal;
-        font-size: 0.75em;
-        margin-right: 1em;
-        a{
-            text-decoration: none;
-            
-           
-        }
-        a:link{
-            color: #33f;
-        }
-        a:visited{
-            color: #33f;
-        }
-        a:hover{
-            color: #c90;
-        }
-    }
-   
-}
-
-  
+ 
 .loggedout{
     border: 1px solid #333;
     padding: 2em;
@@ -79,3 +79,4 @@ mat-toolbar{
     display: inline-block;
     margin-left: 1em;
 }
+

@@ -1,49 +1,48 @@
 <!-- for testing only -->
 <div>
     <h2>API Test</h2>
-    <div>See console for output.</div>
-    <ul class="actions">
-        <li>
-            <div class="button">
-                <button mat-raised-button matTooltip="should always succeed" (click)="ping()">Ping</button>
-            </div>
-            <div class="output">
-                {{output.ping}}
-            </div>
-        </li>
-        <li>
-            <div class="button">
-                <button mat-raised-button matTooltip="should succeed only when logged in" (click)="protected()">
-                    <mat-icon>lock</mat-icon>
-                    Protected
-                </button>
-            </div>
-            <div class="output">
-                {{output.protected}}
-            </div>
-        </li>
-        <li>
-            <div class="button">
-                <button mat-raised-button matTooltip="insert a ping into the database" (click)="databasePing()">
-                    <mat-icon>lock</mat-icon>
-                    Database Ping
-                </button>
-            </div>
-            <div class="output">
-                {{output.databasePing}}
-            </div>
-        </li>
-        <li>
-            <div class="button">
-                <button mat-raised-button matTooltip="retrieve pings from the database" (click)="databasePings()">
-                    <mat-icon>lock</mat-icon>
-                    Database Pings
-                </button>
-            </div>
-            <div class="output">
-                {{output.databasePings}}
-            </div>
-        </li>
-    </ul>
+    <div style="font-size: 0.6em; color: #999;">See console for more output.</div>
+    <div style="display: flex">
+        <ul class="actions">
+            <li>
+                <div class="button">
+                    <button mat-raised-button matTooltip="should always succeed" (click)="ping()">Ping</button>
+                </div>
+            </li>
+            <li>
+                <div class="button">
+                    <button mat-raised-button matTooltip="should succeed only when logged in" (click)="protected()">
+                        <mat-icon>lock</mat-icon>
+                        Protected
+                    </button>
+                </div>
+            </li>
+            <li>
+                <div class="button">
+                    <button mat-raised-button matTooltip="insert a ping into the database" (click)="databasePing()">
+                        <mat-icon>lock</mat-icon>
+                        Database Ping
+                    </button>
+                </div>
+            </li>
+            <li>
+                <div class="button">
+                    <button mat-raised-button matTooltip="retrieve pings from the database" (click)="databasePings()">
+                        <mat-icon>lock</mat-icon>
+                        Database Pings
+                    </button>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="output" style="width: 30em; border: 1px solid #ccc; margin-left: 1em;">
+            <ng-container *ngFor="let line of output;let i=index;">
+                <li *ngIf="i==0">
+                    <span [ngClass]="{'error':line.error>0}">{{line.text}}</span>
+
+                </li>
+            </ng-container>
+        </ul>
+    </div>
 
 </div>
