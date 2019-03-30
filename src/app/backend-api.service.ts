@@ -40,11 +40,17 @@ export class BackendApiService {
         console.log("protected");
         return this.http.get(url + apiPath + 'protected');
     }
-    configSchema(target: string, ) {
+    configSchema(target: string) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
         console.log("config schema");
         return this.http.get(url + apiPath + 'config/schema');
+    }
+    getEntities(target: string, plural: string) {
+        const url: string = environment.targets[target].url;
+        const apiPath: string = environment.targets[target].apiPath;
+        return this.http.get(url + apiPath + 'entities/' + plural);
+
     }
     /**
     testWebhook(route: String, body: any, options: any ){

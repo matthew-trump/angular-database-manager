@@ -8,7 +8,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class ConfigSchemaService {
-
+  public target: string;
   public schema: any;
   public entities$: BehaviorSubject<any> = new BehaviorSubject(null);
 
@@ -16,10 +16,17 @@ export class ConfigSchemaService {
     private store: Store<any>
   ) { }
 
+  getEntityConfig(plural: string) {
+    return this.schema.entities.filter((entity: any) => {
+      return entity.plural === plural;
+    })[0];
+  }
+
   loadSchema(target: string): Promise<any> {
     if (environment.targets[target].schemaPath) {
       this.backendApiService.configSchema(target).toPromise().then((schema: any) => {
         this.schema = schema;
+        this.target = target;
         //console.log("DISPATCHING SCHEMA", schema);
         if (schema) {
           this.entities$.next(schema.entities)
