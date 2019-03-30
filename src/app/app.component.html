@@ -34,11 +34,14 @@
         <span class='arrow'>&#9656;</span>
         <a [routerLink]="['test-api']">API Test</a>
       </li>
-      <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
-        true}">
-        <span class='arrow'>&#9656;</span>
-        <a [routerLink]="['config-schema']">Config Schema</a>
-      </li>
+      <ng-container *ngIf="authService.isLoggedIn()">
+        <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+            true}">
+          <span class='arrow'>&#9656;</span>
+          <a [routerLink]="['config-schema']">Config Schema</a>
+        </li>
+      </ng-container>
+
     </ul>
   </div>
 

@@ -5,6 +5,7 @@ import { environment } from '../environments/environment';
 import { ConfigSchemaService } from './config-schema.service';
 
 import * as moment from "moment";
+import { BackendApiService } from './backend-api.service';
 
 const TARGETS: any = environment.targets;
 const DEFAULT_TARGET: any = environment.defaultTarget;
@@ -16,25 +17,26 @@ export class AuthService {
 
   currentTarget: string = DEFAULT_TARGET;
   targetNames: string[] = Object.keys(TARGETS);
-  constructor(private http: HttpClient, private configSchemaService: ConfigSchemaService) {
+  constructor(
+    private backendApiService: BackendApiService,
+    private configSchemaService: ConfigSchemaService) {
 
   }
 
-  login(target: string, username: String, password: String) {
-    const url: string = environment.targets[target].url;
-    const apiPath: string = environment.targets[target].apiPath;
-    console.log(target, username, password, url, apiPath);
-    return this.http.post<any>(url + apiPath + 'login', { username, password })
+  login(target: string, username: string, password: string) {
+    return this.backendApiService.login(target, username, password)
       .pipe(
         tap(res => this.setSession(res)),
         tap(_ => {
           this.currentTarget = target;
-          this.configSchemaService.loadSchema(target).then((schema: any) => {
-            console.log("SCHEMA loaded for target", target, schema);
-          })
+          this.loadCurrentSchema();
         }),
         shareReplay(1)
       );
+  }
+  loadCurrentSchema() {
+    const target: string = this.currentTarget;
+    this.configSchemaService.loadSchema(target);
   }
   private setSession(authResult) {
     const expiresAt = moment().add(authResult.expiresIn, 'second');

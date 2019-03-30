@@ -9,6 +9,12 @@ import { environment } from '../environments/environment';
 export class BackendApiService {
     constructor(public http: HttpClient) { }
 
+    login(target: string, username: string, password: string) {
+        const url: string = environment.targets[target].url;
+        const apiPath: string = environment.targets[target].apiPath;
+        console.log(target, username, password, url, apiPath);
+        return this.http.post<any>(url + apiPath + 'login', { username, password });
+    }
     /** Testing methods */
     ping(target: string) {
         const url: string = environment.targets[target].url;
