@@ -1,3 +1,37 @@
 <div *ngIf="entityConfig">
   <h2>{{entityConfig.plural}}</h2>
+
+  <div *ngIf="(entities$|async) as entities">
+    <ul>
+      <ng-container *ngFor="let entity of entities; let i=index">
+        <ng-container *ngIf="100>i">
+          <ng-container *ngIf="!formGroups[entity.id]">
+            <li>
+              {{entity[entityConfig.field]}}
+              <span *ngIf="entityConfig.editable" class="edit">
+                <a (click)="edit(entity)">edit</a>
+              </span>
+            </li>
+          </ng-container>
+          <ng-container *ngIf="formGroups[entity.id]">
+            <li>
+              <form [formGroup]="formGroups[entity.id]">
+
+                <input name="password" formControlName="name" type="name" [disabled]="loading[entity.id]">
+
+                <span class="edit">
+                  <input type="button" (click)="save(entity,i)" value="save"
+                    [disabled]="formGroups[entity.id].pristine || loading[entity.id]">
+                </span>
+                <span class="edit">
+                  <input type="button" (click)="cancel(entity)" value="cancel" [disabled]="loading[entity.id]">
+                </span>
+              </form>
+            </li>
+          </ng-container>
+
+        </ng-container>
+      </ng-container>
+    </ul>
+  </div>
 </div>

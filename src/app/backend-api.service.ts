@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from './auth.service';
 import { environment } from '../environments/environment';
 
 @Injectable({
@@ -51,6 +50,11 @@ export class BackendApiService {
         const apiPath: string = environment.targets[target].apiPath;
         return this.http.get(url + apiPath + 'entities/' + plural);
 
+    }
+    updateEntity(target: string, plural: string, id: number, update: any) {
+        const url: string = environment.targets[target].url;
+        const apiPath: string = environment.targets[target].apiPath;
+        return this.http.put(url + apiPath + 'entities/' + plural + "/" + id, { update: update });
     }
     /**
     testWebhook(route: String, body: any, options: any ){

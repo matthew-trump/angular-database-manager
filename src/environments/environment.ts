@@ -11,7 +11,8 @@ export const environment = {
     },
     staging: {
       url: "http://localhost:8083",
-      apiPath: "/api/"
+      apiPath: "/api/",
+      schemaPath: 'config/schema'
     },
     production: {
       url: "http://localhost:8084",

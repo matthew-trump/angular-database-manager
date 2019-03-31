@@ -1,3 +1,18 @@
 h2{
     text-transform: capitalize
 }
+
+.edit{
+    display: inline-block;
+    margin-left: 0.5em;
+    color: #999;
+    font-size: 0.8em;
+    
+    a{
+        cursor: default;
+    }
+    a:hover{
+        color: goldenrod;
+     
+    }
+}
