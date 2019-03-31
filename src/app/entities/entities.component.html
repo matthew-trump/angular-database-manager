@@ -7,13 +7,17 @@
         <ng-container *ngIf="100>i">
           <ng-container *ngIf="!formGroups[entity.id]">
             <li>
+              <ng-container *ngIf="entityConfig.enablement">
+                <a (click)="toggle(entity,entityConfig.enablement)">{{entity[entityConfig.enablement] ? 'Y' : 'N'}}</a>
+              </ng-container>
+
               <ng-container *ngFor="let field of entityConfig.fields">
                 <ng-container *ngIf="!field.foreignKey">
                   {{entity[field.name]}}
                 </ng-container>
                 <ng-container *ngIf="field.foreignKey">
-                  <ng-container *ngIf="foreignKeyEntitiesMap[field.foreignKey]">
-                    {{foreignKeyEntitiesMap[field.foreignKey][entity[field.name]].name}}
+                  <ng-container *ngIf="foreignKeyEntitiesIdMap[field.foreignKey]">
+                    {{foreignKeyEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}
                   </ng-container>
                 </ng-container>
               </ng-container>
@@ -25,23 +29,21 @@
           <ng-container *ngIf="formGroups[entity.id]">
             <li>
               <form [formGroup]="formGroups[entity.id]">
+
+
                 <ng-container *ngFor="let field of entityConfig.fields">
 
                   <ng-container *ngIf="!field.foreignKey">
                     <input type="text" [formControlName]="field.name">
                   </ng-container>
+
                   <ng-container *ngIf="field.foreignKey">
-                    [select]
+                    <select [formControlName]="field.name">
+                      <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                        {{entity[field.label]}}
+                      </option>
+                    </select>
                   </ng-container>
-                  <!--
-                    <mat-form-field>
-                      <mat-select formControlName="target">
-                        <mat-option *ngFor="let targetName of targetNames" [value]="targetName">
-                          {{targetName}}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                     -->
 
 
                 </ng-container>

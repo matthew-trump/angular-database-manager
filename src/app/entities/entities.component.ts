@@ -16,8 +16,10 @@ export class EntitiesComponent implements OnInit {
   target: string;
   entities: any[];
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
-  foreignKeyEntityConfigs: any[] = [];
-  foreignKeyEntitiesMap: any = {};
+  //foreignKeyEntityConfigMap: any = {};
+  foreignKeyEntities: any = {}
+  foreignKeyEntitiesIdMap: any = {};
+
   loading: any = {};
   formGroups: any = {};
 
@@ -49,19 +51,26 @@ export class EntitiesComponent implements OnInit {
           this.loading = {};
           this.entities$.next(null);
           if (this.entityConfig) {
-            this.foreignKeyEntityConfigs = this.entityConfig.fields.filter((field: any) => {
+            const foreignKeyEntityConfigs: any[] = this.entityConfig.fields.filter((field: any) => {
               return typeof field.foreignKey !== 'undefined';
             }).map((field: any) => {
               return this.configSchemaService.getEntityConfig(field.foreignKey);
             });
 
-            console.log("FOREIGN KEY ENTITY CONFIGS", this.foreignKeyEntityConfigs);
+            //console.log("FOREIGN KEY ENTITY CONFIGS", foreignKeyEntityConfigs);
 
-            Promise.all(this.foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
+            //this.foreignKeyEntityConfigMap = 
+            /** 
+            foreignKeyEntityConfigs.reduce((obj: any, entityConfig: any) => {
+              obj[entityConfig.plural] = entityConfig;
+              return obj;
+            }, {});
+            */
+            Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
               return this.loadForeignKeyEntities(foreignKeyEntityConfig.plural);
             })).then((_) => {
 
-              console.log("FOREIGN KEY ENTITIES", this.foreignKeyEntitiesMap);
+              //console.log("FOREIGN KEY ENTITIES", this.foreignKeyEntitiesMap);
 
               this.backendApiService.getEntities(this.target, this.entityConfig.plural)
                 .toPromise().then((result: any) => {
@@ -82,8 +91,8 @@ export class EntitiesComponent implements OnInit {
     const retobj: any = await this.backendApiService.getEntities(this.target, plural).toPromise();
     const entityList: any[] = retobj.result;
     if (entityList) {
-
-      this.foreignKeyEntitiesMap[plural] = entityList.reduce((obj: any, entry: any) => {
+      this.foreignKeyEntities[plural] = entityList;
+      this.foreignKeyEntitiesIdMap[plural] = entityList.reduce((obj: any, entry: any) => {
         obj[entry.id] = entry;
         return obj;
       }, {});
@@ -91,7 +100,17 @@ export class EntitiesComponent implements OnInit {
     //this.foreignKeyEntitiesMap[plural] = retobj.result;
     return Promise.resolve(true);
   }
-
+  toggle(entity: any, field: string) {
+    const value: boolean = !entity[field];
+    this.backendApiService.updateEntity(
+      this.target,
+      this.entityConfig.plural,
+      entity.id,
+      { [field]: value ? 1 : 0 }
+    ).toPromise().then((res: any) => {
+      entity[field] = value;
+    });
+  }
   edit(entity: any) {
     const fbconfig: any = {};
     for (let i = 0, len = this.entityConfig.fields.length; i < len; i++) {
