@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { tap, takeUntil, switchMap, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { Subject, of, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
 @Component({
@@ -16,7 +16,8 @@ export class EntitiesComponent implements OnInit {
   target: string;
   entities: any[];
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
-
+  foreignKeyEntityConfigs: any[] = [];
+  foreignKeyEntitiesMap: any = {};
   loading: any = {};
   formGroups: any = {};
 
@@ -48,21 +49,56 @@ export class EntitiesComponent implements OnInit {
           this.loading = {};
           this.entities$.next(null);
           if (this.entityConfig) {
-            this.backendApiService.getEntities(this.target, this.entityConfig.plural)
-              .toPromise().then((result: any) => {
-                this.entities = result.result;
-                this.entities$.next(this.entities);
-              });
+            this.foreignKeyEntityConfigs = this.entityConfig.fields.filter((field: any) => {
+              return typeof field.foreignKey !== 'undefined';
+            }).map((field: any) => {
+              return this.configSchemaService.getEntityConfig(field.foreignKey);
+            });
+
+            console.log("FOREIGN KEY ENTITY CONFIGS", this.foreignKeyEntityConfigs);
+
+            Promise.all(this.foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
+              return this.loadForeignKeyEntities(foreignKeyEntityConfig.plural);
+            })).then((_) => {
+
+              console.log("FOREIGN KEY ENTITIES", this.foreignKeyEntitiesMap);
+
+              this.backendApiService.getEntities(this.target, this.entityConfig.plural)
+                .toPromise().then((result: any) => {
+                  this.entities = result.result;
+                  this.entities$.next(this.entities);
+                });
+
+            })
+
+
           }
         }),
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
 
   }
+  async loadForeignKeyEntities(plural: string): Promise<any> {
+    const retobj: any = await this.backendApiService.getEntities(this.target, plural).toPromise();
+    const entityList: any[] = retobj.result;
+    if (entityList) {
+
+      this.foreignKeyEntitiesMap[plural] = entityList.reduce((obj: any, entry: any) => {
+        obj[entry.id] = entry;
+        return obj;
+      }, {});
+    }
+    //this.foreignKeyEntitiesMap[plural] = retobj.result;
+    return Promise.resolve(true);
+  }
+
   edit(entity: any) {
-    const group: FormGroup = this.fb.group({
-      [this.entityConfig.field]: [entity[this.entityConfig.field]]
-    });
+    const fbconfig: any = {};
+    for (let i = 0, len = this.entityConfig.fields.length; i < len; i++) {
+      const field: any = this.entityConfig.fields[i];
+      fbconfig[field.name] = [entity[field.name]];
+    }
+    const group: FormGroup = this.fb.group(fbconfig);
     this.formGroups[entity.id] = group;
 
   }

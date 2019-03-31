@@ -7,8 +7,17 @@
         <ng-container *ngIf="100>i">
           <ng-container *ngIf="!formGroups[entity.id]">
             <li>
-              {{entity[entityConfig.field]}}
-              <span *ngIf="entityConfig.editable" class="edit">
+              <ng-container *ngFor="let field of entityConfig.fields">
+                <ng-container *ngIf="!field.foreignKey">
+                  {{entity[field.name]}}
+                </ng-container>
+                <ng-container *ngIf="field.foreignKey">
+                  <ng-container *ngIf="foreignKeyEntitiesMap[field.foreignKey]">
+                    {{foreignKeyEntitiesMap[field.foreignKey][entity[field.name]].name}}
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+              <span class="edit">
                 <a (click)="edit(entity)">edit</a>
               </span>
             </li>
@@ -16,8 +25,26 @@
           <ng-container *ngIf="formGroups[entity.id]">
             <li>
               <form [formGroup]="formGroups[entity.id]">
+                <ng-container *ngFor="let field of entityConfig.fields">
 
-                <input name="password" [formControlName]="entityConfig.field" type="text">
+                  <ng-container *ngIf="!field.foreignKey">
+                    <input type="text" [formControlName]="field.name">
+                  </ng-container>
+                  <ng-container *ngIf="field.foreignKey">
+                    [select]
+                  </ng-container>
+                  <!--
+                    <mat-form-field>
+                      <mat-select formControlName="target">
+                        <mat-option *ngFor="let targetName of targetNames" [value]="targetName">
+                          {{targetName}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                     -->
+
+
+                </ng-container>
 
                 <span class="edit">
                   <input type="button" (click)="save(entity,i)" value="save"
@@ -26,6 +53,7 @@
                 <span class="edit">
                   <input type="button" (click)="cancel(entity)" value="cancel" [disabled]="loading[entity.id]">
                 </span>
+
               </form>
             </li>
           </ng-container>
