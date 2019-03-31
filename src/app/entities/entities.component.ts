@@ -37,7 +37,6 @@ export class EntitiesComponent implements OnInit {
           return state.target !== null;
         }),
         tap((state: any) => {
-          //console.log("TARGET", state.target);
           this.target = state.target;
         }),
         switchMap((_: any) => {
@@ -61,10 +60,8 @@ export class EntitiesComponent implements OnInit {
 
   }
   edit(entity: any) {
-    console.log("EDIT", entity);
-
     const group: FormGroup = this.fb.group({
-      name: [entity.name]
+      [this.entityConfig.field]: [entity[this.entityConfig.field]]
     });
     this.formGroups[entity.id] = group;
 

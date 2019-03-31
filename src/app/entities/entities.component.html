@@ -17,7 +17,7 @@
             <li>
               <form [formGroup]="formGroups[entity.id]">
 
-                <input name="password" formControlName="name" type="name" [disabled]="loading[entity.id]">
+                <input name="password" [formControlName]="entityConfig.field" type="text">
 
                 <span class="edit">
                   <input type="button" (click)="save(entity,i)" value="save"
