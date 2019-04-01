@@ -50,10 +50,10 @@ export class BackendApiService {
         console.log("config schema");
         return this.http.get(url + apiPath + 'config/schema');
     }
-    getEntities(target: string, plural: string, filter?: any) {
+    getEntities(target: string, plural: string, query?: any) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
-        const queryString: string = filter ? "?" + this.getQueryString(filter) : "";
+        const queryString: string = query ? "?" + this.getQueryString(query) : "";
         return this.http.get(url + apiPath + 'entities/' + plural + queryString);
 
     }

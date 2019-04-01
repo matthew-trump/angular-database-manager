@@ -27,8 +27,21 @@
     <input type="button" value="go" (click)="doSearch()">
   </ng-container>
 
+  <ng-container *ngIf="result">
+    <div>Showing {{result.returned}} of {{result.total}}</div>
+    <ng-container *ngIf="result.total>result.returned">
+      <div>
+        <input type="button" value="&laquo;" (click)="previousPage()" [disabled]="1>result.query.offset">
+        <input type="button" value="&raquo;" (click)="nextPage()"
+          [disabled]="(result.query.offset+result.returned)>=result.total">
+
+      </div>
+
+    </ng-container>
+
+  </ng-container>
   <div *ngIf="(entities$|async) as entities">
-    <ul>
+    <ol [start]="result.query.offset+1">
       <ng-container *ngFor="let entity of entities; let i=index">
         <ng-container *ngIf="100>i">
           <ng-container *ngIf="!formGroups[entity.id]">
@@ -93,6 +106,6 @@
 
         </ng-container>
       </ng-container>
-    </ul>
+    </ol>
   </div>
 </div>

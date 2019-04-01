@@ -6,6 +6,10 @@ import { Store } from '@ngrx/store';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
+import { environment } from 'src/environments/environment';
+
+const DEFAULT_LIMIT: number = 50;
+const TARGETS: any = environment.targets;
 @Component({
   selector: 'app-entities',
   templateUrl: './entities.component.html',
@@ -14,10 +18,14 @@ import { BackendApiService } from '../backend-api.service';
 export class EntitiesComponent implements OnInit {
 
   FILTER_ALL: string = "--FILTER_ALL--";
+  limit: number = DEFAULT_LIMIT;
+  offset: number = 0;
 
   entityConfig: any;
   target: string;
-  entities: any[];
+
+  result: any;
+  //entities: any[];
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
   foreignKeyEntityConfigMap: any = {};
   foreignKeys: any[];
@@ -60,6 +68,9 @@ export class EntitiesComponent implements OnInit {
           this.loading = {};
           this.entities$.next(null);
           if (this.entityConfig) {
+            const limits = TARGETS[this.target].limits;
+            this.limit = (limits && limits[this.entityConfig.plural]) ? limits[this.entityConfig.plural] : DEFAULT_LIMIT;
+            this.offset = 0;
             const foreignKeyEntityConfigs: any[] = this.entityConfig.fields.filter((field: any) => {
               return typeof field.foreignKey !== 'undefined';
             }).map((field: any) => {
@@ -70,20 +81,8 @@ export class EntitiesComponent implements OnInit {
               return this.loadForeignKeyEntities(foreignKeyEntityConfig);
             })).then((_) => {
               this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap)
-              this.loadEntries()
-              this.backendApiService.getEntities(this.target, this.entityConfig.plural)
-                .toPromise().then((result: any) => {
-                  this.loadingList = false;
-                  this.entities = result.result;
-                  this.entities$.next(this.entities);
-                }).catch((err) => {
-                  this.loadingList = false;
-                  console.log(err);
-                });
-
+              this.loadEntries({});
             })
-
-
           }
         }),
         takeUntil(this.unsubscribe$)
@@ -94,7 +93,7 @@ export class EntitiesComponent implements OnInit {
     const plural: string = entityConfig.plural;
     this.foreignKeyEntityConfigMap[plural] = entityConfig;
     const retobj: any = await this.backendApiService.getEntities(this.target, plural).toPromise();
-    const entityList: any[] = retobj.result;
+    const entityList: any[] = retobj.entities;
     if (entityList) {
       this.foreignKeyEntities[plural] = entityList;
       this.foreignKeyEntitiesIdMap[plural] = entityList.reduce((obj: any, entry: any) => {
@@ -109,22 +108,35 @@ export class EntitiesComponent implements OnInit {
   }
 
   doFilter(field?: string, value?: any) {
-    this.loadingList = true;
     const query: any = (field && value !== this.FILTER_ALL) ? { [field]: value } : null;
     this.filter = query;
+    this.offset = 0;
     this.loadEntries(this.getQuery())
   }
   doSearch() {
     const searchvalue: string = this.searchString.trim();
     this.search = searchvalue ? { search: searchvalue } : {};
+    this.offset = 0;
     this.loadEntries(this.getQuery())
   }
-  loadEntries(query?: any) {
+  nextPage() {
+    this.offset = this.offset + this.limit;
+    this.loadEntries(this.getQuery());
+  }
+  previousPage() {
+    this.offset = this.offset - this.limit;
+    this.loadEntries(this.getQuery());
+  }
+  loadEntries(query: any) {
+    query.offset = this.offset;
+    query.limit = this.limit;
+    this.loadingList = true;
     this.backendApiService.getEntities(this.target, this.entityConfig.plural, query)
       .toPromise().then((result: any) => {
         this.loadingList = false;
-        this.entities = result.result;
-        this.entities$.next(this.entities);
+        this.result = result;
+        //this.entities = result.result;
+        this.entities$.next(this.result.entities);
       }).catch((err) => {
         this.loadingList = false;
         console.log(err);
@@ -163,10 +175,8 @@ export class EntitiesComponent implements OnInit {
       .toPromise()
       .then((result: any) => {
         this.loading[entity.id] = false;
-        this.entities[index] = Object.assign({}, { id: entity.id }, update);
-
-        console.log(this.entities);
-        this.entities$.next(this.entities);
+        this.result.entities[index] = Object.assign({}, { id: entity.id }, update);
+        this.entities$.next(this.result.entities);
         delete this.formGroups[entity.id];
       })
       .catch(err => {
