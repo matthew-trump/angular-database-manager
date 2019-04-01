@@ -1,6 +1,11 @@
 h2{
     text-transform: capitalize
 }
+li.displaying.disabled{
+    .text{
+        text-decoration: line-through;
+    }
+}
 
 .edit{
     display: inline-block;

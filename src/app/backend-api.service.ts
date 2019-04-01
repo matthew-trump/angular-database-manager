@@ -8,6 +8,11 @@ import { environment } from '../environments/environment';
 export class BackendApiService {
     constructor(public http: HttpClient) { }
 
+    getQueryString(params: any): string {
+        const queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+        return queryString;
+
+    }
     login(target: string, username: string, password: string) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
@@ -45,10 +50,11 @@ export class BackendApiService {
         console.log("config schema");
         return this.http.get(url + apiPath + 'config/schema');
     }
-    getEntities(target: string, plural: string) {
+    getEntities(target: string, plural: string, filter?: any) {
         const url: string = environment.targets[target].url;
         const apiPath: string = environment.targets[target].apiPath;
-        return this.http.get(url + apiPath + 'entities/' + plural);
+        const queryString: string = filter ? "?" + this.getQueryString(filter) : "";
+        return this.http.get(url + apiPath + 'entities/' + plural + queryString);
 
     }
     updateEntity(target: string, plural: string, id: number, update: any) {

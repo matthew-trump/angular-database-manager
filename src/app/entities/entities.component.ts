@@ -12,15 +12,20 @@ import { BackendApiService } from '../backend-api.service';
   styleUrls: ['./entities.component.scss']
 })
 export class EntitiesComponent implements OnInit {
+
+  FILTER_ALL: string = "--FILTER_ALL--";
+
   entityConfig: any;
   target: string;
   entities: any[];
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
-  //foreignKeyEntityConfigMap: any = {};
+  foreignKeyEntityConfigMap: any = {};
+  foreignKeys: any[];
   foreignKeyEntities: any = {}
   foreignKeyEntitiesIdMap: any = {};
 
   loading: any = {};
+  loadingList: boolean = false;
   formGroups: any = {};
 
   unsubscribe$: Subject<null> = new Subject();
@@ -56,26 +61,20 @@ export class EntitiesComponent implements OnInit {
             }).map((field: any) => {
               return this.configSchemaService.getEntityConfig(field.foreignKey);
             });
-
-            //console.log("FOREIGN KEY ENTITY CONFIGS", foreignKeyEntityConfigs);
-
-            //this.foreignKeyEntityConfigMap = 
-            /** 
-            foreignKeyEntityConfigs.reduce((obj: any, entityConfig: any) => {
-              obj[entityConfig.plural] = entityConfig;
-              return obj;
-            }, {});
-            */
+            this.loadingList = true;
             Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
-              return this.loadForeignKeyEntities(foreignKeyEntityConfig.plural);
+              return this.loadForeignKeyEntities(foreignKeyEntityConfig);
             })).then((_) => {
-
-              //console.log("FOREIGN KEY ENTITIES", this.foreignKeyEntitiesMap);
-
+              this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap)
+              this.loadFiltered(null, this.FILTER_ALL)
               this.backendApiService.getEntities(this.target, this.entityConfig.plural)
                 .toPromise().then((result: any) => {
+                  this.loadingList = false;
                   this.entities = result.result;
                   this.entities$.next(this.entities);
+                }).catch((err) => {
+                  this.loadingList = false;
+                  console.log(err);
                 });
 
             })
@@ -87,7 +86,9 @@ export class EntitiesComponent implements OnInit {
       ).subscribe(_ => { })
 
   }
-  async loadForeignKeyEntities(plural: string): Promise<any> {
+  async loadForeignKeyEntities(entityConfig: any): Promise<any> {
+    const plural: string = entityConfig.plural;
+    this.foreignKeyEntityConfigMap[plural] = entityConfig;
     const retobj: any = await this.backendApiService.getEntities(this.target, plural).toPromise();
     const entityList: any[] = retobj.result;
     if (entityList) {
@@ -97,8 +98,21 @@ export class EntitiesComponent implements OnInit {
         return obj;
       }, {});
     }
-    //this.foreignKeyEntitiesMap[plural] = retobj.result;
     return Promise.resolve(true);
+  }
+
+  loadFiltered(field?: string, value?: any) {
+    this.loadingList = true;
+    this.backendApiService.getEntities(this.target, this.entityConfig.plural, (field && value !== this.FILTER_ALL) ? { [field]: value } : null)
+      .toPromise().then((result: any) => {
+        this.loadingList = false;
+        this.entities = result.result;
+        this.entities$.next(this.entities);
+      }).catch((err) => {
+        this.loadingList = false;
+        console.log(err);
+      });
+
   }
   toggle(entity: any, field: string) {
     const value: boolean = !entity[field];
