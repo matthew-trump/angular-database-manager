@@ -1,12 +1,13 @@
 <div *ngIf="entityConfig">
   <h2>{{entityConfig.plural}}</h2>
+
   <ng-container *ngIf="entityConfig.filter">
     <ng-container *ngFor="let filter of entityConfig.filter">
       <ng-container *ngIf="foreignKeyEntityConfigMap[filter.entity] as foreignKeyEntityConfig">
         <div>
           <span>{{foreignKeyEntityConfig.name}}</span>
 
-          <select (change)="loadFiltered(filter.field, $event.target.value)">
+          <select (change)="doFilter(filter.field, $event.target.value)">
             <option *ngIf="filter.all" [value]="FILTER_ALL">
               all
             </option>
@@ -20,6 +21,12 @@
       </ng-container>
     </ng-container>
   </ng-container>
+
+  <ng-container *ngIf="entityConfig.search">
+    <input type="text" placeholder="search" [(ngModel)]="searchString">
+    <input type="button" value="go" (click)="doSearch()">
+  </ng-container>
+
   <div *ngIf="(entities$|async) as entities">
     <ul>
       <ng-container *ngFor="let entity of entities; let i=index">

@@ -28,6 +28,10 @@ export class EntitiesComponent implements OnInit {
   loadingList: boolean = false;
   formGroups: any = {};
 
+  filter: any = {};
+  search: any = {};
+  searchString: string = null;
+
   unsubscribe$: Subject<null> = new Subject();
 
   constructor(private route: ActivatedRoute,
@@ -66,7 +70,7 @@ export class EntitiesComponent implements OnInit {
               return this.loadForeignKeyEntities(foreignKeyEntityConfig);
             })).then((_) => {
               this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap)
-              this.loadFiltered(null, this.FILTER_ALL)
+              this.loadEntries()
               this.backendApiService.getEntities(this.target, this.entityConfig.plural)
                 .toPromise().then((result: any) => {
                   this.loadingList = false;
@@ -100,10 +104,23 @@ export class EntitiesComponent implements OnInit {
     }
     return Promise.resolve(true);
   }
+  getQuery() {
+    return Object.assign({}, this.filter, this.search);
+  }
 
-  loadFiltered(field?: string, value?: any) {
+  doFilter(field?: string, value?: any) {
     this.loadingList = true;
-    this.backendApiService.getEntities(this.target, this.entityConfig.plural, (field && value !== this.FILTER_ALL) ? { [field]: value } : null)
+    const query: any = (field && value !== this.FILTER_ALL) ? { [field]: value } : null;
+    this.filter = query;
+    this.loadEntries(this.getQuery())
+  }
+  doSearch() {
+    const searchvalue: string = this.searchString.trim();
+    this.search = searchvalue ? { search: searchvalue } : {};
+    this.loadEntries(this.getQuery())
+  }
+  loadEntries(query?: any) {
+    this.backendApiService.getEntities(this.target, this.entityConfig.plural, query)
       .toPromise().then((result: any) => {
         this.loadingList = false;
         this.entities = result.result;
@@ -112,7 +129,6 @@ export class EntitiesComponent implements OnInit {
         this.loadingList = false;
         console.log(err);
       });
-
   }
   toggle(entity: any, field: string) {
     const value: boolean = !entity[field];
