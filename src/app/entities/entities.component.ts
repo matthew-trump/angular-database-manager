@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { tap, takeUntil, switchMap, filter } from 'rxjs/operators';
+import { tap, takeUntil, switchMap, filter, debounceTime } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
@@ -20,12 +20,16 @@ export class EntitiesComponent implements OnInit {
   FILTER_ALL: string = "--FILTER_ALL--";
   limit: number = DEFAULT_LIMIT;
   offset: number = 0;
+  adding: boolean = false;
+  addEntities: FormGroup[];
+  added: number = 0;
+  addedThisSave: number = 0;
 
   entityConfig: any;
   target: string;
 
   result: any;
-  //entities: any[];
+
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
   foreignKeyEntityConfigMap: any = {};
   foreignKeys: any[];
@@ -66,6 +70,8 @@ export class EntitiesComponent implements OnInit {
           this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
           this.formGroups = {};
           this.loading = {};
+          this.added = 0;
+          this.addedThisSave = 0;
           this.entities$.next(null);
           if (this.entityConfig) {
             const limits = TARGETS[this.target].limits;
@@ -135,7 +141,6 @@ export class EntitiesComponent implements OnInit {
       .toPromise().then((result: any) => {
         this.loadingList = false;
         this.result = result;
-        //this.entities = result.result;
         this.entities$.next(this.result.entities);
       }).catch((err) => {
         this.loadingList = false;
@@ -154,14 +159,20 @@ export class EntitiesComponent implements OnInit {
     });
   }
   edit(entity: any) {
+    const fbconfig: any = this.getFormConfig(entity);
+    const group: FormGroup = this.fb.group(fbconfig);
+    this.formGroups[entity.id] = group;
+  }
+  getFormConfig(entity: any) {
     const fbconfig: any = {};
     for (let i = 0, len = this.entityConfig.fields.length; i < len; i++) {
       const field: any = this.entityConfig.fields[i];
-      fbconfig[field.name] = [entity[field.name]];
+      fbconfig[field.name] = [entity[field.name]] || [''];
+      if (field.required) {
+        fbconfig[field.name].push(Validators.required)
+      }
     }
-    const group: FormGroup = this.fb.group(fbconfig);
-    this.formGroups[entity.id] = group;
-
+    return fbconfig;
   }
   save(entity: any, index: number) {
     const update: any = this.formGroups[entity.id].value;
@@ -186,6 +197,51 @@ export class EntitiesComponent implements OnInit {
       });
 
 
+  }
+  showAdding(adding: boolean) {
+    this.adding = adding;
+
+    if (adding) {
+      this.addAddEntity();
+      this.added = 0;
+      this.addedThisSave = 0;
+    } else {
+      this.clearAddEntities();
+      this.loadEntries(this.getQuery());
+    }
+  }
+  addAddEntity() {
+    this.addEntities = this.addEntities || [];
+    this.addEntities.push(this.fb.group(this.getFormConfig({})));
+  }
+  clearAddEntities() {
+    this.addEntities = [];
+  }
+  removeAddEntity(index: number) {
+    this.addEntities.splice(index, 1);
+  }
+  addEntitiesValid() {
+    return this.addEntities.filter((fg: any) => {
+      return fg.valid;
+    }).length === this.addEntities.length;
+  }
+  saveAddEntities() {
+    this.addedThisSave = 0;
+    this.backendApiService
+      .addEntities(
+        this.target,
+        this.entityConfig.plural,
+        this.addEntities.map((fg: FormGroup) => { return fg.value; })).toPromise()
+      .then((result: any) => {
+        console.log(result);
+        this.addedThisSave = this.addEntities.length;
+        this.addEntities = null;
+        this.addAddEntity();
+        this.added = this.added + this.addedThisSave;
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
   }
   cancel(entity: any) {
     delete this.formGroups[entity.id];

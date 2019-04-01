@@ -62,6 +62,11 @@ export class BackendApiService {
         const apiPath: string = environment.targets[target].apiPath;
         return this.http.put(url + apiPath + 'entities/' + plural + "/" + id, { update: update });
     }
+    addEntities(target: string, plural: string, entities: any) {
+        const url: string = environment.targets[target].url;
+        const apiPath: string = environment.targets[target].apiPath;
+        return this.http.post(url + apiPath + 'entities/' + plural, { entities: entities });
+    }
     /**
     testWebhook(route: String, body: any, options: any ){
         const req = new HttpRequest('POST', environment.backendUrl+route, body, options);
