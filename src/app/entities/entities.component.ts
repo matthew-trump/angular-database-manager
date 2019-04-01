@@ -69,6 +69,7 @@ export class EntitiesComponent implements OnInit {
         tap((params: any) => {
           this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
           this.formGroups = {};
+          this.addEntities = [];
           this.loading = {};
           this.added = 0;
           this.addedThisSave = 0;
@@ -170,6 +171,11 @@ export class EntitiesComponent implements OnInit {
       fbconfig[field.name] = [entity[field.name]] || [''];
       if (field.required) {
         fbconfig[field.name].push(Validators.required)
+      }
+    }
+    if (this.entityConfig.enablement) {
+      if (typeof fbconfig[this.entityConfig.enablement] === 'undefined') {
+        fbconfig[this.entityConfig.enablement] = this.entityConfig.defaultEnabled;
       }
     }
     return fbconfig;

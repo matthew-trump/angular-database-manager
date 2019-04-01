@@ -37,6 +37,7 @@
                   </select>
                 </ng-container>
               </ng-container>
+
               <span *ngIf="addEntity.valid" class="valid">&#x2713;</span>
 
               <span class="edit">
@@ -102,7 +103,7 @@
           <ng-container *ngIf="100>i">
             <ng-container *ngIf="!formGroups[entity.id]">
               <li class="displaying"
-                [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : !entity[entityConfig.enablement]}">
+                [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement])}">
                 <ng-container *ngIf="entityConfig.enablement">
                   <a
                     (click)="toggle(entity,entityConfig.enablement)">{{entity[entityConfig.enablement] ? 'Y' : 'N'}}</a>
