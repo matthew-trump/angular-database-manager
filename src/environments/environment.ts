@@ -25,9 +25,10 @@ export const environment = {
     production: {
       url: "http://localhost:8084",
       apiPath: "/api/",
+      schemaPath: 'config/schema',
       limits: {
         categories: 40,
-        questions: 25
+        questions: 15
       }
     },
   }

@@ -30,7 +30,7 @@
                 </ng-container>
 
                 <ng-container *ngIf="field.foreignKey">
-                  <select [formControlName]="field.name">
+                  <select [formControlName]="field.name" (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
                     <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
                       {{entity[field.label]}}
                     </option>

@@ -2,14 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
+const TARGET_PARAM: string = "__target__";
+
 @Injectable({
     providedIn: 'root'
 })
 export class BackendApiService {
     constructor(public http: HttpClient) { }
 
-    getQueryString(params: any): string {
-        const queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+    getQueryString(target: string, params: any): string {
+        const full = Object.assign({}, params, { __target__: target });
+        const queryString = Object.keys(full).map(key => key + '=' + full[key]).join('&');
+
         return queryString;
 
     }
@@ -52,8 +56,9 @@ export class BackendApiService {
     }
     getEntities(target: string, plural: string, query?: any) {
         const url: string = environment.targets[target].url;
+        console.log("getEntities", target, plural, url);
         const apiPath: string = environment.targets[target].apiPath;
-        const queryString: string = query ? "?" + this.getQueryString(query) : "";
+        const queryString: string = "?" + this.getQueryString(target, query);
         return this.http.get(url + apiPath + 'entities/' + plural + queryString);
 
     }

@@ -25,6 +25,7 @@ export class ConfigSchemaService {
   loadSchema(target: string): Promise<any> {
     if (environment.targets[target].schemaPath) {
       this.backendApiService.configSchema(target).toPromise().then((schema: any) => {
+        console.log("GOT SCHEMA", target, schema);
         this.schema = schema;
         this.target = target;
         //console.log("DISPATCHING SCHEMA", schema);
@@ -39,9 +40,15 @@ export class ConfigSchemaService {
         /** */
         //console.log("RETURING PROMISE with schema", schema);
         return Promise.resolve(schema);
-      })
+      }).catch((err: any) => {
+        console.log(err);
+      });
     } else {
-      //console.log("RETURING PROMISE no schema");
+      console.log("RETURING PROMISE no schema", target);
+      this.store.dispatch(new ConfigStateAction({
+        target: target,
+        schema: null
+      }));
       return Promise.resolve(null);
     }
 

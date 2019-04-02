@@ -36,7 +36,10 @@ export class AuthService {
   }
   loadCurrentSchema() {
     const target: string = this.currentTarget;
-    this.configSchemaService.loadSchema(target);
+    console.log("loadCurrentSchema", target);
+    if (this.isLoggedIn()) {
+      this.configSchemaService.loadSchema(target);
+    }
   }
   private setSession(authResult) {
     const expiresAt = moment().add(authResult.expiresIn, 'second');

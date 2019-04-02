@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { tap, takeUntil, switchMap, filter, debounceTime } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
@@ -24,6 +24,8 @@ export class EntitiesComponent implements OnInit {
   addEntities: FormGroup[];
   added: number = 0;
   addedThisSave: number = 0;
+
+  foreignKeyValueForAdd: any = {};
 
   entityConfig: any;
   target: string;
@@ -78,6 +80,7 @@ export class EntitiesComponent implements OnInit {
             const limits = TARGETS[this.target].limits;
             this.limit = (limits && limits[this.entityConfig.plural]) ? limits[this.entityConfig.plural] : DEFAULT_LIMIT;
             this.offset = 0;
+            this.foreignKeyValueForAdd = {};
             const foreignKeyEntityConfigs: any[] = this.entityConfig.fields.filter((field: any) => {
               return typeof field.foreignKey !== 'undefined';
             }).map((field: any) => {
@@ -95,6 +98,10 @@ export class EntitiesComponent implements OnInit {
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
 
+  }
+  setLatestForeignKeyValueForAdd(formGroup: FormGroup, field: any) {
+    console.log("setLatestForeignKeyValueForAdd", field.name, formGroup.value[field.name])
+    this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
   async loadForeignKeyEntities(entityConfig: any): Promise<any> {
     const plural: string = entityConfig.plural;
@@ -168,7 +175,7 @@ export class EntitiesComponent implements OnInit {
     const fbconfig: any = {};
     for (let i = 0, len = this.entityConfig.fields.length; i < len; i++) {
       const field: any = this.entityConfig.fields[i];
-      fbconfig[field.name] = [entity[field.name]] || [''];
+      fbconfig[field.name] = entity[field.name] ? [entity[field.name]] : [this.foreignKeyValueForAdd[field.name] ? this.foreignKeyValueForAdd[field.name] : ''];
       if (field.required) {
         fbconfig[field.name].push(Validators.required)
       }
