@@ -43,6 +43,12 @@
         </ng-container>
 
         <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+          true}">
+          <span class='arrow'>&#9656;</span>
+          <a [routerLink]="['schedule']">Schedule</a>
+        </li>
+
+        <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
             true}">
           <span class='arrow'>&#9656;</span>
           <a [routerLink]="['config-schema']">Config Schema</a>

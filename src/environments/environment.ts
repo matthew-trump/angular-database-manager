@@ -10,7 +10,8 @@ export const environment = {
       schemaPath: 'config/schema',
       limits: {
         authors: 40,
-        quotes: 20
+        quotes: 20,
+        schedule: 5
       }
     },
     staging: {
@@ -19,7 +20,8 @@ export const environment = {
       schemaPath: 'config/schema',
       limits: {
         categories: 40,
-        questions: 25
+        questions: 25,
+        schedule: 5
       }
     },
     production: {
@@ -28,7 +30,8 @@ export const environment = {
       schemaPath: 'config/schema',
       limits: {
         categories: 40,
-        questions: 15
+        questions: 15,
+        schedule: 5
       }
     },
   }

@@ -1,0 +1,86 @@
+<h2>Schedule</h2>
+
+<ng-container *ngIf="scheduleConfig && adding">
+  <input type="button" value="cancel" (click)="setAdding(false)">
+
+  <ng-container *ngFor="let selector of scheduleConfig.selectors">
+
+    <ng-container *ngIf="selector.type==='foreignKey'">
+      <ng-container *ngIf="foreignKeyEntitiesIdMap[selector.entity]">
+        <div [ngClass]="selector.entity">
+          {{foreignKeyEntitiesIdMap[selector.entity][entity[selector.entity]][selector.label]}}
+        </div>
+      </ng-container>
+    </ng-container>
+
+  </ng-container>
+
+</ng-container>
+
+<ng-container *ngIf="!adding">
+  <input type="button" value="add" (click)="setAdding(true)">
+</ng-container>
+
+<!--
+<div *ngIf="(items$|async) as items">
+  <ol [start]="result.query.offset+1">
+    <ng-container *ngFor="let item of items; let i=index">
+      <ng-container *ngIf="!formGroups[item.id]">
+        <li class="displaying">
+
+
+          <ng-container *ngFor="let selector of config.selectors">
+
+            <ng-container *ngIf="field.type==='foreignKey'">
+              <ng-container *ngIf="foreignKeyEntitiesIdMap[field.entity]">
+                <div [ngClass]="field.entity">
+                  {{foreignKeyEntitiesIdMap[field.entity][entity[field.entity]][field.label]}}
+                </div>
+              </ng-container>
+            </ng-container>
+
+          </ng-container>
+
+          <span class="edit">
+            <a (click)="edit(entity)">edit</a>
+          </span>
+        </li>
+      </ng-container>
+      <ng-container *ngIf="formGroups[entity.id]">
+        <li class="editing">
+          <form [formGroup]="formGroups[entity.id]">
+
+
+            <ng-container *ngFor="let field of entityConfig.fields">
+
+              <ng-container *ngIf="!field.foreignKey">
+                <input type="text" [formControlName]="field.name">
+              </ng-container>
+
+              <ng-container *ngIf="field.foreignKey">
+                <select [formControlName]="field.name">
+                  <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                    {{entity[field.label]}}
+                  </option>
+                </select>
+              </ng-container>
+
+
+            </ng-container>
+
+            <span class="edit">
+              <input type="button" (click)="save(entity,i)" value="save"
+                [disabled]="formGroups[entity.id].pristine || loading[entity.id]">
+            </span>
+            <span class="edit">
+              <input type="button" (click)="cancel(entity)" value="cancel" [disabled]="loading[entity.id]">
+            </span>
+
+          </form>
+        </li>
+      </ng-container>
+    </ng-container>
+  </ol>
+</div>
+
+--->

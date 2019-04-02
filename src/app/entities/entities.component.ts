@@ -100,7 +100,7 @@ export class EntitiesComponent implements OnInit {
 
   }
   setLatestForeignKeyValueForAdd(formGroup: FormGroup, field: any) {
-    console.log("setLatestForeignKeyValueForAdd", field.name, formGroup.value[field.name])
+    //console.log("setLatestForeignKeyValueForAdd", field.name, formGroup.value[field.name])
     this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
   async loadForeignKeyEntities(entityConfig: any): Promise<any> {
@@ -141,7 +141,8 @@ export class EntitiesComponent implements OnInit {
     this.offset = this.offset - this.limit;
     this.loadEntries(this.getQuery());
   }
-  loadEntries(query: any) {
+  loadEntries(queryObj: any) {
+    const query = Object.assign({}, queryObj);
     query.offset = this.offset;
     query.limit = this.limit;
     this.loadingList = true;

@@ -21,14 +21,18 @@ export class ConfigSchemaService {
       return entity.plural === plural;
     })[0];
   }
+  getScheduleConfig() {
+    console.log("getScheduleConfig", this.schema.schedule);
+    return this.schema.schedule;
+  }
 
   loadSchema(target: string): Promise<any> {
     if (environment.targets[target].schemaPath) {
       this.backendApiService.configSchema(target).toPromise().then((schema: any) => {
-        console.log("GOT SCHEMA", target, schema);
+       
         this.schema = schema;
         this.target = target;
-        //console.log("DISPATCHING SCHEMA", schema);
+        console.log("SETTING SCHEMA", this.target, this.schema);
         if (schema) {
           this.entities$.next(schema.entities)
         }
@@ -37,8 +41,7 @@ export class ConfigSchemaService {
           target: target,
           schema: schema
         }));
-        /** */
-        //console.log("RETURING PROMISE with schema", schema);
+
         return Promise.resolve(schema);
       }).catch((err: any) => {
         console.log(err);

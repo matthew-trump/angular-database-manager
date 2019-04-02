@@ -36,6 +36,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { AppComponent } from './app.component';
 import { ConfigSchemaComponent } from './config-schema/config-schema.component';
 import { EntitiesComponent } from './entities/entities.component';
+import { ScheduleComponent } from './schedule/schedule.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { EntitiesComponent } from './entities/entities.component';
     LoginComponent,
     TestApiComponent,
     ConfigSchemaComponent,
-    EntitiesComponent
+    EntitiesComponent,
+    ScheduleComponent
   ],
   imports: [
     BrowserModule,
