@@ -18,13 +18,14 @@ import { ConfigStateReducer } from './config-state.reducer';
 import { LoginComponent } from './login/login.component';
 import { TestApiComponent } from './test-api/test-api.component';
 
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatMomentDateModule } from "@angular/material-moment-adapter";
 /**
 import { MatCheckboxModule} from '@angular/material';
 import { MatSidenavModule} from '@angular/material/sidenav';
-import { MatInputModule} from '@angular/material/input';
-import { MatFormFieldModule} from '@angular/material/form-field';
-import { MatDatepickerModule} from '@angular/material/datepicker';
-import { MatMomentDateModule } from "@angular/material-moment-adapter";
+
 
 
 import { MatTabsModule } from '@angular/material/tabs';
@@ -61,12 +62,13 @@ import { ScheduleComponent } from './schedule/schedule.component';
     MatTooltipModule,
     MatIconModule,
     MatSelectModule,
-    /** 
-    MatCheckboxModule,
     MatInputModule,
     MatFormFieldModule,
     MatDatepickerModule,
-    MatMomentDateModule ,
+    MatMomentDateModule,
+    /** 
+    MatCheckboxModule,
+   
     MatSelectModule,
     MatSidenavModule,
     MatMenuModule,

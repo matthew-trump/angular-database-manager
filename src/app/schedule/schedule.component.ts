@@ -7,10 +7,11 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
 import { environment } from 'src/environments/environment';
+import * as moment from 'moment';
 
 const DEFAULT_LIMIT: number = 50;
 const TARGETS: any = environment.targets;
-
+const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
 @Component({
   selector: 'app-schedule',
   templateUrl: './schedule.component.html',
@@ -18,10 +19,14 @@ const TARGETS: any = environment.targets;
 })
 export class ScheduleComponent implements OnInit {
 
+  public DATE_FORMAT = DATE_FORMAT;
+
   limit: number = DEFAULT_LIMIT;
   offset: number = 0;
   loadingList: boolean = false;
   formGroups: any = {};
+
+  zone: any;
 
   scheduleConfig: any;
   target: string;
@@ -38,6 +43,17 @@ export class ScheduleComponent implements OnInit {
 
   loading: any = {};
 
+  addScheduleItem: FormGroup;
+  added: number = 0;
+  addedThisSave: number = 0;
+
+  hours: any[number];
+  minutes: any[number];
+
+  schedule: any = {}
+
+
+
   unsubscribe$: Subject<null> = new Subject();
 
   constructor(public fb: FormBuilder,
@@ -46,6 +62,16 @@ export class ScheduleComponent implements OnInit {
     public backendApiService: BackendApiService) { }
 
   ngOnInit() {
+    this.zone = (moment()).utcOffset();
+
+    this.hours = Array(24).fill(1).map((value, index) => {
+      return index;
+    });
+
+    this.minutes = Array(60).fill(1).map((value, index) => {
+      return index;
+    });
+
     this.store
       .select("config")
       .pipe(
@@ -66,11 +92,13 @@ export class ScheduleComponent implements OnInit {
             }).map((selector: any) => {
               return this.configSchemaService.getEntityConfig(selector.entity);
             });
-
+            console.log("foreignKeyEntityConfigs", foreignKeyEntityConfigs);
             Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
               return this.loadForeignKeyEntities(foreignKeyEntityConfig);
             })).then((_) => {
-              this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap)
+
+              this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap);
+              console.log("FOREIGN KEYS", this.foreignKeys);
             }).then((_) => {
               this.loadSchedule({});
             })
@@ -88,47 +116,54 @@ export class ScheduleComponent implements OnInit {
     this.offset = this.offset - this.limit;
     this.loadSchedule(this.getQuery());
   }
-  edit(entity: any) {
-    const fbconfig: any = this.getFormConfig(entity);
+  edit(item: any) {
+
+    const fbconfig: any = this.getFormConfig(item);
     const group: FormGroup = this.fb.group(fbconfig);
-    this.formGroups[entity.id] = group;
+    this.formGroups[item.id] = group;
+  }
+  cancel(item: any) {
+    delete this.formGroups[item.id];
   }
   getQuery() {
     return {};
   }
-  getFormConfig(item: any) {
-    const fbconfig: any = {};
-    for (let i = 0, len = this.scheduleConfig.selectors.length; i < len; i++) {
-      const field: any = this.scheduleConfig.selectors[i];
-      fbconfig[field.name] = item[field.name] ? [item[field.name]] : [this.foreignKeyValueForAdd[field.name] ? this.foreignKeyValueForAdd[field.name] : ''];
-      if (field.required) {
-        fbconfig[field.name].push(Validators.required)
-      }
+
+  getScheduledItemFromFormGroup(formGroup: FormGroup) {
+    const base = formGroup.value.startDate;
+    base.hour(formGroup.value.startHour);
+    base.minute(formGroup.value.startMinute);
+
+    const startTime = base.utc().format(DATE_FORMAT);
+    console.log("SAVING WITH START TIME", base, startTime);
+    const scheduledItem: any = {
+      start: startTime,
+      number: formGroup.value.number,
+      pool: formGroup.value.pool,
     }
-    return fbconfig;
+    this.scheduleConfig.selectors.map((selector: any) => {
+      if (selector.type === 'foreignKey') {
+        scheduledItem[selector.name] = formGroup.value[selector.name]
+      }
+    });
+    return scheduledItem;
   }
-  save(item: any, index: number) {
-    const update: any = this.formGroups[item.id].value;
-    this.loading[item.id] = true;
-    this.backendApiService.updateScheduleItem(
-      this.target,
-      item.id,
-      update
-    )
-      .toPromise()
-      .then((result: any) => {
-        this.loading[item.id] = false;
-        this.result.items[index] = Object.assign({}, { id: item.id }, update);
-        this.items$.next(this.result.items);
-        delete this.formGroups[item.id];
-      })
-      .catch(err => {
-        console.log("ERROR NOT UPDATED", err);
-        this.loading[item.id] = false;
-        delete this.formGroups[item.id];
-      });
+  save(item: any) {
+    const scheduledItem = this.getScheduledItemFromFormGroup(this.formGroups[item.id]);
+    this.backendApiService.updateScheduleItem(this.target, item.id, scheduledItem).toPromise().then((_) => {
+      console.log("UPDATED SCHEDULE ITEM", item.id, scheduledItem);
+    }).catch(err => {
+      console.log(err);
+    })
 
-
+  }
+  saveNewScheduleItem() {
+    const scheduledItem = this.getScheduledItemFromFormGroup(this.addScheduleItem);
+    this.backendApiService.addScheduleItems(this.target, [scheduledItem]).toPromise().then((_) => {
+      console.log("ADDED SCHEDULE ITEM", scheduledItem);
+    }).catch(err => {
+      console.log(err);
+    })
   }
 
   loadSchedule(queryObj: any) {
@@ -140,7 +175,31 @@ export class ScheduleComponent implements OnInit {
       .toPromise().then((result: any) => {
         this.loadingList = false;
         this.result = result;
-        this.items$.next(this.result.items);
+        const items = this.result.items.map(raw => {
+          const item = {
+            id: raw.id,
+            start: moment.utc(raw.start).local(),
+            number: raw['number'],
+            pool: raw['pool']
+          };
+          console.log("PARSED", item.start);
+          this.scheduleConfig.selectors.map((selector: any) => {
+            if (selector.type === 'foreignKey') {
+              item[selector.name] = raw[selector.name];
+            }
+          });
+          return item;
+        }).sort((a: any, b: any) => {
+          return b.start.diff(a.start);
+        })
+        this.schedule = {
+          query: this.result.query,
+          items: items
+        }
+        this.items$.next(items);
+
+
+
       }).catch((err) => {
         this.loadingList = false;
         console.log(err);
@@ -162,7 +221,48 @@ export class ScheduleComponent implements OnInit {
   }
   setAdding(adding: boolean) {
     this.adding = adding;
+    if (adding) {
+      this.addScheduleItem = this.fb.group(this.getFormConfig({}));
+      this.added = 0;
+      this.addedThisSave = 0;
+    } else {
+      delete this.addScheduleItem;
+      this.loadSchedule({});
+    }
   }
+  getFormConfig(item: any) {
+    const fbconfig: any = {};
+    for (let i = 0, len = this.scheduleConfig.selectors.length; i < len; i++) {
+      const selector: any = this.scheduleConfig.selectors[i];
+
+      const time: any = item[this.scheduleConfig.start] ? item[this.scheduleConfig.start] : moment().add(this.scheduleConfig.defaultStartOffsetMinutes, 'minutes');
+      console.log("MOMENT", time, time.hour(), time.minute());
+      console.log("DEFAULT", selector.name, selector.default);
+
+      fbconfig[selector.name] = typeof item[selector.name] !== 'undefined' ?
+        [item[selector.name]]
+        : typeof this.foreignKeyValueForAdd[selector.name] !== 'undefined' ?
+          [this.foreignKeyValueForAdd[selector.name]] : typeof time !== 'undefined' ?
+            selector.type === 'date' ? [time] :
+              selector.type === 'hour' ? [time.hour()] :
+                selector.type === 'minute' ? [time.minute()] :
+                  [selector.default] : [''];
+
+
+
+      if (selector.required) {
+        fbconfig[selector.name].push(Validators.required)
+      }
+    }
+
+    return fbconfig;
+  }
+  setLatestForeignKeyValueForAdd(formGroup: FormGroup, field: any) {
+    this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
+  }
+
+
+
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();

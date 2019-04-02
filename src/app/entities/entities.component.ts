@@ -100,7 +100,6 @@ export class EntitiesComponent implements OnInit {
 
   }
   setLatestForeignKeyValueForAdd(formGroup: FormGroup, field: any) {
-    //console.log("setLatestForeignKeyValueForAdd", field.name, formGroup.value[field.name])
     this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
   async loadForeignKeyEntities(entityConfig: any): Promise<any> {
