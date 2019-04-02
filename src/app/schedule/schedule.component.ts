@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router';
 import { tap, takeUntil, switchMap, filter, debounceTime } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
 import { environment } from 'src/environments/environment';
@@ -21,6 +21,7 @@ export class ScheduleComponent implements OnInit {
 
   public DATE_FORMAT = DATE_FORMAT;
 
+  now$: BehaviorSubject<any>;
   limit: number = DEFAULT_LIMIT;
   offset: number = 0;
   loadingList: boolean = false;
@@ -31,7 +32,7 @@ export class ScheduleComponent implements OnInit {
   scheduleConfig: any;
   target: string;
   adding: boolean = false;
-
+  editing: boolean = false;
   result: any;
 
   items$: BehaviorSubject<any[]> = new BehaviorSubject(null);
@@ -51,7 +52,7 @@ export class ScheduleComponent implements OnInit {
   minutes: any[number];
 
   schedule: any = {}
-
+  timeFlags: any = {}
 
 
   unsubscribe$: Subject<null> = new Subject();
@@ -62,7 +63,12 @@ export class ScheduleComponent implements OnInit {
     public backendApiService: BackendApiService) { }
 
   ngOnInit() {
+    this.now$ = new BehaviorSubject(moment());
     this.zone = (moment()).utcOffset();
+    setInterval(() => {
+      this.now$.next(moment());
+      this.resetTimeFlags();
+    }, 60000);
 
     this.hours = Array(24).fill(1).map((value, index) => {
       return index;
@@ -117,25 +123,47 @@ export class ScheduleComponent implements OnInit {
     this.loadSchedule(this.getQuery());
   }
   edit(item: any) {
-
+    this.formGroups = {}; //allows editing only one at a time
+    this.editing = true;
     const fbconfig: any = this.getFormConfig(item);
     const group: FormGroup = this.fb.group(fbconfig);
     this.formGroups[item.id] = group;
   }
   cancel(item: any) {
+    this.editing = false;
     delete this.formGroups[item.id];
   }
   getQuery() {
     return {};
   }
+  resetTimeFlags() {
+    let foundCurrent = false;
+    let now = moment();
+    this.timeFlags = {};
+    this.schedule.items.map((item: any) => {
+      if (now.diff(item.start) < 0) {
+        this.timeFlags[item.id] = -1;
+      } else if (!foundCurrent) {
+        this.timeFlags[item.id] = 0;
+        foundCurrent = true;
+      } else {
+        this.timeFlags[item.id] = 1
+      }
+    });
 
+  }
   getScheduledItemFromFormGroup(formGroup: FormGroup) {
-    const base = formGroup.value.startDate;
+    //console.log("GETTING SCHEDULED ITEM", formGroup.value);
+    const base = moment(formGroup.value.startDate);
     base.hour(formGroup.value.startHour);
     base.minute(formGroup.value.startMinute);
 
+    if ((moment()).diff(base) > 0) {
+      throw new Error("The start date must be in the future.")
+    }
+
     const startTime = base.utc().format(DATE_FORMAT);
-    console.log("SAVING WITH START TIME", base, startTime);
+    //console.log("SAVING WITH START TIME", base, startTime);
     const scheduledItem: any = {
       start: startTime,
       number: formGroup.value.number,
@@ -148,19 +176,46 @@ export class ScheduleComponent implements OnInit {
     });
     return scheduledItem;
   }
+  delete(item: any) {
+    if (window.confirm("delete this item?")) {
+      this.backendApiService.deleteScheduleItem(this.target, item.id).toPromise().then(_ => {
+        this.loadSchedule({});
+      }).catch(err => {
+        console.log(err);
+      })
+    }
+  }
   save(item: any) {
-    const scheduledItem = this.getScheduledItemFromFormGroup(this.formGroups[item.id]);
+    let scheduledItem: any;
+    try {
+      scheduledItem = this.getScheduledItemFromFormGroup(this.formGroups[item.id]);
+    } catch (err) {
+      window.alert(err.message);
+      return;
+    }
+
     this.backendApiService.updateScheduleItem(this.target, item.id, scheduledItem).toPromise().then((_) => {
+      this.cancel(item);
+
       console.log("UPDATED SCHEDULE ITEM", item.id, scheduledItem);
+      this.loadSchedule({});
     }).catch(err => {
       console.log(err);
     })
 
   }
   saveNewScheduleItem() {
-    const scheduledItem = this.getScheduledItemFromFormGroup(this.addScheduleItem);
+    let scheduledItem: any;
+    try {
+      scheduledItem = this.getScheduledItemFromFormGroup(this.addScheduleItem);
+    } catch (err) {
+      window.alert(err.message);
+      return;
+    }
     this.backendApiService.addScheduleItems(this.target, [scheduledItem]).toPromise().then((_) => {
       console.log("ADDED SCHEDULE ITEM", scheduledItem);
+      this.setAdding(false);
+      this.loadSchedule({});
     }).catch(err => {
       console.log(err);
     })
@@ -197,7 +252,7 @@ export class ScheduleComponent implements OnInit {
           items: items
         }
         this.items$.next(items);
-
+        this.resetTimeFlags();
 
 
       }).catch((err) => {

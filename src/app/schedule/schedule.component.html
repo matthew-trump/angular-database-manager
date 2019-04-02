@@ -1,159 +1,171 @@
 <h2>Schedule</h2>
+<ng-container *ngIf="(now$ | async) as now">
+  <ng-container *ngIf="scheduleConfig && adding">
+    <input type="button" value="cancel" (click)="setAdding(false)">
+    <input type="button" value="save" (click)="saveNewScheduleItem()" [disabled]="!addScheduleItem.valid">
+    <form [formGroup]="addScheduleItem">
 
-<ng-container *ngIf="scheduleConfig && adding">
-  <input type="button" value="cancel" (click)="setAdding(false)">
-  <input type="button" value="save" (click)="saveNewScheduleItem()" [disabled]="!addScheduleItem.valid">
-  <form [formGroup]="addScheduleItem">
+
+      <ng-container *ngFor="let selector of scheduleConfig.selectors">
+
+        <ng-container *ngIf="selector.type==='foreignKey'">
+          <select [formControlName]="selector.name" (change)="setLatestForeignKeyValueForAdd(addScheduleItem,selector)">
+            <ng-container *ngIf="selector.nullValue">
+              <option [value]="selector.default">{{selector.nullValue}}</option>
+            </ng-container>
+            <option *ngFor="let entity of foreignKeyEntities[selector.entity]" [value]="entity.id">
+              {{entity[selector.label]}}
+            </option>
+          </select>
+        </ng-container>
+
+        <ng-container *ngIf="selector.type==='quantity'">
+          <input [formControlName]="selector.name" type="number" size="5" [placeholder]="selector.name">
+        </ng-container>
+
+        <ng-container *ngIf="selector.type==='date'">
+          <mat-form-field>
+            <input matInput [min]="now" [formControlName]="selector.name" [matDatepicker]="picker"
+              [placeholder]="selector.placeholder">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </ng-container>
+
+        <ng-container *ngIf="selector.type==='hour'">
+          <select [formControlName]="selector.name">
+            <option *ngFor="let h of hours" [value]="h">
+              {{h | number : '2.0-0'}}
+            </option>
+          </select>
+        </ng-container>
+
+        <ng-container *ngIf="selector.type==='minute'">
+          <select [formControlName]="selector.name">
+            <option *ngFor="let m of minutes" [value]="m">
+              :{{m | number : '2.0-0'}}
+            </option>
+          </select>
+        </ng-container>
 
 
-    <ng-container *ngFor="let selector of scheduleConfig.selectors">
 
-      <ng-container *ngIf="selector.type==='foreignKey'">
-        <select [formControlName]="selector.name" (change)="setLatestForeignKeyValueForAdd(addScheduleItem,selector)">
-          <ng-container *ngIf="selector.nullValue">
-            <option [value]="selector.default">{{selector.nullValue}}</option>
-          </ng-container>
-          <option *ngFor="let entity of foreignKeyEntities[selector.entity]" [value]="entity.id">
-            {{entity[selector.label]}}
-          </option>
-        </select>
+
+
+
       </ng-container>
-
-      <ng-container *ngIf="selector.type==='quantity'">
-        <input [formControlName]="selector.name" type="number" size="5" [placeholder]="selector.name">
-      </ng-container>
-
-      <ng-container *ngIf="selector.type==='date'">
-        <mat-form-field>
-          <input matInput [formControlName]="selector.name" [matDatepicker]="picker"
-            [placeholder]="selector.placeholder">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-      </ng-container>
-
-      <ng-container *ngIf="selector.type==='hour'">
-        <select [formControlName]="selector.name">
-          <option *ngFor="let h of hours" [value]="h">
-            {{h | number : '2.0-0'}}
-          </option>
-        </select>
-      </ng-container>
-
-      <ng-container *ngIf="selector.type==='minute'">
-        <select [formControlName]="selector.name">
-          <option *ngFor="let m of minutes" [value]="m">
-            :{{m | number : '2.0-0'}}
-          </option>
-        </select>
-      </ng-container>
-
-
-
-
-
-
-    </ng-container>
-    <span>zone GMT-{{zone/60}}</span>
-  </form>
+      <span>zone GMT-{{zone/60}}</span>
+    </form>
+  </ng-container>
 </ng-container>
 
 <ng-container *ngIf="!adding">
   <input type="button" value="add" (click)="setAdding(true)">
 </ng-container>
 
+<div *ngIf="(now$ | async) as now">
+  <div *ngIf="(items$|async) as items">
+    <ol [start]="schedule.query.offset+1">
+      <ng-container *ngFor="let item of items; let i=index">
+        <ng-container *ngIf="!formGroups[item.id]">
+          <li class="displaying"
+            [ngClass]="{'future' : 0>timeFlags[item.id], 'current':0===timeFlags[item.id],  'completed':timeFlags[item.id]>0  }">
 
-<div *ngIf="(items$|async) as items">
-  <ol [start]="schedule.query.offset+1">
-    <ng-container *ngFor="let item of items; let i=index">
-      <ng-container *ngIf="!formGroups[item.id]">
-        <li class="displaying">
-
-
-          <ng-container *ngFor="let selector of scheduleConfig.selectors">
-
-            <ng-container *ngIf="selector.type==='foreignKey'">
-              <ng-container *ngIf="foreignKeyEntitiesIdMap[selector.entity]">
-                <div [ngClass]="selectorentity">
-                  <ng-container *ngIf="item[selector.name] as id">
-                    {{foreignKeyEntitiesIdMap[selector.entity][id][selector.label]}}
-                  </ng-container>
-                  <ng-container *ngIf="!item[selector.name]">
-                    any
-                  </ng-container>
-                </div>
-              </ng-container>
-            </ng-container>
-
-            <ng-container *ngIf="selector.type==='quantity'">
-              <div>{{item[selector.name]}}</div>
-
-            </ng-container>
-
-
-
-
-            <ng-container *ngIf="selector.type==='date'">
-              {{item.start.format('M/DD/YYYY HH:mm')}}
-            </ng-container>
-
-
-          </ng-container>
-          <span class="edit">
-            <a (click)="edit(item)">edit</a>
-          </span>
-
-        </li>
-      </ng-container>
-      <ng-container *ngIf="formGroups[item.id]">
-        <li class="editing">
-          <form [formGroup]="formGroups[item.id]">
 
             <ng-container *ngFor="let selector of scheduleConfig.selectors">
 
               <ng-container *ngIf="selector.type==='foreignKey'">
-                <select [formControlName]="selector.name"
-                  (change)="setLatestForeignKeyValueForAdd(formGroups[item.id],selector)">
-                  <ng-container *ngIf="selector.nullValue">
-                    <option [value]="selector.default">{{selector.nullValue}}</option>
-                  </ng-container>
-                  <option *ngFor="let entity of foreignKeyEntities[selector.entity]" [value]="entity.id">
-                    {{entity[selector.label]}}
-                  </option>
-                </select>
+                <ng-container *ngIf="foreignKeyEntitiesIdMap[selector.entity]">
+                  <div [ngClass]="selectorentity">
+                    <ng-container *ngIf="item[selector.name] as id">
+                      {{foreignKeyEntitiesIdMap[selector.entity][id][selector.label]}}
+                    </ng-container>
+                    <ng-container *ngIf="!item[selector.name]">
+                      any
+                    </ng-container>
+                  </div>
+                </ng-container>
               </ng-container>
 
               <ng-container *ngIf="selector.type==='quantity'">
-                <input [formControlName]="selector.name" type="number" size="5" [placeholder]="selector.name">
+                <div>{{item[selector.name]}}</div>
+
               </ng-container>
+
 
 
 
               <ng-container *ngIf="selector.type==='date'">
-                <mat-form-field>
-                  <input matInput [formControlName]="selector.name" [matDatepicker]="picker"
-                    [placeholder]="selector.placeholder">
-                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
+                {{item.start.format('M/DD/YYYY HH:mm')}}
               </ng-container>
 
-              <ng-container *ngIf="selector.type==='hour'">
-                <select [formControlName]="selector.name">
-                  <option *ngFor="let h of hours" [value]="h">
-                    {{h | number : '2.0-0'}}
-                  </option>
-                </select>
-              </ng-container>
 
-              <ng-container *ngIf="selector.type==='minute'">
-                <select [formControlName]="selector.name">
-                  <option *ngFor="let m of minutes" [value]="m">
-                    :{{m | number : '2.0-0'}}
-                  </option>
-                </select>
-              </ng-container>
-              <!--
+            </ng-container>
+            <ng-container *ngIf="0>now.diff(item.start)">
+
+              <span class="edit">
+                <a (click)="edit(item)">edit</a>
+              </span>
+
+              <span class="edit delete">
+                <a (click)="delete(item)">delete</a>
+              </span>
+            </ng-container>
+            <span>
+              {{now.diff(item.start)}}:: {{timeFlags[item.id]}}
+            </span>
+
+          </li>
+        </ng-container>
+        <ng-container *ngIf="formGroups[item.id]">
+          <li class="editing">
+            <form [formGroup]="formGroups[item.id]">
+
+              <ng-container *ngFor="let selector of scheduleConfig.selectors">
+
+                <ng-container *ngIf="selector.type==='foreignKey'">
+                  <select [formControlName]="selector.name"
+                    (change)="setLatestForeignKeyValueForAdd(formGroups[item.id],selector)">
+                    <ng-container *ngIf="selector.nullValue">
+                      <option [value]="selector.default">{{selector.nullValue}}</option>
+                    </ng-container>
+                    <option *ngFor="let entity of foreignKeyEntities[selector.entity]" [value]="entity.id">
+                      {{entity[selector.label]}}
+                    </option>
+                  </select>
+                </ng-container>
+
+                <ng-container *ngIf="selector.type==='quantity'">
+                  <input [formControlName]="selector.name" type="number" size="5" [placeholder]="selector.name">
+                </ng-container>
+
+
+
+                <ng-container *ngIf="selector.type==='date'">
+                  <mat-form-field>
+                    <input matInput [min]="now" [formControlName]="selector.name" [matDatepicker]="picker"
+                      [placeholder]="selector.placeholder">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+                </ng-container>
+
+                <ng-container *ngIf="selector.type==='hour'">
+                  <select [formControlName]="selector.name">
+                    <option *ngFor="let h of hours" [value]="h">
+                      {{h | number : '2.0-0'}}
+                    </option>
+                  </select>
+                </ng-container>
+
+                <ng-container *ngIf="selector.type==='minute'">
+                  <select [formControlName]="selector.name">
+                    <option *ngFor="let m of minutes" [value]="m">
+                      :{{m | number : '2.0-0'}}
+                    </option>
+                  </select>
+                </ng-container>
+                <!--
 
               <ng-container *ngIf="select.foreignKey">
                 <select [formControlName]="field.name">
@@ -167,19 +179,20 @@
                 <input type="text" [formControlName]="field.name">
               </ng-container>
               -->
-            </ng-container>
+              </ng-container>
 
-            <span class="edit">
-              <input type="button" (click)="save(item,i)" value="save"
-                [disabled]="formGroups[item.id].pristine || loading[item.id]">
-            </span>
-            <span class="edit">
-              <input type="button" (click)="cancel(item)" value="cancel" [disabled]="loading[item.id]">
-            </span>
+              <span class="edit">
+                <input type="button" (click)="save(item,i)" value="save"
+                  [disabled]="formGroups[item.id].pristine || loading[item.id]">
+              </span>
+              <span class="edit">
+                <input type="button" (click)="cancel(item)" value="cancel" [disabled]="loading[item.id]">
+              </span>
 
-          </form>
-        </li>
+            </form>
+          </li>
+        </ng-container>
       </ng-container>
-    </ng-container>
-  </ol>
+    </ol>
+  </div>
 </div>
