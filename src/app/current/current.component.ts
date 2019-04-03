@@ -1,21 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { tap, takeUntil, filter, } from 'rxjs/operators';
+import { tap, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
+import { environment } from 'src/environments/environment';
 import * as moment from 'moment';
 
 const DEFAULT_LIMIT: number = 50;
 const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
+const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
 
 @Component({
   selector: 'app-current',
   templateUrl: './current.component.html',
   styleUrls: ['./current.component.scss']
 })
-export class CurrentComponent implements OnInit {
+export class CurrentComponent implements OnInit, OnDestroy {
 
   public DATE_FORMAT = DATE_FORMAT;
 
@@ -48,6 +50,7 @@ export class CurrentComponent implements OnInit {
   timeFlags: any = {}
 
   unsubscribe$: Subject<null> = new Subject();
+  currentScheduleLoader: any;
 
   constructor(public store: Store<any>,
     public configSchemaService: ConfigSchemaService,
@@ -70,10 +73,10 @@ export class CurrentComponent implements OnInit {
                   this.foreignKeyEntities = result[0].entities;
                   this.foreignKeyEntitiesIdMap = result[0].idMap;
                   this.loadCurrentScheduledItem();
-                  setInterval(() => {
+                  this.currentScheduleLoader = setInterval(() => {
                     this.now$.next(moment());
                     this.loadCurrentScheduledItem();
-                  }, 60000);
+                  }, CURRENT_SCHEDULER_LOADER_INTERVAL);
                 }
               })
           }
@@ -84,8 +87,13 @@ export class CurrentComponent implements OnInit {
 
   loadCurrentScheduledItem() {
     this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
-      console.log("CURRENT", current)
+      console.log("CURRENT", current);
       this.current$.next(current);
     })
+  }
+  ngOnDestroy() {
+    clearInterval(this.currentScheduleLoader);
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }

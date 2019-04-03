@@ -1,7 +1,7 @@
 export const environment = {
 
   production: false,
-
+  currentSchedulerLoaderInterval: 30000,
   defaultTarget: "local",
   targets: {
     local: {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { tap, takeUntil, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
@@ -7,6 +7,7 @@ import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
 import { environment } from 'src/environments/environment';
 import * as moment from 'moment';
+const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
 
 
 const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
@@ -15,7 +16,7 @@ const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
   templateUrl: './schedule.component.html',
   styleUrls: ['./schedule.component.scss']
 })
-export class ScheduleComponent implements OnInit {
+export class ScheduleComponent implements OnInit, OnDestroy {
 
   public DATE_FORMAT = DATE_FORMAT;
 
@@ -49,13 +50,19 @@ export class ScheduleComponent implements OnInit {
   added: number = 0;
   addedThisSave: number = 0;
 
-  hours: any[number];
-  minutes: any[number];
+  hours: any = Array(24).fill(1).map((_, index) => {
+    return index;
+  });
+
+  minutes: any = Array(60).fill(1).map((_, index) => {
+    return index;
+  });
+
 
   schedule: any = {}
   timeFlags: any = {}
 
-
+  currentScheduleLoader: any;
   unsubscribe$: Subject<null> = new Subject();
 
   constructor(public fb: FormBuilder,
@@ -64,20 +71,7 @@ export class ScheduleComponent implements OnInit {
     public backendApiService: BackendApiService) { }
 
   ngOnInit() {
-    this.now$ = new BehaviorSubject(moment());
-    this.zone = (moment()).utcOffset();
-    setInterval(() => {
-      this.now$.next(moment());
-      this.loadCurrentScheduledItem();
-    }, 60000);
 
-    this.hours = Array(24).fill(1).map((_, index) => {
-      return index;
-    });
-
-    this.minutes = Array(60).fill(1).map((_, index) => {
-      return index;
-    });
 
     this.store
       .select("config")
@@ -95,6 +89,14 @@ export class ScheduleComponent implements OnInit {
                   this.config = this.configSchemaService.getScheduleConfig();
                   this.loadSchedule({});
                   this.loadCurrentScheduledItem();
+
+                  this.zone = (moment()).utcOffset();
+                  this.now$ = new BehaviorSubject(moment());
+                  this.currentScheduleLoader = setInterval(() => {
+                    this.now$.next(moment());
+                    this.loadCurrentScheduledItem();
+                  }, CURRENT_SCHEDULER_LOADER_INTERVAL);
+
                 }
               })
           }
@@ -292,6 +294,7 @@ export class ScheduleComponent implements OnInit {
   }
   loadCurrentScheduledItem() {
     this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
+      console.log("CURRENT", current);
       this.current$.next(current);
       this.current = current;
       this.resetTimeFlags();
@@ -300,6 +303,7 @@ export class ScheduleComponent implements OnInit {
 
 
   ngOnDestroy() {
+    clearInterval(this.currentScheduleLoader);
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
