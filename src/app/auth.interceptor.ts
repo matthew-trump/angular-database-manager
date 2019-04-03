@@ -18,7 +18,6 @@ export class AuthInterceptor implements HttpInterceptor {
         l.href = req.url;
 
         const target: any = environment.targets[this.authService.getCurrentTarget()];
-        //console.log(l.pathname,target)
         if (l.pathname.startsWith(target.apiPath)) {
             const idToken = localStorage.getItem("id_token");
             if (idToken) {

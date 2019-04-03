@@ -1,6 +1,112 @@
+ul{
+
+list-style-type: none;
+}
+.index{
+    width: 1.5em;
+    color: #ccc;
+    padding-right: 0.5em;
+    text-align: right;
+    span{
+        font-size: 0.8em;
+    }
+}
+.showing{
+    font-size: 0.8em; 
+    color: #666;
+    margin-bottom: 0.2em;
+}
 li.current{
+    border: 1px solid forestgreen !important;
     color: forestgreen;
 }
 li.completed{
     color:#777;
+}
+li.displaying{
+   
+    margin-bottom: 0.5em;
+    padding: 0.2em;
+    padding-left: 0em;
+    border: 1px solid #ccc;
+    display: flex;
+
+    .foreignKey{
+        width: 10em;
+    }
+    .quantity{
+        width: 3em;
+        span{
+            font-size: 0.8em;
+        }
+    }
+    .date{
+        width: 10em;
+    }
+    .edit{
+        a{
+            font-size: 0.8em;
+            color: #666;
+            cursor: default;
+        }
+        a:link{
+            color: #666;
+         
+        }
+        a:hover{
+            color: goldenrod;
+            
+        }
+    }
+    .delete{
+        margin-left: 5em;
+    }
+}
+li.editing{
+    margin-bottom: 0.5em;
+    padding: 0.2em;
+    border: 1px solid goldenrod;
+    padding-left: 1.5em;
+    .index{
+        width: 2em;
+        color: #ccc;
+        padding-left: 0.3em;
+        text-align: right;
+    }
+    form{
+        align-items: center;
+        padding: 0em;
+        display: flex;
+    }
+    .foreignKey{
+       
+        width: 10em;
+    }
+    .quantity{
+        width: 3em; 
+        input[type=number] {
+            width: 3em;
+        }
+    }
+    .date{
+        width: 10em;
+    }
+    .edit{
+        padding-left: 1.5em;
+        a{
+            font-size: 0.8em;
+            color: #666;
+            cursor: default;
+        }
+        a:link{
+            color: #666;
+         
+        }
+        a:hover{
+            color: goldenrod;
+            
+        }
+    }
+
+
 }

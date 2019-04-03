@@ -3,7 +3,8 @@ import { BackendApiService } from './backend-api.service';
 import { environment } from '../environments/environment';
 import { Store } from '@ngrx/store';
 import { ConfigStateAction } from './config-state.action';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import * as moment from 'moment';
 @Injectable({
   providedIn: 'root'
 })
@@ -22,7 +23,6 @@ export class ConfigSchemaService {
     })[0];
   }
   getScheduleConfig() {
-    console.log("getScheduleConfig", this.schema.schedule);
     return this.schema.schedule;
   }
 
@@ -54,4 +54,50 @@ export class ConfigSchemaService {
     }
 
   }
+
+  async loadForeignKeys(): Promise<any> {
+    const scheduleConfig = this.getScheduleConfig();
+    if (scheduleConfig) {
+      const foreignKeyEntityConfigs: any[] = scheduleConfig.selectors.filter((selector: any) => {
+        return selector.type === "foreignKey";
+      }).map((selector: any) => {
+        return this.getEntityConfig(selector.entity);
+      });
+      return Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
+        return this.loadForeignKeyEntities(foreignKeyEntityConfig);
+      }))
+    }
+    return Promise.resolve(null)
+  }
+  async loadForeignKeyEntities(entityConfig: any): Promise<any> {
+    const foreignKeyEntities: any = {};
+    const foreignKeyEntitiesIdMap: any = {};
+    const plural: string = entityConfig.plural;
+    const retobj: any = await this.backendApiService.getEntities(this.target, plural).toPromise();
+    const entityList: any[] = retobj.entities;
+    if (entityList) {
+      foreignKeyEntities[plural] = entityList;
+      foreignKeyEntitiesIdMap[plural] = entityList.reduce((obj: any, entry: any) => {
+        obj[entry.id] = entry;
+        return obj;
+      }, {});
+    }
+    return Promise.resolve({
+      entities: foreignKeyEntities, idMap: foreignKeyEntitiesIdMap
+    });
+  }
+  async loadCurrentScheduledItem(): Promise<any> {
+    const result: any = await this.backendApiService.getCurrentScheduleItem(this.target).toPromise();
+    const current: any = Object.assign({}, result.current);
+    delete current.start;
+    if (result.current) {
+      current.start = moment.utc(result.current.start).local();
+    }
+    if (result.next) {
+      current.end = moment.utc(result.next.start).local();
+    }
+    return Promise.resolve(current);
+
+  }
 }
+

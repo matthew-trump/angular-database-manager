@@ -1,16 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { tap, takeUntil, switchMap, filter, debounceTime } from 'rxjs/operators';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { tap, takeUntil, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { Subject, Observable, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
 import { environment } from 'src/environments/environment';
 import * as moment from 'moment';
 
-const DEFAULT_LIMIT: number = 50;
-const TARGETS: any = environment.targets;
+
 const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
 @Component({
   selector: 'app-schedule',
@@ -39,8 +37,8 @@ export class ScheduleComponent implements OnInit {
   result: any;
 
   items$: BehaviorSubject<any[]> = new BehaviorSubject(null);
-  foreignKeyEntityConfigMap: any = {};
-  foreignKeys: any[];
+
+
   foreignKeyEntities: any = {}
   foreignKeyEntitiesIdMap: any = {};
   foreignKeyValueForAdd: any = {};
@@ -84,29 +82,20 @@ export class ScheduleComponent implements OnInit {
     this.store
       .select("config")
       .pipe(
-        filter((state: any) => {
-          return state.target !== null;
-        }),
         tap((state: any) => {
-          this.target = state.target;
-        }),
-        tap((_: any) => {
-          this.formGroups = {};
-          this.scheduleConfig = this.configSchemaService.getScheduleConfig();
-          if (this.scheduleConfig) {
-            const foreignKeyEntityConfigs: any[] = this.scheduleConfig.selectors.filter((selector: any) => {
-              return selector.type === "foreignKey";
-            }).map((selector: any) => {
-              return this.configSchemaService.getEntityConfig(selector.entity);
-            });
-            Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
-              return this.loadForeignKeyEntities(foreignKeyEntityConfig);
-            })).then((_) => {
-              this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap);
-            }).then((_) => {
-              this.loadSchedule({});
-              this.loadCurrentScheduledItem();
-            })
+          if (state.target !== null) {
+            this.configSchemaService.loadForeignKeys()
+              .then(result => {
+                if (result && result[0]) {
+                  this.formGroups = {};
+                  this.target = state.target;
+                  this.scheduleConfig = this.configSchemaService.getScheduleConfig();
+                  this.foreignKeyEntities = result[0].entities;
+                  this.foreignKeyEntitiesIdMap = result[0].idMap;
+                  this.loadSchedule({});
+                  this.loadCurrentScheduledItem();
+                }
+              })
           }
         }),
         takeUntil(this.unsubscribe$)
@@ -256,20 +245,7 @@ export class ScheduleComponent implements OnInit {
         console.log(err);
       });
   }
-  async loadForeignKeyEntities(entityConfig: any): Promise<any> {
-    const plural: string = entityConfig.plural;
-    this.foreignKeyEntityConfigMap[plural] = entityConfig;
-    const retobj: any = await this.backendApiService.getEntities(this.target, plural).toPromise();
-    const entityList: any[] = retobj.entities;
-    if (entityList) {
-      this.foreignKeyEntities[plural] = entityList;
-      this.foreignKeyEntitiesIdMap[plural] = entityList.reduce((obj: any, entry: any) => {
-        obj[entry.id] = entry;
-        return obj;
-      }, {});
-    }
-    return Promise.resolve(true);
-  }
+
   setAdding(adding: boolean) {
     this.adding = adding;
     if (adding) {
@@ -310,21 +286,11 @@ export class ScheduleComponent implements OnInit {
     this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
   loadCurrentScheduledItem() {
-    this.backendApiService.getCurrentScheduleItem(this.target).toPromise().then((result: any) => {
-      const current: any = Object.assign({}, result.current);
-      delete current.start;
-      if (result.current) {
-        current.start = moment.utc(result.current.start).local();
-      }
-      if (result.next) {
-        current.end = moment.utc(result.next.start).local();
-      }
-      this.current = current;
+    this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
       this.current$.next(current);
+      this.current = current;
       this.resetTimeFlags();
-    }).catch((err) => {
-      console.log(err);
-    });
+    })
   }
 
 
