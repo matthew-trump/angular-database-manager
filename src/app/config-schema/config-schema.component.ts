@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Subject, Observable, of } from 'rxjs';
-import { tap, takeUntil, switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-config-schema',
@@ -11,7 +11,6 @@ import { tap, takeUntil, switchMap } from 'rxjs/operators';
 export class ConfigSchemaComponent implements OnInit {
 
   schema$: Observable<any>;
-  //unsubscribe$: Subject<null> = new Subject();
 
   constructor(
     public store: Store<any>
@@ -20,17 +19,11 @@ export class ConfigSchemaComponent implements OnInit {
 
     this.schema$ = this.store.select("config")
       .pipe(
-        tap((state: any) => {
-          console.log("STATE SCHEMA", state);
-        }),
+        tap((state: any) => { }),
         switchMap((state: any) => {
           return of(state.schema)
         })
       )
-    /**  */
   }
-  ngOnDestroy() {
-    // this.unsubscribe$.next();
-    //this.unsubscribe$.complete();
-  }
+  ngOnDestroy() { }
 }

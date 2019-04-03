@@ -14,7 +14,11 @@ export class AppComponent {
     public authService: AuthService,
     public configSchemaService: ConfigSchemaService,
     private router: Router) {
-    this.authService.loadCurrentSchema();
+    this.authService.loadCurrentSchema().then(loaded => {
+      if (!loaded) {
+        this.router.navigate(['login']);
+      }
+    });
 
   }
 

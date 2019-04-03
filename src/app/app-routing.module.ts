@@ -4,6 +4,7 @@ import { AuthGuard } from './auth.guard';
 import { LoginComponent } from './login/login.component';
 import { EntitiesComponent } from './entities/entities.component';
 import { ScheduleComponent } from './schedule/schedule.component';
+import { CurrentComponent } from './current/current.component';
 import { TestApiComponent } from './test-api/test-api.component';
 import { ConfigSchemaComponent } from './config-schema/config-schema.component';
 
@@ -23,6 +24,9 @@ const routes: Routes = [
             { path: '', component: ScheduleComponent, pathMatch: 'full' },
             { path: ':id', component: ScheduleComponent }
         ]
+    },
+    {
+        path: 'current', canActivate: [AuthGuard], component: CurrentComponent
     },
 
 ];

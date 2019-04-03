@@ -22,8 +22,11 @@ export class ScheduleComponent implements OnInit {
   public DATE_FORMAT = DATE_FORMAT;
 
   now$: BehaviorSubject<any>;
-  limit: number = DEFAULT_LIMIT;
+  current$: BehaviorSubject<any> = new BehaviorSubject(null);
+  current: any;
+  limit: number = 5;//DEFAULT_LIMIT;
   offset: number = 0;
+
   loadingList: boolean = false;
   formGroups: any = {};
 
@@ -67,14 +70,14 @@ export class ScheduleComponent implements OnInit {
     this.zone = (moment()).utcOffset();
     setInterval(() => {
       this.now$.next(moment());
-      this.resetTimeFlags();
+      this.loadCurrentScheduledItem();
     }, 60000);
 
-    this.hours = Array(24).fill(1).map((value, index) => {
+    this.hours = Array(24).fill(1).map((_, index) => {
       return index;
     });
 
-    this.minutes = Array(60).fill(1).map((value, index) => {
+    this.minutes = Array(60).fill(1).map((_, index) => {
       return index;
     });
 
@@ -91,25 +94,20 @@ export class ScheduleComponent implements OnInit {
           this.formGroups = {};
           this.scheduleConfig = this.configSchemaService.getScheduleConfig();
           if (this.scheduleConfig) {
-
-
             const foreignKeyEntityConfigs: any[] = this.scheduleConfig.selectors.filter((selector: any) => {
               return selector.type === "foreignKey";
             }).map((selector: any) => {
               return this.configSchemaService.getEntityConfig(selector.entity);
             });
-            console.log("foreignKeyEntityConfigs", foreignKeyEntityConfigs);
             Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
               return this.loadForeignKeyEntities(foreignKeyEntityConfig);
             })).then((_) => {
-
               this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap);
-              console.log("FOREIGN KEYS", this.foreignKeys);
             }).then((_) => {
               this.loadSchedule({});
+              this.loadCurrentScheduledItem();
             })
           }
-
         }),
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
@@ -137,23 +135,23 @@ export class ScheduleComponent implements OnInit {
     return {};
   }
   resetTimeFlags() {
-    let foundCurrent = false;
-    let now = moment();
-    this.timeFlags = {};
-    this.schedule.items.map((item: any) => {
-      if (now.diff(item.start) < 0) {
-        this.timeFlags[item.id] = -1;
-      } else if (!foundCurrent) {
-        this.timeFlags[item.id] = 0;
-        foundCurrent = true;
-      } else {
-        this.timeFlags[item.id] = 1
-      }
-    });
+
+    if (this.schedule.items && this.current) {
+      this.timeFlags = {
+        [this.current.id]: 0
+      };
+      this.schedule.items.map((item: any) => {
+        if (this.current.start.diff(item.start) < 0) {
+          this.timeFlags[item.id] = -1;
+        } else if (0 < this.current.start.diff(item.start)) {
+          this.timeFlags[item.id] = 1
+        }
+      });
+
+    }
 
   }
   getScheduledItemFromFormGroup(formGroup: FormGroup) {
-    //console.log("GETTING SCHEDULED ITEM", formGroup.value);
     const base = moment(formGroup.value.startDate);
     base.hour(formGroup.value.startHour);
     base.minute(formGroup.value.startMinute);
@@ -163,7 +161,6 @@ export class ScheduleComponent implements OnInit {
     }
 
     const startTime = base.utc().format(DATE_FORMAT);
-    //console.log("SAVING WITH START TIME", base, startTime);
     const scheduledItem: any = {
       start: startTime,
       number: formGroup.value.number,
@@ -185,6 +182,7 @@ export class ScheduleComponent implements OnInit {
       })
     }
   }
+
   save(item: any) {
     let scheduledItem: any;
     try {
@@ -196,8 +194,6 @@ export class ScheduleComponent implements OnInit {
 
     this.backendApiService.updateScheduleItem(this.target, item.id, scheduledItem).toPromise().then((_) => {
       this.cancel(item);
-
-      console.log("UPDATED SCHEDULE ITEM", item.id, scheduledItem);
       this.loadSchedule({});
     }).catch(err => {
       console.log(err);
@@ -213,7 +209,6 @@ export class ScheduleComponent implements OnInit {
       return;
     }
     this.backendApiService.addScheduleItems(this.target, [scheduledItem]).toPromise().then((_) => {
-      console.log("ADDED SCHEDULE ITEM", scheduledItem);
       this.setAdding(false);
       this.loadSchedule({});
     }).catch(err => {
@@ -237,7 +232,6 @@ export class ScheduleComponent implements OnInit {
             number: raw['number'],
             pool: raw['pool']
           };
-          console.log("PARSED", item.start);
           this.scheduleConfig.selectors.map((selector: any) => {
             if (selector.type === 'foreignKey') {
               item[selector.name] = raw[selector.name];
@@ -248,6 +242,8 @@ export class ScheduleComponent implements OnInit {
           return b.start.diff(a.start);
         })
         this.schedule = {
+          total: this.result.total,
+          returned: this.result.returned,
           query: this.result.query,
           items: items
         }
@@ -291,8 +287,6 @@ export class ScheduleComponent implements OnInit {
       const selector: any = this.scheduleConfig.selectors[i];
 
       const time: any = item[this.scheduleConfig.start] ? item[this.scheduleConfig.start] : moment().add(this.scheduleConfig.defaultStartOffsetMinutes, 'minutes');
-      console.log("MOMENT", time, time.hour(), time.minute());
-      console.log("DEFAULT", selector.name, selector.default);
 
       fbconfig[selector.name] = typeof item[selector.name] !== 'undefined' ?
         [item[selector.name]]
@@ -315,7 +309,23 @@ export class ScheduleComponent implements OnInit {
   setLatestForeignKeyValueForAdd(formGroup: FormGroup, field: any) {
     this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
-
+  loadCurrentScheduledItem() {
+    this.backendApiService.getCurrentScheduleItem(this.target).toPromise().then((result: any) => {
+      const current: any = Object.assign({}, result.current);
+      delete current.start;
+      if (result.current) {
+        current.start = moment.utc(result.current.start).local();
+      }
+      if (result.next) {
+        current.end = moment.utc(result.next.start).local();
+      }
+      this.current = current;
+      this.current$.next(current);
+      this.resetTimeFlags();
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
 
 
   ngOnDestroy() {

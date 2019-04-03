@@ -91,7 +91,6 @@
           <input type="button" value="&laquo;" (click)="previousPage()" [disabled]="1>result.query.offset">
           <input type="button" value="&raquo;" (click)="nextPage()"
             [disabled]="(result.query.offset+result.returned)>=result.total">
-
         </div>
 
       </ng-container>

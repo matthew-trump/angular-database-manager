@@ -18,6 +18,7 @@ export class AuthService {
   currentTarget: string = DEFAULT_TARGET;
   targetNames: string[] = Object.keys(TARGETS);
   constructor(
+
     private backendApiService: BackendApiService,
     private configSchemaService: ConfigSchemaService) {
 
@@ -34,11 +35,14 @@ export class AuthService {
         shareReplay(1)
       );
   }
-  loadCurrentSchema() {
+  async loadCurrentSchema() {
     const target: string = this.currentTarget;
-    console.log("loadCurrentSchema", target);
     if (this.isLoggedIn()) {
       this.configSchemaService.loadSchema(target);
+      return Promise.resolve(true);
+    } else {
+      this.logout();
+      return Promise.resolve(false);
     }
   }
   private setSession(authResult) {

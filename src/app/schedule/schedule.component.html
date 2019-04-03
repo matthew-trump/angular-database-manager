@@ -5,7 +5,6 @@
     <input type="button" value="save" (click)="saveNewScheduleItem()" [disabled]="!addScheduleItem.valid">
     <form [formGroup]="addScheduleItem">
 
-
       <ng-container *ngFor="let selector of scheduleConfig.selectors">
 
         <ng-container *ngIf="selector.type==='foreignKey'">
@@ -48,11 +47,6 @@
           </select>
         </ng-container>
 
-
-
-
-
-
       </ng-container>
       <span>zone GMT-{{zone/60}}</span>
     </form>
@@ -61,6 +55,16 @@
 
 <ng-container *ngIf="!adding">
   <input type="button" value="add" (click)="setAdding(true)">
+</ng-container>
+
+<div>Showing {{schedule.returned}} of {{schedule.total}}.</div>
+<ng-container *ngIf="schedule.total>schedule.returned">
+  <div>
+    <input type="button" value="&laquo;" (click)="previousPage()" [disabled]="1>schedule.query.offset">
+    <input type="button" value="&raquo;" (click)="nextPage()"
+      [disabled]="(schedule.query.offset+schedule.returned)>=schedule.total">
+  </div>
+
 </ng-container>
 
 <div *ngIf="(now$ | async) as now">

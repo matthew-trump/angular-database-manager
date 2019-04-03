@@ -1,0 +1,30 @@
+<h2>Current</h2>
+
+<ng-container *ngIf="(current$|async) as item">
+  <ul>
+
+    <li>{{item.start.format('M/DD/YYYY HH:mm')}}</li>
+    <li>{{item.end.format('M/DD/YYYY HH:mm')}}</li>
+
+    <ng-container *ngFor="let selector of scheduleConfig.selectors">
+
+      <ng-container *ngIf="selector.type==='foreignKey'">
+        <ng-container *ngIf="foreignKeyEntitiesIdMap[selector.entity]">
+          <div [ngClass]="selectorentity">
+            <ng-container *ngIf="item[selector.name] as id">
+              <li>{{foreignKeyEntitiesIdMap[selector.entity][id][selector.label]}}</li>
+            </ng-container>
+            <ng-container *ngIf="!item[selector.name]">
+              <li>any</li>
+            </ng-container>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="selector.type==='quantity'">
+        <div>{{item[selector.name]}}</div>
+      </ng-container>
+
+    </ng-container>
+  </ul>
+</ng-container>

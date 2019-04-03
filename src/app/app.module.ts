@@ -38,6 +38,7 @@ import { AppComponent } from './app.component';
 import { ConfigSchemaComponent } from './config-schema/config-schema.component';
 import { EntitiesComponent } from './entities/entities.component';
 import { ScheduleComponent } from './schedule/schedule.component';
+import { CurrentComponent } from './current/current.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { ScheduleComponent } from './schedule/schedule.component';
     TestApiComponent,
     ConfigSchemaComponent,
     EntitiesComponent,
-    ScheduleComponent
+    ScheduleComponent,
+    CurrentComponent
   ],
   imports: [
     BrowserModule,

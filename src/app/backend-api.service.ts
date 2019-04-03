@@ -88,5 +88,10 @@ export class BackendApiService {
         const apiPath: string = environment.targets[target].apiPath;
         return this.http.delete(url + apiPath + 'schedule/' + id);
     }
+    getCurrentScheduleItem(target: string) {
+        const url: string = environment.targets[target].url;
+        const apiPath: string = environment.targets[target].apiPath;
+        return this.http.get(url + apiPath + 'current');
+    }
 
 }

@@ -32,6 +32,18 @@
 
       <ng-container *ngIf="authService.isLoggedIn()">
 
+        <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+            true}">
+          <span class='arrow'>&#9656;</span>
+          <a [routerLink]="['current']">Current</a>
+        </li>
+
+        <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
+            true}">
+          <span class='arrow'>&#9656;</span>
+          <a [routerLink]="['schedule']">Schedule</a>
+        </li>
+
         <ng-container *ngIf="(configSchemaService.entities$|async) as entities">
           <ng-container *ngFor="let entity of entities">
             <li class="entity" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
@@ -42,11 +54,7 @@
           </ng-container>
         </ng-container>
 
-        <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
-          true}">
-          <span class='arrow'>&#9656;</span>
-          <a [routerLink]="['schedule']">Schedule</a>
-        </li>
+
 
         <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
             true}">
