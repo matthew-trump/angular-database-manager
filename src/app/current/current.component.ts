@@ -84,6 +84,7 @@ export class CurrentComponent implements OnInit {
 
   loadCurrentScheduledItem() {
     this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
+      console.log("CURRENT", current)
       this.current$.next(current);
     })
   }
