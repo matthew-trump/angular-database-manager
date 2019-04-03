@@ -1,14 +1,99 @@
 h2{
     text-transform: capitalize
 }
-li.displaying.disabled{
-    .text{
+.addentries{
+    form{
+        display: flex;
+        align-items: flex-start;
+
+        textarea{
+            margin-right: 1em;
+        }
+    }
+}
+.controls{
+    display: flex;
+    margin-bottom: 0.5em;
+    .filter{
+        span{
+            display: inline-block;
+            margin-right: 0.5em;
+            font-size: 0.8em; 
+            color: #333;
+        }
+        margin-right: 1em;
+    }
+    .search{
+        margin-right: 5em;
+    }
+}
+.showing{
+    margin-top: 0.5em;
+    color: #666;
+    font-size: 0.85em;
+}
+ul{
+    list-style-type: none;
+    padding-left: 0em;
+}
+.disabled{
+    color: #999;
+    .field{
+
         text-decoration: line-through;
     }
 }
+li.displaying{
+    margin-bottom: 0.5em;
+    form{
+        display: flex;
+        align-items: flex-start;
 
+        textarea{
+            margin-right: 0.5em;
+        }
+    }
+    > div{
+        display: flex;
+        align-items: flex-start;
+        .index{
+            color: #999;
+            width: 2em;
+            padding-right: 0.5em;
+            text-align: right;
+            span{
+                font-size: 0.9em;
+            }
+        }
+        .status{
+            width: 1em;
+            margin-right: 0.5em;
+            a{
+                color: #999;
+                cursor: default;
+            }
+        }
+        .text{
+            width: 25em;
+            margin-right: 0.5em;
+            span{
+                font-size: 0.9em;
+            }
+        }
+        
+        
+        .foreignKey{
+            width: 10em;
+            span{
+                font-size: 0.85em;
+            }
+        }
+           
+       
+        
+    }
+}
 .edit{
-    display: inline-block;
     margin-left: 0.5em;
     color: #999;
     font-size: 0.8em;

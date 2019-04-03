@@ -30,7 +30,7 @@ export class ScheduleComponent implements OnInit {
 
   zone: any;
 
-  scheduleConfig: any;
+  config: any;
   target: string;
   adding: boolean = false;
   editing: boolean = false;
@@ -87,11 +87,12 @@ export class ScheduleComponent implements OnInit {
             this.configSchemaService.loadForeignKeys()
               .then(result => {
                 if (result && result[0]) {
-                  this.formGroups = {};
-                  this.target = state.target;
-                  this.scheduleConfig = this.configSchemaService.getScheduleConfig();
                   this.foreignKeyEntities = result[0].entities;
                   this.foreignKeyEntitiesIdMap = result[0].idMap;
+
+                  this.formGroups = {};
+                  this.target = state.target;
+                  this.config = this.configSchemaService.getScheduleConfig();
                   this.loadSchedule({});
                   this.loadCurrentScheduledItem();
                 }
@@ -129,13 +130,16 @@ export class ScheduleComponent implements OnInit {
       this.timeFlags = {
         [this.current.id]: 0
       };
-      this.schedule.items.map((item: any) => {
-        if (this.current.start.diff(item.start) < 0) {
-          this.timeFlags[item.id] = -1;
-        } else if (0 < this.current.start.diff(item.start)) {
-          this.timeFlags[item.id] = 1
-        }
-      });
+      if (this.schedule.items && this.current && this.current.start) {
+        this.schedule.items.map((item: any) => {
+          if (this.current.start.diff(item.start) < 0) {
+            this.timeFlags[item.id] = -1;
+          } else if (0 < this.current.start.diff(item.start)) {
+            this.timeFlags[item.id] = 1
+          }
+        });
+      }
+
 
     }
 
@@ -155,9 +159,9 @@ export class ScheduleComponent implements OnInit {
       number: formGroup.value.number,
       pool: formGroup.value.pool,
     }
-    this.scheduleConfig.selectors.map((selector: any) => {
-      if (selector.type === 'foreignKey') {
-        scheduledItem[selector.name] = formGroup.value[selector.name]
+    this.config.fields.map((field: any) => {
+      if (typeof field.foreignKey !== 'undefined') {
+        scheduledItem[field.name] = formGroup.value[field.name]
       }
     });
     return scheduledItem;
@@ -221,15 +225,16 @@ export class ScheduleComponent implements OnInit {
             number: raw['number'],
             pool: raw['pool']
           };
-          this.scheduleConfig.selectors.map((selector: any) => {
-            if (selector.type === 'foreignKey') {
-              item[selector.name] = raw[selector.name];
+          this.config.fields.map((field: any) => {
+            if (typeof field.foreignKey !== 'undefined') {
+              item[field.name] = raw[field.name];
             }
           });
           return item;
         }).sort((a: any, b: any) => {
           return b.start.diff(a.start);
         })
+
         this.schedule = {
           total: this.result.total,
           returned: this.result.returned,
@@ -259,24 +264,24 @@ export class ScheduleComponent implements OnInit {
   }
   getFormConfig(item: any) {
     const fbconfig: any = {};
-    for (let i = 0, len = this.scheduleConfig.selectors.length; i < len; i++) {
-      const selector: any = this.scheduleConfig.selectors[i];
+    for (let i = 0, len = this.config.fields.length; i < len; i++) {
+      const field: any = this.config.fields[i];
 
-      const time: any = item[this.scheduleConfig.start] ? item[this.scheduleConfig.start] : moment().add(this.scheduleConfig.defaultStartOffsetMinutes, 'minutes');
+      const time: any = item[this.config.start] ? item[this.config.start] : moment().add(this.config.defaultStartOffsetMinutes, 'minutes');
 
-      fbconfig[selector.name] = typeof item[selector.name] !== 'undefined' ?
-        [item[selector.name]]
-        : typeof this.foreignKeyValueForAdd[selector.name] !== 'undefined' ?
-          [this.foreignKeyValueForAdd[selector.name]] : typeof time !== 'undefined' ?
-            selector.type === 'date' ? [time] :
-              selector.type === 'hour' ? [time.hour()] :
-                selector.type === 'minute' ? [time.minute()] :
-                  [selector.default] : [''];
+      fbconfig[field.name] = typeof item[field.name] !== 'undefined' ?
+        [item[field.name]]
+        : typeof this.foreignKeyValueForAdd[field.name] !== 'undefined' ?
+          [this.foreignKeyValueForAdd[field.name]] : typeof time !== 'undefined' ?
+            field.type === 'date' ? [time] :
+              field.type === 'hour' ? [time.hour()] :
+                field.type === 'minute' ? [time.minute()] :
+                  [field.default] : [''];
 
 
 
-      if (selector.required) {
-        fbconfig[selector.name].push(Validators.required)
+      if (field.required) {
+        fbconfig[field.name].push(Validators.required)
       }
     }
 

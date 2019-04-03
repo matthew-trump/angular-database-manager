@@ -54,14 +54,29 @@ export class ConfigSchemaService {
     }
 
   }
-
-  async loadForeignKeys(): Promise<any> {
-    const scheduleConfig = this.getScheduleConfig();
-    if (scheduleConfig) {
-      const foreignKeyEntityConfigs: any[] = scheduleConfig.selectors.filter((selector: any) => {
-        return selector.type === "foreignKey";
-      }).map((selector: any) => {
-        return this.getEntityConfig(selector.entity);
+  /**
+  async loadForeignKeysEntity(id: string): Promise<any> {
+    const config = this.getEntityConfig(id);
+    if (config) {
+      const foreignKeyEntityConfigs: any[] = config.fields.filter((field: any) => {
+        return typeof field.foreignKey !== 'undefined';
+      }).map((field: any) => {
+        return this.getEntityConfig(field.foreignKey);
+      });
+      return Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
+        return this.loadForeignKeyEntities(foreignKeyEntityConfig);
+      }))
+    }
+    return Promise.resolve(null)
+  }
+   */
+  async loadForeignKeys(id?: string): Promise<any> {
+    const config = typeof id !== 'undefined' ? this.getEntityConfig(id) : this.getScheduleConfig();
+    if (config) {
+      const foreignKeyEntityConfigs: any[] = config.fields.filter((field: any) => {
+        return typeof field.foreignKey !== 'undefined';
+      }).map((field: any) => {
+        return this.getEntityConfig(field.foreignKey);
       });
       return Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
         return this.loadForeignKeyEntities(foreignKeyEntityConfig);

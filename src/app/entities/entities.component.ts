@@ -34,7 +34,7 @@ export class EntitiesComponent implements OnInit {
 
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
   foreignKeyEntityConfigMap: any = {};
-  foreignKeys: any[];
+  //foreignKeys: any[];
   foreignKeyEntities: any = {}
   foreignKeyEntitiesIdMap: any = {};
 
@@ -69,53 +69,54 @@ export class EntitiesComponent implements OnInit {
           return this.route.params
         }),
         tap((params: any) => {
-          this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
-          this.formGroups = {};
-          this.addEntities = [];
-          this.loading = {};
-          this.added = 0;
-          this.addedThisSave = 0;
-          this.entities$.next(null);
-          if (this.entityConfig) {
-            const limits = TARGETS[this.target].limits;
-            this.limit = (limits && limits[this.entityConfig.plural]) ? limits[this.entityConfig.plural] : DEFAULT_LIMIT;
-            this.offset = 0;
-            this.foreignKeyValueForAdd = {};
-            const foreignKeyEntityConfigs: any[] = this.entityConfig.fields.filter((field: any) => {
-              return typeof field.foreignKey !== 'undefined';
-            }).map((field: any) => {
-              return this.configSchemaService.getEntityConfig(field.foreignKey);
-            });
-            this.loadingList = true;
-            Promise.all(foreignKeyEntityConfigs.map((foreignKeyEntityConfig: any) => {
-              return this.loadForeignKeyEntities(foreignKeyEntityConfig);
-            })).then((_) => {
-              this.foreignKeys = Object.keys(this.foreignKeyEntitiesIdMap)
-              this.loadEntries({});
-            })
+          if (params.id) {
+            this.configSchemaService.loadForeignKeys(params.id)
+              .then((result) => {
+                if (result && result[0]) {
+                  this.foreignKeyEntities = result[0].entities;
+                  this.foreignKeyEntitiesIdMap = result[0].idMap;
+                }
+                this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
+                this.formGroups = {};
+                this.addEntities = [];
+                this.loading = {};
+                this.added = 0;
+                this.addedThisSave = 0;
+                this.limit = (TARGETS[this.target].limits && TARGETS[this.target].limits[this.entityConfig.plural]) ? TARGETS[this.target].limits[this.entityConfig.plural] : DEFAULT_LIMIT;
+                this.offset = 0;
+                this.foreignKeyValueForAdd = {};
+                this.entities$.next(null);
+                this.loadEntries({});
+              }).catch(err => {
+                console.log(err);
+              })
           }
+
         }),
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
 
   }
+
+  loadEntries(queryObj: any) {
+    const query = Object.assign({}, queryObj);
+    query.offset = this.offset;
+    query.limit = this.limit;
+    this.loadingList = true;
+    this.backendApiService.getEntities(this.target, this.entityConfig.plural, query)
+      .toPromise().then((result: any) => {
+        this.loadingList = false;
+        this.result = result;
+        this.entities$.next(this.result.entities);
+      }).catch((err) => {
+        this.loadingList = false;
+        console.log(err);
+      });
+  }
   setLatestForeignKeyValueForAdd(formGroup: FormGroup, field: any) {
     this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
-  async loadForeignKeyEntities(entityConfig: any): Promise<any> {
-    const plural: string = entityConfig.plural;
-    this.foreignKeyEntityConfigMap[plural] = entityConfig;
-    const retobj: any = await this.backendApiService.getEntities(this.target, plural).toPromise();
-    const entityList: any[] = retobj.entities;
-    if (entityList) {
-      this.foreignKeyEntities[plural] = entityList;
-      this.foreignKeyEntitiesIdMap[plural] = entityList.reduce((obj: any, entry: any) => {
-        obj[entry.id] = entry;
-        return obj;
-      }, {});
-    }
-    return Promise.resolve(true);
-  }
+
   getQuery() {
     return Object.assign({}, this.filter, this.search);
   }
@@ -140,21 +141,7 @@ export class EntitiesComponent implements OnInit {
     this.offset = this.offset - this.limit;
     this.loadEntries(this.getQuery());
   }
-  loadEntries(queryObj: any) {
-    const query = Object.assign({}, queryObj);
-    query.offset = this.offset;
-    query.limit = this.limit;
-    this.loadingList = true;
-    this.backendApiService.getEntities(this.target, this.entityConfig.plural, query)
-      .toPromise().then((result: any) => {
-        this.loadingList = false;
-        this.result = result;
-        this.entities$.next(this.result.entities);
-      }).catch((err) => {
-        this.loadingList = false;
-        console.log(err);
-      });
-  }
+
   toggle(entity: any, field: string) {
     const value: boolean = !entity[field];
     this.backendApiService.updateEntity(

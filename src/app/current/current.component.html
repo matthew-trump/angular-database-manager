@@ -1,30 +1,74 @@
 <h2>Current</h2>
 
 <ng-container *ngIf="(current$|async) as item">
-  <ul>
+  <ng-template #noitem>
+    No current item found.
+  </ng-template>
+  <ng-container *ngIf="item.start; else noitem">
+    <ul>
 
-    <li>{{item.start.format('M/DD/YYYY HH:mm')}}</li>
-    <li>{{item.end.format('M/DD/YYYY HH:mm')}}</li>
+      <li class="start">
 
-    <ng-container *ngFor="let selector of scheduleConfig.selectors">
+        <label>
+          <span>start</span>
+        </label>
 
-      <ng-container *ngIf="selector.type==='foreignKey'">
-        <ng-container *ngIf="foreignKeyEntitiesIdMap[selector.entity]">
-          <div [ngClass]="selectorentity">
-            <ng-container *ngIf="item[selector.name] as id">
-              <li>{{foreignKeyEntitiesIdMap[selector.entity][id][selector.label]}}</li>
-            </ng-container>
-            <ng-container *ngIf="!item[selector.name]">
-              <li>any</li>
-            </ng-container>
-          </div>
+        <div>
+          <span>
+            {{item.start.format('M/DD/YYYY HH:mm')}}
+          </span>
+        </div>
+      </li>
+
+      <li class="end">
+
+        <label>
+          <span>end</span>
+        </label>
+
+        <div>
+          <span *ngIf="item.end">
+            {{item.end.format('M/DD/YYYY HH:mm')}}
+          </span>
+        </div>
+      </li>
+
+
+      <ng-container *ngFor="let field of config.fields">
+
+        <ng-container *ngIf="field.foreignKey">
+          <ng-container *ngIf="foreignKeyEntitiesIdMap[field.foreignKey]">
+            <li [ngClass]="selectorentity">
+              <label>
+                <span>{{field.name}}</span>
+              </label>
+              <div>
+                <ng-container *ngIf="item[field.name] as id">
+
+                  <span>
+                    {{foreignKeyEntitiesIdMap[field.foreignKey][id][field.label]}}</span>
+                </ng-container>
+                <ng-container *ngIf="!item[field.name]">
+                  <span>any</span>
+                </ng-container>
+              </div>
+            </li>
+          </ng-container>
         </ng-container>
+
+        <ng-container *ngIf="field.type==='quantity'">
+          <li>
+            <label>
+              <span>{{field.name}}</span>
+            </label>
+            <div><span>{{item[field.name]}}</span></div>
+          </li>
+        </ng-container>
+
       </ng-container>
 
-      <ng-container *ngIf="selector.type==='quantity'">
-        <div>{{item[selector.name]}}</div>
-      </ng-container>
 
-    </ng-container>
-  </ul>
+    </ul>
+  </ng-container>
+
 </ng-container>

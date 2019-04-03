@@ -42,15 +42,12 @@ export class LoginComponent implements OnInit, OnDestroy {
         const val = this.loginform.value;
         this.inProgress = true;
         this.loginError = false;
-
-        console.log(val);
         if (val.target && val.username && val.password) {
             this.authService.login(val.target, val.username, val.password)
                 .pipe(
                     tap((result) => {
                         this.inProgress = false;
                         if (result) {
-                            console.log("User is logged in to " + val.target);
                             this.router.navigateByUrl('/');
                         }
                     }),

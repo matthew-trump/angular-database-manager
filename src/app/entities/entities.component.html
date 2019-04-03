@@ -10,13 +10,13 @@
     </span>
 
     <ng-container *ngIf="addedThisSave>0">
-      <span>
-        Added {{addedThisSave}} entries;
-      </span>
+      <div class="showing">
+        <span>Added {{addedThisSave}} entries</span>
+      </div>
     </ng-container>
 
     <ng-container *ngIf="addEntities">
-      <ol>
+      <ol class="addentries">
         <ng-container *ngFor="let addEntity of addEntities; let i=index">
           <li>
 
@@ -26,7 +26,18 @@
               <ng-container *ngFor="let field of entityConfig.fields">
 
                 <ng-container *ngIf="!field.foreignKey">
-                  <input type="text" [placeholder]="field.name" [formControlName]="field.name">
+                  <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
+                    <div>
+                      <textarea [formControlName]="field.name" [placeholder]="field.name" [rows]="field.input.rows"
+                        [cols]="field.input.cols"></textarea>
+                    </div>
+                  </ng-container>
+                  <ng-template #textinput>
+                    <div>
+                      <input type="text" [placeholder]="field.name" [formControlName]="field.name">
+                    </div>
+                  </ng-template>
+
                 </ng-container>
 
                 <ng-container *ngIf="field.foreignKey">
@@ -54,38 +65,48 @@
   </ng-container>
 
   <ng-container *ngIf="!adding">
-    <ng-container *ngIf="entityConfig.add">
-      <input type="button" value="add" (click)="showAdding(true)">
-    </ng-container>
 
-    <ng-container *ngIf="entityConfig.filter">
-      <ng-container *ngFor="let filter of entityConfig.filter">
-        <ng-container *ngIf="foreignKeyEntityConfigMap[filter.entity] as foreignKeyEntityConfig">
-          <div>
-            <span>{{foreignKeyEntityConfig.name}}</span>
 
-            <select (change)="doFilter(filter.field, $event.target.value)">
-              <option *ngIf="filter.all" [value]="FILTER_ALL">
-                all
-              </option>
+    <div class="controls">
+      <ng-container *ngIf="entityConfig.filter">
+        <ng-container *ngFor="let filter of entityConfig.filter">
+          <ng-container *ngIf="configSchemaService.getEntityConfig(filter.entity) as foreignKeyEntityConfig">
+            <div class="filter">
+              <span>{{foreignKeyEntityConfig.name}}</span>
 
-              <option *ngFor=" let entity of foreignKeyEntities[filter.entity]" [value]="entity.id">
-                {{entity[filter.label]}}
-              </option>
+              <select (change)="doFilter(filter.field, $event.target.value)">
+                <option *ngIf="filter.all" [value]="FILTER_ALL">
+                  all
+                </option>
 
-            </select>
-          </div>
+                <option *ngFor=" let entity of foreignKeyEntities[filter.entity]" [value]="entity.id">
+                  {{entity[filter.label]}}
+                </option>
+
+              </select>
+            </div>
+          </ng-container>
         </ng-container>
       </ng-container>
-    </ng-container>
 
-    <ng-container *ngIf="entityConfig.search">
-      <input type="text" placeholder="search" [(ngModel)]="searchString">
-      <input type="button" value="go" (click)="doSearch()">
-    </ng-container>
+      <ng-container *ngIf="entityConfig.search">
+        <div class="search">
+          <input type="text" size="25" placeholder="search" [(ngModel)]="searchString">
+          <input type="button" value="go" (click)="doSearch()">
+        </div>
+
+      </ng-container>
+
+      <ng-container *ngIf="entityConfig.add">
+        <div class="addbutton">
+          <input type="button" value="add" (click)="showAdding(true)">
+        </div>
+      </ng-container>
+
+    </div>
 
     <ng-container *ngIf="result">
-      <div>Showing {{result.returned}} of {{result.total}}</div>
+      <div class="showing">Showing {{result.returned}} of {{result.total}}</div>
       <ng-container *ngIf="result.total>result.returned">
         <div>
           <input type="button" value="&laquo;" (click)="previousPage()" [disabled]="1>result.query.offset">
@@ -97,73 +118,97 @@
 
     </ng-container>
     <div *ngIf="(entities$|async) as entities">
-      <ol [start]="result.query.offset+1">
+      <ul>
         <ng-container *ngFor="let entity of entities; let i=index">
           <ng-container *ngIf="100>i">
-            <ng-container *ngIf="!formGroups[entity.id]">
-              <li class="displaying"
-                [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement])}">
+
+            <li class="displaying"
+              [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement])}">
+              <div>
+                <div class="index">
+                  <span>{{result.query.offset+1+i}}</span>
+                </div>
                 <ng-container *ngIf="entityConfig.enablement">
-                  <a
-                    (click)="toggle(entity,entityConfig.enablement)">{{entity[entityConfig.enablement] ? 'Y' : 'N'}}</a>
+                  <div class="status">
+
+                    <a
+                      (click)="toggle(entity,entityConfig.enablement)">{{entity[entityConfig.enablement] ? '&#x2713;' : '&times;'}}</a>
+                  </div>
                 </ng-container>
 
-                <ng-container *ngFor="let field of entityConfig.fields">
 
-                  <ng-container *ngIf="!field.foreignKey">
-                    <div [ngClass]="field.name">{{entity[field.name]}}</div>
-                  </ng-container>
-
-                  <ng-container *ngIf="field.foreignKey">
-                    <ng-container *ngIf="foreignKeyEntitiesIdMap[field.foreignKey]">
-                      <div [ngClass]="field.name">
-                        {{foreignKeyEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}
-                      </div>
-                    </ng-container>
-                  </ng-container>
-                </ng-container>
-                <span class="edit">
-                  <a (click)="edit(entity)">edit</a>
-                </span>
-              </li>
-            </ng-container>
-            <ng-container *ngIf="formGroups[entity.id]">
-              <li class="editing">
-                <form [formGroup]="formGroups[entity.id]">
-
-
+                <ng-container *ngIf="!formGroups[entity.id]">
                   <ng-container *ngFor="let field of entityConfig.fields">
 
                     <ng-container *ngIf="!field.foreignKey">
-                      <input type="text" [formControlName]="field.name">
+                      <div class="field" [ngClass]="field.name">
+                        <span>{{entity[field.name]}}</span></div>
                     </ng-container>
 
                     <ng-container *ngIf="field.foreignKey">
-                      <select [formControlName]="field.name">
-                        <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
-                          {{entity[field.label]}}
-                        </option>
-                      </select>
+                      <ng-container *ngIf="foreignKeyEntitiesIdMap[field.foreignKey]">
+                        <div class="field foreignKey" [ngClass]="field.name">
+                          <span>{{foreignKeyEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}</span>
+                        </div>
+                      </ng-container>
                     </ng-container>
-
 
                   </ng-container>
 
-                  <span class="edit">
-                    <input type="button" (click)="save(entity,i)" value="save"
-                      [disabled]="formGroups[entity.id].pristine || loading[entity.id]">
-                  </span>
-                  <span class="edit">
-                    <input type="button" (click)="cancel(entity)" value="cancel" [disabled]="loading[entity.id]">
-                  </span>
+                  <div class="edit">
+                    <a (click)="edit(entity)">edit</a>
+                  </div>
+                </ng-container>
 
-                </form>
-              </li>
-            </ng-container>
+
+                <ng-container *ngIf="formGroups[entity.id]">
+
+                  <form [formGroup]="formGroups[entity.id]">
+
+
+                    <ng-container *ngFor="let field of entityConfig.fields">
+
+                      <ng-container *ngIf="!field.foreignKey">
+                        <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
+                          <textarea [formControlName]="field.name" [rows]="field.input.rows"
+                            [cols]="field.input.cols"></textarea>
+                        </ng-container>
+                        <ng-template #textinput>
+                          <input type="text" [formControlName]="field.name">
+                        </ng-template>
+                      </ng-container>
+
+                      <ng-container *ngIf="field.foreignKey">
+                        <select [formControlName]="field.name">
+                          <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                            {{entity[field.label]}}
+                          </option>
+                        </select>
+                      </ng-container>
+
+
+                    </ng-container>
+
+                    <span class="edit">
+                      <input type="button" (click)="save(entity,i)" value="save"
+                        [disabled]="formGroups[entity.id].pristine || loading[entity.id]">
+                    </span>
+                    <span class="edit">
+                      <input type="button" (click)="cancel(entity)" value="cancel" [disabled]="loading[entity.id]">
+                    </span>
+
+                  </form>
+
+                </ng-container>
+
+
+              </div>
+
+            </li>
 
           </ng-container>
         </ng-container>
-      </ol>
+      </ul>
     </div>
 
   </ng-container>

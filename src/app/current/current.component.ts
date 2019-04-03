@@ -28,7 +28,7 @@ export class CurrentComponent implements OnInit {
 
   zone: any;
 
-  scheduleConfig: any;
+  config: any;
   target: string;
   adding: boolean = false;
   editing: boolean = false;
@@ -65,7 +65,7 @@ export class CurrentComponent implements OnInit {
                   this.now$ = new BehaviorSubject(moment());
                   this.zone = (moment()).utcOffset();
                   this.formGroups = {};
-                  this.scheduleConfig = this.configSchemaService.getScheduleConfig();
+                  this.config = this.configSchemaService.getScheduleConfig();
                   this.target = state.target;
                   this.foreignKeyEntities = result[0].entities;
                   this.foreignKeyEntitiesIdMap = result[0].idMap;
