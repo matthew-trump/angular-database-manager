@@ -1,7 +1,7 @@
-<mat-toolbar>
-  <h1 style="margin-left: 1em;">Actions on Google Database Manager</h1>
+<mat-toolbar *ngIf="authService.currentTarget">
+  <h1 style="margin-left: 1em;">{{TARGETS[authService.currentTarget].title}}</h1>
   <span class="environmentName" *ngIf="authService.getLoggedInUser()"
-    [ngStyle]="{'color':authService.getThemeColor()}">{{authService.getCurrentTarget()}}</span>
+    [ngStyle]="{'color': TARGETS[authService.currentTarget].color}">{{authService.getCurrentTarget()}}</span>
   <span class="example-fill-remaining-space"></span>
   <div class="login" style="display: flex; align-items: center;" *ngIf="authService.isLoggedIn()">
     <span style="display: flex; align-items: center; margin-right: 0.5em;">

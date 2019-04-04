@@ -16,7 +16,7 @@ const DEFAULT_TARGET: any = environment.defaultTarget;
 })
 export class AuthService {
 
-  currentTarget: string = DEFAULT_TARGET;
+  currentTarget: string = localStorage.getItem('target') || DEFAULT_TARGET;
   targetNames: string[] = Object.keys(TARGETS);
   constructor(
     private router: Router,
@@ -31,6 +31,7 @@ export class AuthService {
         tap(res => this.setSession(res)),
         tap(_ => {
           this.currentTarget = target;
+          localStorage.setItem('target', target);
           this.configSchemaService.loadSchema(target);
         }),
         shareReplay(1)

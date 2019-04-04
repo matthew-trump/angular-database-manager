@@ -30,6 +30,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   formGroups: any = {};
 
   zone: any;
+  zoneDisplay: any = (moment()).format('Z');
 
   config: any;
   target: string;

@@ -14,6 +14,7 @@ export const environment = {
         schedule: 6
       },
       color: "dodgerblue",
+      title: "Author Quotes Database Manager"
     },
     staging: {
       url: "http://localhost:8083",
@@ -25,6 +26,7 @@ export const environment = {
         schedule: 5
       },
       color: "green",
+      title: "Trivia Bank Database Manager"
     },
     production: {
       url: "http://localhost:8084",
@@ -36,6 +38,7 @@ export const environment = {
         schedule: 5
       },
       color: "maroon",
+      title: "Trivia Bank Database Manager"
     },
   }
 

@@ -96,7 +96,9 @@
 
 
 
-<div class="showing">Showing {{schedule.returned}} of {{schedule.total}}.</div>
+<div class="showing">Showing {{schedule.returned}} of {{schedule.total}} (start times are GMT{{zoneDisplay}})
+
+</div>
 <ng-container *ngIf="schedule.total>schedule.returned">
   <div>
     <button mat-icon-button matTooltip="previous page" (click)="previousPage()" [disabled]="1>schedule.query.offset">
