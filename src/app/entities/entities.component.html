@@ -1,12 +1,18 @@
 <div *ngIf="entityConfig">
+  <div style="display: flex; align-items: center;">
 
-  <h2 style="color: #333;">{{entityConfig.plural}}</h2>
+    <h2 style="color: #333;">{{entityConfig.plural}}</h2>
 
-  <ng-container *ngIf="!result && entityConfig.add && !adding">
-    <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">
-      <mat-icon>add_circle_outline</mat-icon>
-    </button>
-  </ng-container>
+    <ng-container *ngIf="entityConfig.add && !adding">
+      <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">
+        <mat-icon>add_circle_outline</mat-icon>
+      </button>
+    </ng-container>
+
+  </div>
+
+
+
 
 
   <ng-container *ngIf="adding">
@@ -141,7 +147,7 @@
 
       </ng-container>
 
-      <ng-container *ngIf="entityConfig.add">
+      <ng-container *ngIf="false && entityConfig.add">
 
 
         <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">

@@ -1,14 +1,15 @@
-<h2>Schedule</h2>
+<div style="display: flex; align-items: center">
+  <h2>Schedule</h2>
+  <ng-container *ngIf="!adding">
+    <button matTooltip="add schedudle item" mat-icon-button (click)="setAdding(true)">
+      <mat-icon>add_circle_outline</mat-icon>
+    </button>
+  </ng-container>
+</div>
 <ng-container *ngIf="(now$ | async) as now">
 
   <ng-container *ngIf="config && adding">
     <div class="adding">
-      <button mat-icon-button matTooltip="done" (click)="setAdding(false)">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-
-
-
       <form [formGroup]="addScheduleItem">
 
         <ng-container *ngFor="let field of config.fields">
@@ -93,11 +94,7 @@
 
 </ng-container>
 
-<ng-container *ngIf="!adding">
-  <button matTooltip="add schedudle item" mat-icon-button (click)="setAdding(true)">
-    <mat-icon>add_circle_outline</mat-icon>
-  </button>
-</ng-container>
+
 
 <div class="showing">Showing {{schedule.returned}} of {{schedule.total}}.</div>
 <ng-container *ngIf="schedule.total>schedule.returned">
