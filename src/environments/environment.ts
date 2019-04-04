@@ -11,8 +11,9 @@ export const environment = {
       limits: {
         authors: 40,
         quotes: 20,
-        schedule: 5
-      }
+        schedule: 6
+      },
+      color: "dodgerblue",
     },
     staging: {
       url: "http://localhost:8083",
@@ -22,7 +23,8 @@ export const environment = {
         categories: 40,
         questions: 25,
         schedule: 5
-      }
+      },
+      color: "green",
     },
     production: {
       url: "http://localhost:8084",
@@ -32,7 +34,8 @@ export const environment = {
         categories: 40,
         questions: 15,
         schedule: 5
-      }
+      },
+      color: "maroon",
     },
   }
 

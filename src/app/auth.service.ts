@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { ConfigSchemaService } from './config-schema.service';
@@ -18,7 +19,7 @@ export class AuthService {
   currentTarget: string = DEFAULT_TARGET;
   targetNames: string[] = Object.keys(TARGETS);
   constructor(
-
+    private router: Router,
     private backendApiService: BackendApiService,
     private configSchemaService: ConfigSchemaService) {
 
@@ -30,20 +31,10 @@ export class AuthService {
         tap(res => this.setSession(res)),
         tap(_ => {
           this.currentTarget = target;
-          this.loadCurrentSchema();
+          this.configSchemaService.loadSchema(target);
         }),
         shareReplay(1)
       );
-  }
-  async loadCurrentSchema() {
-    const target: string = this.currentTarget;
-    if (this.isLoggedIn()) {
-      this.configSchemaService.loadSchema(target);
-      return Promise.resolve(true);
-    } else {
-      this.logout();
-      return Promise.resolve(false);
-    }
   }
   private setSession(authResult) {
     const expiresAt = moment().add(authResult.expiresIn, 'second');
@@ -55,6 +46,9 @@ export class AuthService {
     localStorage.removeItem("id_token");
     localStorage.removeItem("expires_at");
     localStorage.removeItem("username");
+  }
+  getThemeColor() {
+    return environment.targets[this.currentTarget].color;
   }
 
   public isLoggedIn() {

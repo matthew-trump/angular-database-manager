@@ -23,7 +23,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   now$: BehaviorSubject<any>;
   current$: BehaviorSubject<any> = new BehaviorSubject(null);
   current: any;
-  limit: number = 5;//DEFAULT_LIMIT;
+  limit: number = 6;//DEFAULT_LIMIT;
   offset: number = 0;
 
   loadingList: boolean = false;

@@ -122,13 +122,15 @@ export class EntitiesComponent implements OnInit {
   }
 
   doFilter(field?: string, value?: any) {
+    console.log("DO FILTER");
     const query: any = (field && value !== this.FILTER_ALL) ? { [field]: value } : null;
     this.filter = query;
     this.offset = 0;
     this.loadEntries(this.getQuery())
   }
   doSearch() {
-    const searchvalue: string = this.searchString.trim();
+
+    const searchvalue: string = this.searchString ? this.searchString.trim() : this.searchString;
     this.search = searchvalue ? { search: searchvalue } : {};
     this.offset = 0;
     this.loadEntries(this.getQuery())
@@ -219,6 +221,9 @@ export class EntitiesComponent implements OnInit {
   }
   removeAddEntity(index: number) {
     this.addEntities.splice(index, 1);
+    if (this.addEntities.length === 0) {
+      this.showAdding(false)
+    }
   }
   addEntitiesValid() {
     return this.addEntities.filter((fg: any) => {

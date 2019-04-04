@@ -1,13 +1,25 @@
 <div *ngIf="entityConfig">
-  <h2>{{entityConfig.plural}}</h2>
+
+  <h2 style="color: #333;">{{entityConfig.plural}}</h2>
+
+  <ng-container *ngIf="!result && entityConfig.add && !adding">
+    <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">
+      <mat-icon>add_circle_outline</mat-icon>
+    </button>
+  </ng-container>
+
 
   <ng-container *ngIf="adding">
-    <input type="button" value="cancel" (click)="showAdding(false)">
-    <input type="button" value="+" (click)="addAddEntity()">
+    <button mat-icon-button matTooltip="done" (click)="showAdding(false)">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
 
-    <span>
-      <input type="button" value="save" [disabled]="!addEntitiesValid()" (click)="saveAddEntities()">
-    </span>
+    <button mat-stroked-button [disabled]="!addEntitiesValid()" matTooltip="save" (click)="saveAddEntities()">
+      save all
+    </button>
+
+
+
 
     <ng-container *ngIf="addedThisSave>0">
       <div class="showing">
@@ -16,20 +28,31 @@
     </ng-container>
 
     <ng-container *ngIf="addEntities">
-      <ol class="addentries">
+      <ul class="addentries">
         <ng-container *ngFor="let addEntity of addEntities; let i=index">
           <li>
 
+
             <form [formGroup]="addEntity">
+
+              <div style="width: 1.5em;">
+                <span *ngIf="addEntity.valid" class="valid">&#x2713;</span>
+                <span *ngIf="!addEntity.valid">&nbsp;</span>
+              </div>
+
 
 
               <ng-container *ngFor="let field of entityConfig.fields">
 
                 <ng-container *ngIf="!field.foreignKey">
                   <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
-                    <div>
-                      <textarea [formControlName]="field.name" [placeholder]="field.name" [rows]="field.input.rows"
-                        [cols]="field.input.cols"></textarea>
+                    <div class="text">
+                      <mat-form-field>
+                        <mat-label>{{field.name}}</mat-label>
+                        <textarea matInput [formControlName]="field.name" [rows]="field.input.rows"
+                          [cols]="field.input.cols"></textarea>
+                      </mat-form-field>
+
                     </div>
                   </ng-container>
                   <ng-template #textinput>
@@ -41,18 +64,30 @@
                 </ng-container>
 
                 <ng-container *ngIf="field.foreignKey">
-                  <select [formControlName]="field.name" (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
-                    <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
-                      {{entity[field.label]}}
-                    </option>
-                  </select>
+                  <mat-form-field>
+                    <mat-label>{{field.name}}</mat-label>
+                    <mat-select [formControlName]="field.name"
+                      (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
+                      <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                        {{entity[field.label]}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
                 </ng-container>
               </ng-container>
 
-              <span *ngIf="addEntity.valid" class="valid">&#x2713;</span>
 
-              <span class="edit">
-                <input type="button" value="delete" (click)="removeAddEntity(i)" [disabled]="2>addEntities.length">
+
+              <span style="width: 8em; display: flex; justify-content: space-between;">
+
+                <button mat-icon-button matTooltip="add another entry" (click)="addAddEntity()">
+                  <mat-icon>add_outline</mat-icon>
+                </button>
+
+                <button mat-icon-button matTooltip="delete entry" (click)="removeAddEntity(i)">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+
               </span>
 
             </form>
@@ -60,7 +95,7 @@
 
           </li>
         </ng-container>
-      </ol>
+      </ul>
     </ng-container>
   </ng-container>
 
@@ -72,18 +107,19 @@
         <ng-container *ngFor="let filter of entityConfig.filter">
           <ng-container *ngIf="configSchemaService.getEntityConfig(filter.entity) as foreignKeyEntityConfig">
             <div class="filter">
-              <span>{{foreignKeyEntityConfig.name}}</span>
+              <mat-form-field>
+                <mat-label>{{foreignKeyEntityConfig.name}}</mat-label>
+                <mat-select (selectionChange)="doFilter(filter.field, $event.value)">
+                  <mat-option *ngIf="filter.all" [value]="FILTER_ALL">
+                    all
+                  </mat-option>
 
-              <select (change)="doFilter(filter.field, $event.target.value)">
-                <option *ngIf="filter.all" [value]="FILTER_ALL">
-                  all
-                </option>
+                  <mat-option *ngFor=" let entity of foreignKeyEntities[filter.entity]" [value]="entity.id">
+                    {{entity[filter.label]}}
+                  </mat-option>
 
-                <option *ngFor=" let entity of foreignKeyEntities[filter.entity]" [value]="entity.id">
-                  {{entity[filter.label]}}
-                </option>
-
-              </select>
+                </mat-select>
+              </mat-form-field>
             </div>
           </ng-container>
         </ng-container>
@@ -91,27 +127,50 @@
 
       <ng-container *ngIf="entityConfig.search">
         <div class="search">
-          <input type="text" size="25" placeholder="search" [(ngModel)]="searchString">
-          <input type="button" value="go" (click)="doSearch()">
+          <mat-form-field>
+            <input matInput type="text" size="25" placeholder="search" [(ngModel)]="searchString">
+          </mat-form-field>
+          <button mat-icon-button (click)="doSearch()">
+            <mat-icon>search</mat-icon>
+          </button>
         </div>
 
       </ng-container>
 
       <ng-container *ngIf="entityConfig.add">
-        <div class="addbutton">
-          <input type="button" value="add" (click)="showAdding(true)">
-        </div>
+
+
+        <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+
+
       </ng-container>
+
 
     </div>
 
     <ng-container *ngIf="result">
-      <div class="showing">Showing {{result.returned}} of {{result.total}}</div>
+      <div class="showing">
+        Showing {{result.returned}} of {{result.total}}
+        <ng-container *ngIf="search && search.search">
+          for &ldquo;{{search.search}}&rdquo;
+        </ng-container>
+
+
+
+      </div>
+
       <ng-container *ngIf="result.total>result.returned">
         <div>
-          <input type="button" value="&laquo;" (click)="previousPage()" [disabled]="1>result.query.offset">
-          <input type="button" value="&raquo;" (click)="nextPage()"
+          <button mat-icon-button matTooltip="previous page" (click)="previousPage()"
+            [disabled]="1>result.query.offset">
+            <mat-icon>navigate_before</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="next page" (click)="nextPage()"
             [disabled]="(result.query.offset+result.returned)>=result.total">
+            <mat-icon>navigate_next</mat-icon>
+          </button>
         </div>
 
       </ng-container>
@@ -155,9 +214,11 @@
 
                   </ng-container>
 
+
                   <div class="edit">
                     <a (click)="edit(entity)">edit</a>
                   </div>
+
                 </ng-container>
 
 
@@ -170,33 +231,48 @@
 
                       <ng-container *ngIf="!field.foreignKey">
                         <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
-                          <textarea [formControlName]="field.name" [rows]="field.input.rows"
-                            [cols]="field.input.cols"></textarea>
+                          <div class="textarea">
+
+                            <mat-form-field>
+                              <mat-label>{{field.name}}</mat-label>
+                              <textarea matInput [formControlName]="field.name" [rows]="field.input.rows"></textarea>
+                            </mat-form-field>
+                          </div>
                         </ng-container>
                         <ng-template #textinput>
                           <input type="text" [formControlName]="field.name">
                         </ng-template>
+
                       </ng-container>
 
                       <ng-container *ngIf="field.foreignKey">
-                        <select [formControlName]="field.name">
-                          <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
-                            {{entity[field.label]}}
-                          </option>
-                        </select>
+                        <mat-form-field>
+                          <mat-label>{{field.name}}</mat-label>
+                          <mat-select [formControlName]="field.name">
+                            <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                              {{entity[field.label]}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
                       </ng-container>
 
 
                     </ng-container>
 
-                    <span class="edit">
-                      <input type="button" (click)="save(entity,i)" value="save"
-                        [disabled]="formGroups[entity.id].pristine || loading[entity.id]">
-                    </span>
-                    <span class="edit">
-                      <input type="button" (click)="cancel(entity)" value="cancel" [disabled]="loading[entity.id]">
-                    </span>
-
+                    <div class="buttons">
+                      <span>
+                        <button mat-icon-button matTooltip="save changes" (click)="save(entity,i)"
+                          [disabled]="formGroups[entity.id].pristine || loading[entity.id]">
+                          <mat-icon>save_alt</mat-icon>
+                        </button>
+                      </span>
+                      <span>
+                        <button mat-icon-button (click)="cancel(entity)" matTooltip="close"
+                          [disabled]="loading[entity.id]">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
+                    </div>
                   </form>
 
                 </ng-container>

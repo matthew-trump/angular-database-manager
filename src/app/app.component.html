@@ -1,27 +1,20 @@
 <mat-toolbar>
-  <h1 style="margin-left: 1em;">Actions on Google Backend Admin</h1>
-  <span class="environmentName" *ngIf="authService.getLoggedInUser()">{{authService.getCurrentTarget()}}</span>
+  <h1 style="margin-left: 1em;">Actions on Google Database Manager</h1>
+  <span class="environmentName" *ngIf="authService.getLoggedInUser()"
+    [ngStyle]="{'color':authService.getThemeColor()}">{{authService.getCurrentTarget()}}</span>
   <span class="example-fill-remaining-space"></span>
-  <div class="login" *ngIf="authService.isLoggedIn()">
-    Logged in as {{authService.getLoggedInUser()}}
-    | <a (click)="logout()">Logout</a>
+  <div class="login" style="display: flex; align-items: center;" *ngIf="authService.isLoggedIn()">
+    <span style="display: flex; align-items: center; margin-right: 0.5em;">
+      <mat-icon>person</mat-icon>
+      {{authService.getLoggedInUser()}}
+    </span>
+    <span style="margin-left: 0.5em;"><a (click)="logout()">Logout</a></span>
   </div>
   <div class="login" *ngIf="authService.isLoggedOut()"><a [routerLink]="['login']">Login</a></div>
 </mat-toolbar>
 
 <div id="content">
   <div id="left" class="column">
-
-    <ul class="navigationlinks" *ngIf="authService.isLoggedIn()">
-      <!--
-  <li><a [routerLink]="['admin','authors']">Authors</a></li>
-  <li><a [routerLink]="['admin','quotes']">Quotes</a></li>
-  <li><a [routerLink]="['admin','schedule']">Schedule</a></li>
-  <li><a [routerLink]="['admin','themes']">Themes</a></li>
-  <li><a [routerLink]="['admin','addquotes']">New Quote</a></li>
-  <li><a [routerLink]="['admin','current']">Current</a></li>
-   -->
-    </ul>
 
     <ul class="navigationlinks">
       <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:

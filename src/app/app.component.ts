@@ -14,12 +14,14 @@ export class AppComponent {
     public authService: AuthService,
     public configSchemaService: ConfigSchemaService,
     private router: Router) {
-    this.authService.loadCurrentSchema().then(loaded => {
+    const target: string = this.authService.currentTarget;
+    this.configSchemaService.loadSchema(target).then(loaded => {
+      console.log(loaded);
       if (!loaded) {
-        this.router.navigate(['login']);
+        console.log("LOGGING OUT");
+        this.logout();
       }
     });
-
   }
 
   logout() {

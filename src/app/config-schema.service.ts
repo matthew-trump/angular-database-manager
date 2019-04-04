@@ -3,7 +3,7 @@ import { BackendApiService } from './backend-api.service';
 import { environment } from '../environments/environment';
 import { Store } from '@ngrx/store';
 import { ConfigStateAction } from './config-state.action';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import * as moment from 'moment';
 @Injectable({
   providedIn: 'root'
@@ -26,24 +26,23 @@ export class ConfigSchemaService {
     return this.schema.schedule;
   }
 
-  loadSchema(target: string): Promise<any> {
+
+  async loadSchema(target: string): Promise<any> {
     if (environment.targets[target].schemaPath) {
-      this.backendApiService.configSchema(target).toPromise().then((schema: any) => {
-        this.schema = schema;
-        this.target = target;
-        if (schema) {
-          this.entities$.next(schema.entities)
-        }
+      const schema: any = await this.backendApiService.configSchema(target).toPromise();
+      this.schema = schema;
+      this.target = target;
+      if (schema) {
+        this.entities$.next(schema.entities)
+      }
 
-        this.store.dispatch(new ConfigStateAction({
-          target: target,
-          schema: schema
-        }));
+      this.store.dispatch(new ConfigStateAction({
+        target: target,
+        schema: schema
+      }));
+      console.log("RETURNING SCHEMA");
+      return Promise.resolve(schema);
 
-        return Promise.resolve(schema);
-      }).catch((err: any) => {
-        console.log(err);
-      });
     } else {
       console.log("ERROR: RETURING PROMISE no schema", target);
       this.store.dispatch(new ConfigStateAction({
@@ -52,7 +51,7 @@ export class ConfigSchemaService {
       }));
       return Promise.resolve(null);
     }
-
+    console.log("RETURNING NOTHING");
   }
   /**
   async loadForeignKeysEntity(id: string): Promise<any> {
@@ -102,7 +101,7 @@ export class ConfigSchemaService {
     });
   }
   async loadCurrentScheduledItem(): Promise<any> {
-    try{
+    try {
       const result: any = await this.backendApiService.getCurrentScheduleItem(this.target).toPromise();
       const current: any = Object.assign({}, result.item);
       delete current.start;
@@ -114,12 +113,12 @@ export class ConfigSchemaService {
       }
       return Promise.resolve(current);
 
-    }catch(err){
-        console.log(err);
-        return Promise.resolve(null);
+    } catch (err) {
+      return Promise.reject();
+      //return Promise.resolve(null);
     }
-   
-    
+
+
   }
 }
 

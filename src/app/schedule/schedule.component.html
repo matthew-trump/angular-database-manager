@@ -2,68 +2,107 @@
 <ng-container *ngIf="(now$ | async) as now">
 
   <ng-container *ngIf="config && adding">
-    <input type="button" value="cancel" (click)="setAdding(false)">
-    <input type="button" value="save" (click)="saveNewScheduleItem()" [disabled]="!addScheduleItem.valid">
-    <form [formGroup]="addScheduleItem">
+    <div class="adding">
+      <button mat-icon-button matTooltip="done" (click)="setAdding(false)">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
 
-      <ng-container *ngFor="let field of config.fields">
+      <button mat-stroked-button [disabled]="!addScheduleItem.valid" (click)="saveNewScheduleItem()">
+        save
+      </button>
 
-        <ng-container *ngIf="field.foreignKey">
-          <select [formControlName]="field.name" (change)="setLatestForeignKeyValueForAdd(addScheduleItem,field)">
-            <ng-container *ngIf="field.nullValue">
-              <option [value]="field.default">{{field.nullValue}}</option>
-            </ng-container>
-            <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
-              {{entity[field.label]}}
-            </option>
-          </select>
+      <form [formGroup]="addScheduleItem">
+
+        <ng-container *ngFor="let field of config.fields">
+
+          <ng-container *ngIf="field.foreignKey">
+            <mat-form-field>
+              <mat-label>{{field.name}}</mat-label>
+              <mat-select [formControlName]="field.name"
+                (selectionChange)="setLatestForeignKeyValueForAdd(addScheduleItem,field)">
+                <ng-container *ngIf="field.nullValue">
+                  <mat-option [value]="field.default">{{field.nullValue}}</mat-option>
+                </ng-container>
+                <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                  {{entity[field.label]}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </ng-container>
+
+          <ng-container *ngIf="field.type==='quantity'">
+            <div class="quantity">
+              <mat-form-field>
+                <mat-label>{{field.name}}</mat-label>
+                <input matInput [formControlName]="field.name" type="number" [placeholder]="field.name">
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="field.type==='date'">
+            <div class="date">
+              <mat-form-field>
+                <mat-label>start date (GMT-{{zone/60}})</mat-label>
+                <input matInput [min]="now" [formControlName]="field.name" [matDatepicker]="picker"
+                  [placeholder]="field.placeholder">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="field.type==='hour'">
+            <div class="hour">
+              <mat-form-field>
+                <mat-label>time</mat-label>
+                <mat-select [formControlName]="field.name">
+                  <mat-option *ngFor="let h of hours" [value]="h">
+                    {{h | number : '2.0-0'}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="field.type==='minute'">
+            <div class="minute">
+              <mat-form-field>
+                <mat-label></mat-label>
+                <mat-select [formControlName]="field.name">
+                  <mat-option *ngFor="let m of minutes" [value]="m">
+                    :{{m | number : '2.0-0'}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
         </ng-container>
 
-        <ng-container *ngIf="field.type==='quantity'">
-          <input [formControlName]="field.name" type="number" size="5" [placeholder]="field.name">
-        </ng-container>
-
-        <ng-container *ngIf="field.type==='date'">
-          <mat-form-field>
-            <input matInput [min]="now" [formControlName]="field.name" [matDatepicker]="picker"
-              [placeholder]="field.placeholder">
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
-        </ng-container>
-
-        <ng-container *ngIf="field.type==='hour'">
-          <select [formControlName]="field.name">
-            <option *ngFor="let h of hours" [value]="h">
-              {{h | number : '2.0-0'}}
-            </option>
-          </select>
-        </ng-container>
-
-        <ng-container *ngIf="field.type==='minute'">
-          <select [formControlName]="field.name">
-            <option *ngFor="let m of minutes" [value]="m">
-              :{{m | number : '2.0-0'}}
-            </option>
-          </select>
-        </ng-container>
-
-      </ng-container>
-      <span>zone GMT-{{zone/60}}</span>
-    </form>
+      </form>
+    </div>
   </ng-container>
+
 </ng-container>
 
 <ng-container *ngIf="!adding">
-  <input type="button" value="add" (click)="setAdding(true)">
+  <button matTooltip="add schedudle item" mat-icon-button (click)="setAdding(true)">
+    <mat-icon>add_circle_outline</mat-icon>
+  </button>
 </ng-container>
 
 <div class="showing">Showing {{schedule.returned}} of {{schedule.total}}.</div>
 <ng-container *ngIf="schedule.total>schedule.returned">
   <div>
-    <input type="button" value="&laquo;" (click)="previousPage()" [disabled]="1>schedule.query.offset">
-    <input type="button" value="&raquo;" (click)="nextPage()"
+    <button mat-icon-button matTooltip="previous page" (click)="previousPage()" [disabled]="1>schedule.query.offset">
+      <mat-icon>navigate_before</mat-icon>
+    </button>
+
+    <button mat-icon-button matTooltip="next page" (click)="nextPage()"
       [disabled]="(schedule.query.offset+schedule.returned)>=schedule.total">
+      <mat-icon>navigate_next</mat-icon>
+    </button>
   </div>
 
 </ng-container>
@@ -126,6 +165,15 @@
                 <a (click)="delete(item)">delete</a>
               </div>
             </ng-container>
+
+            <ng-container *ngIf="0===timeFlags[item.id]">
+              <div class="status"><span>in progress</span></div>
+            </ng-container>
+
+            <ng-container *ngIf="timeFlags[item.id]>0">
+              <div class="status"><span>completed</span></div>
+            </ng-container>
+
           </li>
 
         </ng-container>

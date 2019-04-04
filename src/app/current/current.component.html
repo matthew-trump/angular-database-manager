@@ -7,31 +7,7 @@
   <ng-container *ngIf="item.start; else noitem">
     <ul>
 
-      <li class="start">
 
-        <label>
-          <span>start</span>
-        </label>
-
-        <div>
-          <span>
-            {{item.start.format('M/DD/YYYY HH:mm')}}
-          </span>
-        </div>
-      </li>
-
-      <li class="end">
-
-        <label>
-          <span>end</span>
-        </label>
-
-        <div>
-          <span *ngIf="item.end">
-            {{item.end.format('M/DD/YYYY HH:mm')}}
-          </span>
-        </div>
-      </li>
 
 
       <ng-container *ngFor="let field of config.fields">
@@ -56,6 +32,7 @@
           </ng-container>
         </ng-container>
 
+
         <ng-container *ngIf="field.type==='quantity'">
           <li>
             <label>
@@ -66,6 +43,33 @@
         </ng-container>
 
       </ng-container>
+
+      <li class="end">
+
+        <label>
+          <span>ends</span>
+        </label>
+
+        <div>
+          <span *ngIf="item.end">
+            {{item.end.format('M/DD/YYYY HH:mm')}}
+          </span>
+        </div>
+      </li>
+
+      <li class="start">
+
+        <label>
+          <span>started</span>
+        </label>
+
+        <div>
+          <span>
+            {{item.start.format('M/DD/YYYY HH:mm')}}
+          </span>
+        </div>
+      </li>
+
 
 
     </ul>

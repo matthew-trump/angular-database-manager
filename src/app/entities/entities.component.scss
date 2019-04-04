@@ -1,18 +1,27 @@
+
 h2{
-    text-transform: capitalize
+    text-transform: capitalize;
+    margin-bottom: 0em;
 }
+
 .addentries{
     form{
         display: flex;
         align-items: flex-start;
 
-        textarea{
+        div.text{
+            width: 25em;
             margin-right: 1em;
+
+            mat-form-field{
+                width: 100%;
+            }
         }
     }
 }
 .controls{
     display: flex;
+    align-items: baseline;
     margin-bottom: 0.5em;
     .filter{
         span{
@@ -49,9 +58,17 @@ li.displaying{
         display: flex;
         align-items: flex-start;
 
-        textarea{
-            margin-right: 0.5em;
+        .textarea{
+            width: 24em;
+            margin-right: 1.5em;
+            mat-form-field {
+                width: 100%;
+            }
         }
+        .buttons{
+            margin-left: 2em;
+        }
+     
     }
     > div{
         display: flex;
