@@ -83,6 +83,10 @@
         <button mat-stroked-button [disabled]="!addScheduleItem.valid" (click)="saveNewScheduleItem()">
           save
         </button>
+        &nbsp;
+        <button mat-stroked-button (click)="setAdding(false)">
+          cancel
+        </button>
       </div>
     </div>
   </ng-container>
@@ -251,7 +255,7 @@
 
               </ng-container>
 
-              <div>
+              <div class="savebutton">
                 <button mat-icon-button (click)="save(item,i)"
                   [disabled]="formGroups[item.id].pristine || loading[item.id]">
                   <mat-icon>save_alt</mat-icon>
@@ -268,7 +272,7 @@
                 <button mat-icon-button (click)="delete(item)">
                   <mat-icon>delete</mat-icon>
                 </button>
-                
+
               </div>
 
             </form>
