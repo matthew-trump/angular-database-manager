@@ -7,9 +7,7 @@
         <mat-icon>arrow_back</mat-icon>
       </button>
 
-      <button mat-stroked-button [disabled]="!addScheduleItem.valid" (click)="saveNewScheduleItem()">
-        save
-      </button>
+
 
       <form [formGroup]="addScheduleItem">
 
@@ -81,6 +79,11 @@
         </ng-container>
 
       </form>
+      <div class="save">
+        <button mat-stroked-button [disabled]="!addScheduleItem.valid" (click)="saveNewScheduleItem()">
+          save
+        </button>
+      </div>
     </div>
   </ng-container>
 
@@ -161,9 +164,7 @@
                 <a (click)="edit(item)">edit</a>
               </div>
 
-              <div class="edit delete">
-                <a (click)="delete(item)">delete</a>
-              </div>
+
             </ng-container>
 
             <ng-container *ngIf="0===timeFlags[item.id]">
@@ -187,21 +188,27 @@
 
                 <ng-container *ngIf="field.foreignKey">
                   <div class="foreignKey" [ngClass]="field.foreignKey">
-                    <select [formControlName]="field.name"
-                      (change)="setLatestForeignKeyValueForAdd(formGroups[item.id],field)">
-                      <ng-container *ngIf="field.nullValue">
-                        <option [value]="field.default">{{field.nullValue}}</option>
-                      </ng-container>
-                      <option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
-                        {{entity[field.label]}}
-                      </option>
-                    </select>
+                    <mat-form-field>
+                      <mat-label>{{field.name}}</mat-label>
+
+                      <mat-select [formControlName]="field.name"
+                        (selectionChange)="setLatestForeignKeyValueForAdd(formGroups[item.id],field)">
+                        <ng-container *ngIf="field.nullValue">
+                          <mat-option [value]="field.default">{{field.nullValue}}</mat-option>
+                        </ng-container>
+                        <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                          {{entity[field.label]}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
                   </div>
                 </ng-container>
 
                 <ng-container *ngIf="field.type==='quantity'">
                   <div class="quantity" [ngClass]="field.name">
-                    <input [formControlName]="field.name" type="number" [placeholder]="field.name">
+                    <mat-form-field>
+                      <input matInput [formControlName]="field.name" type="number" [placeholder]="field.name">
+                    </mat-form-field>
                   </div>
 
                 </ng-container>
@@ -215,30 +222,53 @@
                   </mat-form-field>
                 </ng-container>
 
+
                 <ng-container *ngIf="field.type==='hour'">
-                  <select [formControlName]="field.name">
-                    <option *ngFor="let h of hours" [value]="h">
-                      {{h | number : '2.0-0'}}
-                    </option>
-                  </select>
+                  <div class="hour">
+                    <mat-form-field>
+                      <mat-label>time</mat-label>
+                      <mat-select [formControlName]="field.name">
+                        <mat-option *ngFor="let h of hours" [value]="h">
+                          {{h | number : '2.0-0'}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
                 </ng-container>
 
                 <ng-container *ngIf="field.type==='minute'">
-                  <select [formControlName]="field.name">
-                    <option *ngFor="let m of minutes" [value]="m">
-                      :{{m | number : '2.0-0'}}
-                    </option>
-                  </select>
+                  <div class="minute">
+                    <mat-form-field>
+                      <mat-label></mat-label>
+                      <mat-select [formControlName]="field.name">
+                        <mat-option *ngFor="let m of minutes" [value]="m">
+                          :{{m | number : '2.0-0'}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
                 </ng-container>
 
               </ng-container>
 
-              <div class="edit">
-                <input type="button" (click)="save(item,i)" value="save"
+              <div>
+                <button mat-icon-button (click)="save(item,i)"
                   [disabled]="formGroups[item.id].pristine || loading[item.id]">
+                  <mat-icon>save_alt</mat-icon>
+                </button>
               </div>
-              <div class="edit">
-                <input type="button" (click)="cancel(item)" value="cancel" [disabled]="loading[item.id]">
+              <div>
+                <button mat-icon-button (click)="cancel(item)" [disabled]="loading[item.id]">
+                  <mat-icon>close</mat-icon>
+                </button>
+
+              </div>
+
+              <div class="edit delete">
+                <button mat-icon-button (click)="delete(item)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                
               </div>
 
             </form>

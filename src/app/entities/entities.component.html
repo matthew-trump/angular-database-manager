@@ -10,15 +10,16 @@
 
 
   <ng-container *ngIf="adding">
-    <button mat-icon-button matTooltip="done" (click)="showAdding(false)">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
+    <div class="adding">
+      <button mat-icon-button matTooltip="done" (click)="showAdding(false)">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
 
-    <button mat-stroked-button [disabled]="!addEntitiesValid()" matTooltip="save" (click)="saveAddEntities()">
-      save all
-    </button>
+      <button mat-stroked-button [disabled]="!addEntitiesValid()" matTooltip="save" (click)="saveAddEntities()">
+        save all
+      </button>
 
-
+    </div>
 
 
     <ng-container *ngIf="addedThisSave>0">
@@ -56,8 +57,11 @@
                     </div>
                   </ng-container>
                   <ng-template #textinput>
-                    <div>
-                      <input type="text" [placeholder]="field.name" [formControlName]="field.name">
+                    <div class="textinput">
+                      <mat-form-field>
+                        <mat-label>{{field.name}}</mat-label>
+                        <input matInput type="text" [placeholder]="field.name" [formControlName]="field.name">
+                      </mat-form-field>
                     </div>
                   </ng-template>
 
@@ -240,7 +244,12 @@
                           </div>
                         </ng-container>
                         <ng-template #textinput>
-                          <input type="text" [formControlName]="field.name">
+                          <div class="textinput">
+                            <mat-form-field>
+                              <mat-label>{{field.name}}</mat-label>
+                              <input matInput type="text" [formControlName]="field.name">
+                            </mat-form-field>
+                          </div>
                         </ng-template>
 
                       </ng-container>
