@@ -102,17 +102,24 @@ export class ConfigSchemaService {
     });
   }
   async loadCurrentScheduledItem(): Promise<any> {
-    const result: any = await this.backendApiService.getCurrentScheduleItem(this.target).toPromise();
-    const current: any = Object.assign({}, result.item);
-    delete current.start;
-    if (result.item) {
-      current.start = moment.utc(result.item.start).local();
-    }
-    if (result.next) {
-      current.end = moment.utc(result.next.start).local();
-    }
-    return Promise.resolve(current);
+    try{
+      const result: any = await this.backendApiService.getCurrentScheduleItem(this.target).toPromise();
+      const current: any = Object.assign({}, result.item);
+      delete current.start;
+      if (result.item) {
+        current.start = moment.utc(result.item.start).local();
+      }
+      if (result.next) {
+        current.end = moment.utc(result.next.start).local();
+      }
+      return Promise.resolve(current);
 
+    }catch(err){
+        console.log(err);
+        return Promise.resolve(null);
+    }
+   
+    
   }
 }
 
