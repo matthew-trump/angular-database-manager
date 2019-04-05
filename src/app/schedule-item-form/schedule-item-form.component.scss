@@ -46,7 +46,7 @@
 
 
 .editing{
-    
+    display: flex; 
     margin-bottom: 0.5em;
     padding: 0.4em;
     border: 1px solid goldenrod;
@@ -80,7 +80,6 @@
         }
     }
     .date{
-        width: 10em;
         margin-left: 0.5em;
     }
     .hour{
