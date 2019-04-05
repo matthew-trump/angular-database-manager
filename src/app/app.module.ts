@@ -39,6 +39,8 @@ import { ConfigSchemaComponent } from './config-schema/config-schema.component';
 import { EntitiesComponent } from './entities/entities.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { CurrentComponent } from './current/current.component';
+import { InstanceDisplayBasicComponent } from './instance-display-basic/instance-display-basic.component';
+import { ScheduleItemDetailsComponent } from './schedule-item-details/schedule-item-details.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +50,9 @@ import { CurrentComponent } from './current/current.component';
     ConfigSchemaComponent,
     EntitiesComponent,
     ScheduleComponent,
-    CurrentComponent
+    CurrentComponent,
+    InstanceDisplayBasicComponent,
+    ScheduleItemDetailsComponent
   ],
   imports: [
     BrowserModule,
