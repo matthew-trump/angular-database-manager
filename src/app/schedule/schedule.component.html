@@ -1,97 +1,20 @@
 <div style="display: flex; align-items: center">
   <h2>Schedule</h2>
   <ng-container *ngIf="!adding">
-    <button matTooltip="add schedudle item" mat-icon-button (click)="setAdding(true)">
+    <button matTooltip="add schedule item" mat-icon-button (click)="setAdding(true)">
       <mat-icon>add_circle_outline</mat-icon>
     </button>
   </ng-container>
 </div>
 <ng-container *ngIf="(now$ | async) as now">
+  <ng-container *ngIf="config && adding && addScheduleItem">
 
-  <ng-container *ngIf="config && adding">
-    <div class="adding">
-      <form [formGroup]="addScheduleItem">
+    <app-schedule-item-form [formGroup]="addScheduleItem" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
+      [scheduleConfig]="config" [target]="target" [dateFormat]="DATE_FORMAT" [now$]="now$"
+      (done)="closeAddForm($event)">
+    </app-schedule-item-form>
 
-        <ng-container *ngFor="let field of config.fields">
-
-          <ng-container *ngIf="field.foreignKey">
-            <mat-form-field>
-              <mat-label>{{field.name}}</mat-label>
-              <mat-select [formControlName]="field.name"
-                (selectionChange)="setLatestForeignKeyValueForAdd(addScheduleItem,field)">
-                <ng-container *ngIf="field.nullValue">
-                  <mat-option [value]="field.default">{{field.nullValue}}</mat-option>
-                </ng-container>
-                <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
-                  {{entity[field.label]}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
-          </ng-container>
-
-          <ng-container *ngIf="field.type==='quantity'">
-            <div class="quantity">
-              <mat-form-field>
-                <mat-label>{{field.name}}</mat-label>
-                <input matInput [formControlName]="field.name" type="number" [placeholder]="field.name">
-              </mat-form-field>
-            </div>
-          </ng-container>
-
-          <ng-container *ngIf="field.type==='date'">
-            <div class="date">
-              <mat-form-field>
-                <mat-label>start date (GMT-{{zone/60}})</mat-label>
-                <input matInput [min]="now" [formControlName]="field.name" [matDatepicker]="picker"
-                  [placeholder]="field.placeholder">
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
-            </div>
-          </ng-container>
-
-          <ng-container *ngIf="field.type==='hour'">
-            <div class="hour">
-              <mat-form-field>
-                <mat-label>time</mat-label>
-                <mat-select [formControlName]="field.name">
-                  <mat-option *ngFor="let h of hours" [value]="h">
-                    {{h | number : '2.0-0'}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </ng-container>
-
-          <ng-container *ngIf="field.type==='minute'">
-            <div class="minute">
-              <mat-form-field>
-                <mat-label></mat-label>
-                <mat-select [formControlName]="field.name">
-                  <mat-option *ngFor="let m of minutes" [value]="m">
-                    :{{m | number : '2.0-0'}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </ng-container>
-
-        </ng-container>
-
-      </form>
-      <div class="save">
-        <button mat-stroked-button [disabled]="!addScheduleItem.valid" (click)="saveNewScheduleItem()">
-          save
-        </button>
-        &nbsp;
-        <button mat-stroked-button (click)="setAdding(false)">
-          cancel
-        </button>
-      </div>
-    </div>
   </ng-container>
-
 </ng-container>
 
 
@@ -183,98 +106,12 @@
         </ng-container>
         <ng-container *ngIf="formGroups[item.id]">
 
-          <li class="editing">
+          <li>
+            <app-schedule-item-form [formGroup]="formGroups[item.id]" [item]="item" [scheduleConfig]="config"
+              [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" [now$]="now$" [target]="target"
+              [dateFormat]="DATE_FORMAT" (done)="closeEditForm(item.id,$event)">
+            </app-schedule-item-form>
 
-            <form [formGroup]="formGroups[item.id]">
-
-              <ng-container *ngFor="let field of config.fields">
-
-                <ng-container *ngIf="field.foreignKey">
-                  <div class="foreignKey" [ngClass]="field.foreignKey">
-                    <mat-form-field>
-                      <mat-label>{{field.name}}</mat-label>
-
-                      <mat-select [formControlName]="field.name"
-                        (selectionChange)="setLatestForeignKeyValueForAdd(formGroups[item.id],field)">
-                        <ng-container *ngIf="field.nullValue">
-                          <mat-option [value]="field.default">{{field.nullValue}}</mat-option>
-                        </ng-container>
-                        <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
-                          {{entity[field.label]}}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                </ng-container>
-
-                <ng-container *ngIf="field.type==='quantity'">
-                  <div class="quantity" [ngClass]="field.name">
-                    <mat-form-field>
-                      <input matInput [formControlName]="field.name" type="number" [placeholder]="field.name">
-                    </mat-form-field>
-                  </div>
-
-                </ng-container>
-
-                <ng-container *ngIf="field.type==='date'">
-                  <mat-form-field>
-                    <input matInput [min]="now" [formControlName]="field.name" [matDatepicker]="picker"
-                      [placeholder]="field.placeholder">
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                  </mat-form-field>
-                </ng-container>
-
-
-                <ng-container *ngIf="field.type==='hour'">
-                  <div class="hour">
-                    <mat-form-field>
-                      <mat-label>time</mat-label>
-                      <mat-select [formControlName]="field.name">
-                        <mat-option *ngFor="let h of hours" [value]="h">
-                          {{h | number : '2.0-0'}}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                </ng-container>
-
-                <ng-container *ngIf="field.type==='minute'">
-                  <div class="minute">
-                    <mat-form-field>
-                      <mat-label></mat-label>
-                      <mat-select [formControlName]="field.name">
-                        <mat-option *ngFor="let m of minutes" [value]="m">
-                          :{{m | number : '2.0-0'}}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                </ng-container>
-
-              </ng-container>
-
-              <div class="savebutton">
-                <button mat-icon-button (click)="save(item,i)"
-                  [disabled]="formGroups[item.id].pristine || loading[item.id]">
-                  <mat-icon>save_alt</mat-icon>
-                </button>
-              </div>
-              <div>
-                <button mat-icon-button (click)="cancel(item)" [disabled]="loading[item.id]">
-                  <mat-icon>close</mat-icon>
-                </button>
-
-              </div>
-
-              <div class="edit delete">
-                <button mat-icon-button (click)="delete(item)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-
-              </div>
-
-            </form>
           </li>
         </ng-container>
       </ng-container>
