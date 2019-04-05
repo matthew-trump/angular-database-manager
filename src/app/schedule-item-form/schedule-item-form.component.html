@@ -1,0 +1,110 @@
+<ng-container *ngIf="(now$|async) as now">
+  <ng-container *ngIf="foreignKeysEntitiesMap">
+    <ng-container *ngIf="scheduleConfig as config">
+
+      <div [ngClass]="{'adding':!item,'editing':item}">
+        <form [formGroup]="formGroup">
+
+          <ng-container *ngFor="let field of config.fields">
+            <ng-container *ngIf="field.foreignKey">
+
+              <mat-form-field>
+                <mat-label>{{field.name}}</mat-label>
+                <mat-select [formControlName]="field.name"
+                  (selectionChange)="setLatestForeignKeyValueForAdd(formGroup,field)">
+                  <ng-container *ngIf="field.nullValue">
+                    <mat-option [value]="field.default">{{field.nullValue}}</mat-option>
+                  </ng-container>
+                  <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
+                    {{entity[field.label]}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+            </ng-container>
+
+            <ng-container *ngIf="field.type==='quantity'">
+              <div class="quantity">
+                <mat-form-field>
+                  <mat-label>{{field.name}}</mat-label>
+                  <input matInput [formControlName]="field.name" type="number" [placeholder]="field.name">
+                </mat-form-field>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="field.type==='date'">
+              <div class="date">
+                <mat-form-field>
+                  <mat-label>start date (GMT-{{utcOffset/60}})</mat-label>
+                  <input matInput [min]="now" [formControlName]="field.name" [matDatepicker]="picker"
+                    [placeholder]="field.placeholder">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="field.type==='hour'">
+              <div class="hour">
+                <mat-form-field>
+                  <mat-label>time</mat-label>
+                  <mat-select [formControlName]="field.name">
+                    <mat-option *ngFor="let h of hours" [value]="h">
+                      {{h | number : '2.0-0'}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="field.type==='minute'">
+              <div class="minute">
+                <mat-form-field>
+                  <mat-label></mat-label>
+                  <mat-select [formControlName]="field.name">
+                    <mat-option *ngFor="let m of minutes" [value]="m">
+                      :{{m | number : '2.0-0'}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </ng-container>
+          </ng-container>
+        </form>
+        <ng-container *ngIf="!item">
+          <div class="save">
+            <button mat-stroked-button [disabled]="!formGroup.valid" (click)="saveNewScheduleItem()">
+              save
+            </button>
+            &nbsp;
+            <button mat-stroked-button (click)="done.emit(false)">
+              cancel
+            </button>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="item">
+          <div class="savebutton">
+            <button mat-icon-button (click)="save()" [disabled]="formGroup.pristine || loading">
+              <mat-icon>save_alt</mat-icon>
+            </button>
+          </div>
+          <div>
+            <button mat-icon-button (click)="done.emit(false)" [disabled]="loading">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="edit delete">
+            <button mat-icon-button (click)="delete()">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </ng-container>
+
+      </div>
+
+    </ng-container>
+
+
+  </ng-container>
+</ng-container>
