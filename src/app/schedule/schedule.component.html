@@ -22,7 +22,7 @@
                 <ng-container *ngIf="field.nullValue">
                   <mat-option [value]="field.default">{{field.nullValue}}</mat-option>
                 </ng-container>
-                <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
                   {{entity[field.label]}}
                 </mat-option>
               </mat-select>
@@ -128,11 +128,11 @@
             <ng-container *ngFor="let field of config.fields">
 
               <ng-container *ngIf="field.foreignKey">
-                <ng-container *ngIf="foreignKeyEntitiesIdMap[field.foreignKey]">
+                <ng-container *ngIf="foreignKeysEntitiesIdMap[field.foreignKey]">
 
                   <div class="foreignKey" [ngClass]="field.foreignKey">
                     <ng-container *ngIf="item[field.name] as id">
-                      {{foreignKeyEntitiesIdMap[field.foreignKey][id][field.label]}}
+                      {{foreignKeysEntitiesIdMap[field.foreignKey][id][field.label]}}
                     </ng-container>
                     <ng-container *ngIf="!item[field.name]">
                       any
@@ -199,7 +199,7 @@
                         <ng-container *ngIf="field.nullValue">
                           <mat-option [value]="field.default">{{field.nullValue}}</mat-option>
                         </ng-container>
-                        <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                        <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
                           {{entity[field.label]}}
                         </mat-option>
                       </mat-select>

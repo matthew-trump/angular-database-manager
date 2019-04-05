@@ -8,6 +8,7 @@ import { BackendApiService } from '../backend-api.service';
 import { EntitiesMap } from '../entities-map';
 import { EntitiesIdMap } from '../entities-id-map';
 import { ScheduleConfig } from '../schedule-config';
+import { ScheduleField } from '../schedule-field';
 import { ScheduleItem } from '../schedule-item';
 import { ScheduleItemUpdate } from '../schedule-item-update';
 import { ScheduleQuery } from '../schedule-query';
@@ -46,7 +47,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
   items$: BehaviorSubject<ScheduleItem[]> = new BehaviorSubject(null);
 
-  foreignKeysMapEntitiesMap: EntitiesMap;
+  foreignKeysEntitiesMap: EntitiesMap;
   foreignKeysEntitiesIdMap: EntitiesIdMap;
   foreignKeyValueForAdd: Map<string, number> = new Map<string, number>();
 
@@ -86,9 +87,9 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           if (state.target !== null) {
             this.configSchemaService.loadScheduleForeignKeys()
               .then((foreignKeysMapEntitiesMap: EntitiesMap) => {
-                this.foreignKeysMapEntitiesMap = foreignKeysMapEntitiesMap;
-                if (this.foreignKeysMapEntitiesMap) {
-                  this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysMapEntitiesMap);
+                this.foreignKeysEntitiesMap = foreignKeysMapEntitiesMap;
+                if (this.foreignKeysEntitiesMap) {
+                  this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
                 }
                 this.resetFormGroups();
                 this.target = state.target;
@@ -165,11 +166,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     if ((moment()).diff(start) > 0) {
       throw new Error("The start date must be in the future.")
     }
-    const scheduleItemUpdate: ScheduleItemUpdate = Object.assign(this.config.fields.map((field: any) => {
+    const scheduleItemUpdate: ScheduleItemUpdate = Object.assign({}, this.config.fields.reduce((obj: ScheduleItemUpdate, field: ScheduleField) => {
       if (typeof field.foreignKey !== 'undefined') {
-        scheduleItemUpdate[field.name] = formGroup.value[field.name]
+        obj[field.name] = formGroup.value[field.name]
       }
-    }), {
+      return obj;
+    }, {} as ScheduleItemUpdate), {
       start: start.utc().format(DATE_FORMAT),
       number: formGroup.value.number,
       pool: formGroup.value.pool,
