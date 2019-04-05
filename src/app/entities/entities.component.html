@@ -78,7 +78,7 @@
                     <mat-label>{{field.name}}</mat-label>
                     <mat-select [formControlName]="field.name"
                       (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
-                      <mat-option *ngFor="let entity of foreignKeyEntitiesMap[field.foreignKey]" [value]="entity.id">
+                      <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
                         {{entity[field.label]}}
                       </mat-option>
                     </mat-select>
@@ -124,7 +124,7 @@
                     all
                   </mat-option>
 
-                  <mat-option *ngFor=" let entity of foreignKeyEntitiesMap[filter.entity]" [value]="entity.id">
+                  <mat-option *ngFor=" let entity of foreignKeysEntitiesMap[filter.entity]" [value]="entity.id">
                     {{entity[filter.label]}}
                   </mat-option>
 
@@ -215,9 +215,9 @@
                     </ng-container>
 
                     <ng-container *ngIf="field.foreignKey">
-                      <ng-container *ngIf="foreignKeyEntitiesIdMap[field.foreignKey]">
+                      <ng-container *ngIf="foreignKeysEntitiesIdMap[field.foreignKey]">
                         <div class="field foreignKey" [ngClass]="field.name">
-                          <span>{{foreignKeyEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}</span>
+                          <span>{{foreignKeysEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}</span>
                         </div>
                       </ng-container>
                     </ng-container>
@@ -264,7 +264,7 @@
                         <mat-form-field>
                           <mat-label>{{field.name}}</mat-label>
                           <mat-select [formControlName]="field.name">
-                            <mat-option *ngFor="let entity of foreignKeyEntitiesMap[field.foreignKey]"
+                            <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]"
                               [value]="entity.id">
                               {{entity[field.label]}}
                             </mat-option>
