@@ -93,5 +93,10 @@ export class BackendApiService {
         const apiPath: string = environment.targets[target].apiPath;
         return this.http.get(url + apiPath + 'current');
     }
+    getCurrentScheduleInstance(target: string) {
+        const url: string = environment.targets[target].url;
+        const apiPath: string = environment.targets[target].apiPath;
+        return this.http.get(url + apiPath + '/round');
+    }
 
 }

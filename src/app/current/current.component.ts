@@ -87,8 +87,12 @@ export class CurrentComponent implements OnInit, OnDestroy {
 
   loadCurrentScheduledItem() {
     this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
-      console.log("CURRENT", current);
       this.current$.next(current);
+    })
+  }
+  loadCurrentScheduleInstance(){
+    this.backendApiService.getCurrentScheduleInstance(this.target).toPromise().then((instance)=>{
+      console.log(instance);
     })
   }
   ngOnDestroy() {
