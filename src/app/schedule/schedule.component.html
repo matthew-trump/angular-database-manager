@@ -1,7 +1,7 @@
 <div style="display: flex; align-items: center">
   <h2>Schedule</h2>
   <ng-container *ngIf="!adding">
-    <button matTooltip="add schedule item" mat-icon-button (click)="setAdding(true)">
+    <button matTooltip="add schedule item" mat-icon-button (click)="add()">
       <mat-icon>add_circle_outline</mat-icon>
     </button>
   </ng-container>
