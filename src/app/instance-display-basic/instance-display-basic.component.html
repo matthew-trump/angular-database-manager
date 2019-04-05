@@ -1,0 +1,22 @@
+<ng-container *ngIf="entityConfig">
+  <ng-container *ngIf="(scheduleInstance$|async) as instance">
+    <div class="round">
+      <ng-container *ngFor="let field of entityConfig.fields">
+        <ng-container *ngIf="field.foreignKey">
+
+          <h4>{{field.name}} : {{instance.round[field.name].name}}</h4>
+
+        </ng-container>
+      </ng-container>
+
+      <ul>
+        <li *ngFor="let item of instance.items; let i = index;">
+          <div class="number">{{i+1}}</div>
+          <div class="text">{{item.text}}</div>
+        </li>
+      </ul>
+    </div>
+
+
+  </ng-container>
+</ng-container>

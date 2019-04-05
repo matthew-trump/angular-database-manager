@@ -1,0 +1,23 @@
+div.round{
+    li{
+        display: flex;
+        flex-direction: row;
+        flex: 1 1 auto;
+        padding-bottom: 0.5em;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 1em;
+
+        .number{
+            width: 3em;
+        }
+        .text{
+            width: 40em;
+
+        }
+        /**
+        .percentage_correct{
+            margin-left: 1em;
+            width: 3em;
+        }**/
+    }
+}
