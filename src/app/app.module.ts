@@ -41,6 +41,8 @@ import { ScheduleComponent } from './schedule/schedule.component';
 import { CurrentComponent } from './current/current.component';
 import { InstanceDisplayBasicComponent } from './instance-display-basic/instance-display-basic.component';
 import { ScheduleItemDetailsComponent } from './schedule-item-details/schedule-item-details.component';
+import { EntityFormComponent } from './entity-form/entity-form.component';
+import { ScheduleItemFormComponent } from './schedule-item-form/schedule-item-form.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,9 @@ import { ScheduleItemDetailsComponent } from './schedule-item-details/schedule-i
     ScheduleComponent,
     CurrentComponent,
     InstanceDisplayBasicComponent,
-    ScheduleItemDetailsComponent
+    ScheduleItemDetailsComponent,
+    EntityFormComponent,
+    ScheduleItemFormComponent
   ],
   imports: [
     BrowserModule,
