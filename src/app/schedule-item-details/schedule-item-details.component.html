@@ -1,0 +1,63 @@
+<ng-container *ngIf="(scheduleItem$|async) as item">
+  <ng-container *ngIf="foreignKeysEntitiesIdMap">
+    <ul class="details">
+      <ng-container *ngFor="let field of scheduleConfig.fields">
+        <ng-container *ngIf="field.foreignKey">
+          <ng-container *ngIf="foreignKeysEntitiesIdMap[field.foreignKey]">
+
+            <li [ngClass]="selectorentity">
+              <label>
+                <span>{{field.name}}</span>
+              </label>
+              <div>
+                <ng-container *ngIf="item[field.name] as id">
+                  <span>
+                    {{foreignKeysEntitiesIdMap[field.foreignKey][id][field.label]}}</span>
+                </ng-container>
+                <ng-container *ngIf="!item[field.name]">
+                  <span>any</span>
+                </ng-container>
+              </div>
+            </li>
+
+          </ng-container>
+        </ng-container>
+
+
+        <ng-container *ngIf="field.type==='quantity'">
+          <li>
+            <label>
+              <span>{{field.name}}</span>
+            </label>
+            <div><span>{{item[field.name]}}</span></div>
+          </li>
+        </ng-container>
+
+      </ng-container>
+
+      <li class="end">
+
+        <label>
+          <span>ends</span>
+        </label>
+
+        <div>
+          <span *ngIf="item.end">
+            {{item.end.format(dateFormat)}}
+          </span>
+        </div>
+      </li>
+
+      <li class="start">
+        <label>
+          <span>started</span>
+        </label>
+        <div>
+          <span>
+            {{item.start.format(dateFormat)}}
+          </span>
+        </div>
+      </li>
+    </ul>
+  </ng-container>
+</ng-container>
