@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { tap, takeUntil, switchMap, filter, debounceTime } from 'rxjs/operators';
+import { tap, takeUntil, switchMap, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
+import { EntitiesMap } from '../entities-map';
+import { EntitiesIdMap } from '../entities-id-map';
 import { environment } from 'src/environments/environment';
 
 const DEFAULT_LIMIT: number = 50;
@@ -35,8 +37,8 @@ export class EntitiesComponent implements OnInit {
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
   foreignKeyEntityConfigMap: any = {};
   //foreignKeys: any[];
-  foreignKeyEntities: any = {}
-  foreignKeyEntitiesIdMap: any = {};
+  foreignKeysEntitiesMap: EntitiesMap;
+  foreignKeysEntitiesIdMap: EntitiesIdMap;
 
   loading: any = {};
   loadingList: boolean = false;
@@ -70,12 +72,14 @@ export class EntitiesComponent implements OnInit {
         }),
         tap((params: any) => {
           if (params.id) {
-            this.configSchemaService.loadForeignKeys(params.id)
-              .then((result) => {
-                if (result && result[0]) {
-                  this.foreignKeyEntities = result[0].entities;
-                  this.foreignKeyEntitiesIdMap = result[0].idMap;
+            this.configSchemaService.loadEntityForeignKeys(params.id)
+              .then((foreignKeysEntitiesMap: EntitiesMap) => {
+                this.foreignKeysEntitiesMap = foreignKeysEntitiesMap;
+                if (this.foreignKeysEntitiesMap) {
+                  this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
                 }
+
+
                 this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
                 this.formGroups = {};
                 this.addEntities = [];
@@ -122,7 +126,6 @@ export class EntitiesComponent implements OnInit {
   }
 
   doFilter(field?: string, value?: any) {
-    console.log("DO FILTER");
     const query: any = (field && value !== this.FILTER_ALL) ? { [field]: value } : null;
     this.filter = query;
     this.offset = 0;

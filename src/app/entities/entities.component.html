@@ -78,7 +78,7 @@
                     <mat-label>{{field.name}}</mat-label>
                     <mat-select [formControlName]="field.name"
                       (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
-                      <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                      <mat-option *ngFor="let entity of foreignKeyEntitiesMap[field.foreignKey]" [value]="entity.id">
                         {{entity[field.label]}}
                       </mat-option>
                     </mat-select>
@@ -124,7 +124,7 @@
                     all
                   </mat-option>
 
-                  <mat-option *ngFor=" let entity of foreignKeyEntities[filter.entity]" [value]="entity.id">
+                  <mat-option *ngFor=" let entity of foreignKeyEntitiesMap[filter.entity]" [value]="entity.id">
                     {{entity[filter.label]}}
                   </mat-option>
 
@@ -264,7 +264,8 @@
                         <mat-form-field>
                           <mat-label>{{field.name}}</mat-label>
                           <mat-select [formControlName]="field.name">
-                            <mat-option *ngFor="let entity of foreignKeyEntities[field.foreignKey]" [value]="entity.id">
+                            <mat-option *ngFor="let entity of foreignKeyEntitiesMap[field.foreignKey]"
+                              [value]="entity.id">
                               {{entity[field.label]}}
                             </mat-option>
                           </mat-select>
