@@ -8,9 +8,7 @@ import { BackendApiService } from '../backend-api.service';
 import { EntitiesMap } from '../entities-map';
 import { EntitiesIdMap } from '../entities-id-map';
 import { ScheduleConfig } from '../schedule-config';
-import { ScheduleField } from '../schedule-field';
 import { ScheduleItem } from '../schedule-item';
-import { ScheduleItemUpdate } from '../schedule-item-update';
 import { ScheduleQuery } from '../schedule-query';
 import { environment } from 'src/environments/environment';
 import * as moment from 'moment';
@@ -91,9 +89,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
                 if (this.foreignKeysEntitiesMap) {
                   this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
                 }
-                this.resetFormGroups();
+
                 this.target = state.target;
                 this.config = this.configSchemaService.getScheduleConfig();
+                this.resetFormGroups();
                 this.loadSchedule({});
                 this.loadCurrentScheduledItem();
 
@@ -109,114 +108,15 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
   }
+
   resetFormGroups() {
     this.formGroups = new Map<number, FormGroup>();
-  }
-  nextPage() {
-    this.offset = this.offset + this.limit;
-    this.loadSchedule(this.getQuery());
-  }
-  previousPage() {
-    this.offset = this.offset - this.limit;
-    this.loadSchedule(this.getQuery());
-  }
-  edit(item: any) {
-    this.resetFormGroups();
-    this.editing = true;
-    const fbconfig: any = this.getFormConfig(item);
-    const group: FormGroup = this.fb.group(fbconfig);
-    this.formGroups[item.id] = group;
-  }
-  cancel(item: any) {
-    this.editing = false;
-    delete this.formGroups[item.id];
   }
   getQuery() {
     return {};
   }
-  resetTimeFlags() {
-
-    if (this.schedule.items && this.current) {
-      this.timeFlags = {
-        [this.current.id]: 0
-      };
-      if (this.schedule.items && this.current && this.current.start) {
-        this.schedule.items.map((item: any) => {
-          if (this.current.start.diff(item.start) < 0) {
-            this.timeFlags[item.id] = -1;
-          } else if (0 < this.current.start.diff(item.start)) {
-            this.timeFlags[item.id] = 1
-          }
-        });
-      }
-
-
-    }
-  }
-  getStartFromFormGroup(formGroup: FormGroup): moment.Moment {
-    const base: moment.Moment = moment(formGroup.value.startDate);
-    base.hour(formGroup.value.startHour);
-    base.minute(formGroup.value.startMinute);
-    return base;
-  }
-
-  getScheduleItemUpdateFromFormGroup(formGroup: FormGroup) {
-
-    const start: moment.Moment = this.getStartFromFormGroup(formGroup);
-    if ((moment()).diff(start) > 0) {
-      throw new Error("The start date must be in the future.")
-    }
-    const scheduleItemUpdate: ScheduleItemUpdate = Object.assign({}, this.config.fields.reduce((obj: ScheduleItemUpdate, field: ScheduleField) => {
-      if (typeof field.foreignKey !== 'undefined') {
-        obj[field.name] = formGroup.value[field.name]
-      }
-      return obj;
-    }, {} as ScheduleItemUpdate), {
-      start: start.utc().format(DATE_FORMAT),
-      number: formGroup.value.number,
-      pool: formGroup.value.pool,
-    } as ScheduleItemUpdate);
-
-    return scheduleItemUpdate;
-  }
-  delete(item: ScheduleItem) {
-    if (window.confirm("Delete this schedule item?")) {
-      this.backendApiService.deleteScheduleItem(this.target, item.id).toPromise().then(_ => {
-        this.loadSchedule({});
-      }).catch(err => {
-        console.log(err);
-      })
-    }
-  }
-
-  save(item: ScheduleItem) {
-    try {
-      const scheduleItemUpdate: ScheduleItemUpdate = this.getScheduleItemUpdateFromFormGroup(this.formGroups[item.id]);
-      this.backendApiService.updateScheduleItem(this.target, item.id, scheduleItemUpdate).toPromise().then((_) => {
-        this.cancel(item);
-        this.loadSchedule({});
-      }).catch(err => {
-        console.log(err);
-      })
-    } catch (err) {
-      window.alert(err.message);
-    }
-  }
-  saveNewScheduleItem() {
-    try {
-      const scheduleItemUpdate: ScheduleItemUpdate = this.getScheduleItemUpdateFromFormGroup(this.addScheduleItem);
-      this.backendApiService.addScheduleItems(this.target, [scheduleItemUpdate]).toPromise().then((_) => {
-        this.setAdding(false);
-        this.loadSchedule({});
-      }).catch(err => {
-        console.log(err);
-      })
-    } catch (err) {
-      window.alert(err.message);
-    }
-  }
-
   loadSchedule(queryObj: any) {
+    console.log("LOADING SCHEDULE");
     const query: ScheduleQuery = Object.assign({}, queryObj, {
       offset: this.offset,
       limit: this.limit
@@ -258,16 +158,29 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         console.log(err);
       });
   }
+  loadCurrentScheduledItem() {
+    this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
+      console.log("CURRENT", current);
+      this.current$.next(current);
+      this.current = current;
+      this.resetTimeFlags();
+    })
+  }
+  resetTimeFlags() {
 
-  setAdding(adding: boolean) {
-    this.adding = adding;
-    if (adding) {
-      this.addScheduleItem = this.fb.group(this.getFormConfig({}));
-      this.added = 0;
-      this.addedThisSave = 0;
-    } else {
-      delete this.addScheduleItem;
-      this.loadSchedule({});
+    if (this.schedule.items && this.current) {
+      this.timeFlags = {
+        [this.current.id]: 0
+      };
+      if (this.schedule.items && this.current && this.current.start) {
+        this.schedule.items.map((item: any) => {
+          if (this.current.start.diff(item.start) < 0) {
+            this.timeFlags[item.id] = -1;
+          } else if (0 < this.current.start.diff(item.start)) {
+            this.timeFlags[item.id] = 1
+          }
+        });
+      }
     }
   }
   getFormConfig(item: any) {
@@ -286,27 +199,50 @@ export class ScheduleComponent implements OnInit, OnDestroy {
                 field.type === 'minute' ? [time.minute()] :
                   [field.default] : [''];
 
-
-
       if (field.required) {
         fbconfig[field.name].push(Validators.required)
       }
     }
-
     return fbconfig;
   }
+  add() {
+    this.adding = true;
+    this.addScheduleItem = this.fb.group(this.getFormConfig({}));
+  }
+  edit(item: any) {
+    this.resetFormGroups(); //edit only one at a time
+    this.editing = true;
+    this.formGroups[item.id] = this.fb.group(this.getFormConfig(item));
+  }
+
+
+  closeAddForm(reload: boolean) {
+    this.adding = false;
+    delete this.addScheduleItem;
+    if (reload) {
+      this.loadSchedule({});
+    }
+  }
+  closeEditForm(id: number, reload: boolean) {
+    this.editing = false;
+    delete this.formGroups[id];
+    if (reload) {
+      this.loadSchedule({});
+    }
+  }
+
   setLatestForeignKeyValueForAdd(formGroup: FormGroup, field: any) {
     this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
-  loadCurrentScheduledItem() {
-    this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
-      console.log("CURRENT", current);
-      this.current$.next(current);
-      this.current = current;
-      this.resetTimeFlags();
-    })
-  }
 
+  nextPage() {
+    this.offset = this.offset + this.limit;
+    this.loadSchedule(this.getQuery());
+  }
+  previousPage() {
+    this.offset = this.offset - this.limit;
+    this.loadSchedule(this.getQuery());
+  }
 
   ngOnDestroy() {
     clearInterval(this.currentScheduleLoader);
