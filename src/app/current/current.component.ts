@@ -1,14 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { tap, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
+import { EntitiesMap } from '../entities-map';
+import { EntitiesIdMap } from '../entities-id-map';
 import { environment } from 'src/environments/environment';
-import * as moment from 'moment';
 
-const DEFAULT_LIMIT: number = 50;
 const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
 const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
 
@@ -21,36 +20,15 @@ export class CurrentComponent implements OnInit, OnDestroy {
 
   public DATE_FORMAT = DATE_FORMAT;
 
-  current$: BehaviorSubject<any> = new BehaviorSubject(null)
-  now$: BehaviorSubject<any>;
-  limit: number = DEFAULT_LIMIT;
-  offset: number = 0;
-  loadingList: boolean = false;
-  formGroups: any = {};
-
-  zone: any;
+  scheduleItem$: BehaviorSubject<any> = new BehaviorSubject(null);
+  scheduleInstance$: BehaviorSubject<any> = new BehaviorSubject(null);
+  unsubscribe$: Subject<null> = new Subject();
 
   config: any;
   target: string;
-  adding: boolean = false;
-  editing: boolean = false;
-  result: any;
+  foreignKeysEntitiesIdMap: EntitiesIdMap;
 
-  foreignKeyEntities: any = {}
-  foreignKeyEntitiesIdMap: any = {};
-  foreignKeyValueForAdd: any = {};
-
-  loading: any = {};
-
-  addScheduleItem: FormGroup;
-  added: number = 0;
-  addedThisSave: number = 0;
-
-  schedule: any = {}
-  timeFlags: any = {}
-
-  unsubscribe$: Subject<null> = new Subject();
-  currentScheduleLoader: any;
+  currentScheduleLoader: number;
 
   constructor(public store: Store<any>,
     public configSchemaService: ConfigSchemaService,
@@ -62,21 +40,17 @@ export class CurrentComponent implements OnInit, OnDestroy {
       .pipe(
         tap((state: any) => {
           if (state.target !== null) {
-            this.configSchemaService.loadForeignKeys()
-              .then(result => {
-                if (result && result[0]) {
-                  this.now$ = new BehaviorSubject(moment());
-                  this.zone = (moment()).utcOffset();
-                  this.formGroups = {};
-                  this.config = this.configSchemaService.getScheduleConfig();
+            this.configSchemaService.loadScheduleForeignKeys()
+              .then((foreignKeysEntitiesMap: EntitiesMap) => {
+                if (foreignKeysEntitiesMap) {
+                  this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(foreignKeysEntitiesMap);
                   this.target = state.target;
-                  this.foreignKeyEntities = result[0].entities;
-                  this.foreignKeyEntitiesIdMap = result[0].idMap;
+                  this.config = this.configSchemaService.getScheduleConfig();
                   this.loadCurrentScheduledItem();
-                  this.currentScheduleLoader = setInterval(() => {
-                    this.now$.next(moment());
+                  this.currentScheduleLoader = <any>setInterval(() => {
                     this.loadCurrentScheduledItem();
                   }, CURRENT_SCHEDULER_LOADER_INTERVAL);
+                  this.loadCurrentScheduleInstance();
                 }
               })
           }
@@ -85,14 +59,15 @@ export class CurrentComponent implements OnInit, OnDestroy {
       ).subscribe(_ => { })
   }
 
+
   loadCurrentScheduledItem() {
     this.configSchemaService.loadCurrentScheduledItem().then((current: any) => {
-      this.current$.next(current);
+      this.scheduleItem$.next(current);
     })
   }
-  loadCurrentScheduleInstance(){
-    this.backendApiService.getCurrentScheduleInstance(this.target).toPromise().then((instance)=>{
-      console.log(instance);
+  loadCurrentScheduleInstance() {
+    this.backendApiService.getCurrentScheduleInstance(this.target).toPromise().then((instance) => {
+      this.scheduleInstance$.next(instance);
     })
   }
   ngOnDestroy() {
