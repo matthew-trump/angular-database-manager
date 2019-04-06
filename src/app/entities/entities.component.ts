@@ -30,7 +30,6 @@ export class EntitiesComponent implements OnInit {
   foreignKeyValueForAdd: any = {};
 
   entityConfig: any;
-  target: string;
 
   result: any;
 
@@ -64,9 +63,6 @@ export class EntitiesComponent implements OnInit {
         filter((state: any) => {
           return state.target !== null;
         }),
-        tap((state: any) => {
-          this.target = state.target;
-        }),
         switchMap((_: any) => {
           return this.route.params
         }),
@@ -86,7 +82,7 @@ export class EntitiesComponent implements OnInit {
                 this.loading = {};
                 this.added = 0;
                 this.addedThisSave = 0;
-                this.limit = (TARGETS[this.target].limits && TARGETS[this.target].limits[this.entityConfig.plural]) ? TARGETS[this.target].limits[this.entityConfig.plural] : DEFAULT_LIMIT;
+                this.limit = (TARGETS[this.backendApiService.target].limits && TARGETS[this.backendApiService.target].limits[this.entityConfig.plural]) ? TARGETS[this.backendApiService.target].limits[this.entityConfig.plural] : DEFAULT_LIMIT;
                 this.offset = 0;
                 this.foreignKeyValueForAdd = {};
                 this.entities$.next(null);
@@ -107,7 +103,7 @@ export class EntitiesComponent implements OnInit {
     query.offset = this.offset;
     query.limit = this.limit;
     this.loadingList = true;
-    this.backendApiService.getEntities(this.target, this.entityConfig.plural, query)
+    this.backendApiService.getEntities(this.entityConfig.plural, query)
       .toPromise().then((result: any) => {
         this.loadingList = false;
         this.result = result;
@@ -150,7 +146,6 @@ export class EntitiesComponent implements OnInit {
   toggle(entity: any, field: string) {
     const value: boolean = !entity[field];
     this.backendApiService.updateEntity(
-      this.target,
       this.entityConfig.plural,
       entity.id,
       { [field]: value ? 1 : 0 }
@@ -183,7 +178,6 @@ export class EntitiesComponent implements OnInit {
     const update: any = this.formGroups[entity.id].value;
     this.loading[entity.id] = true;
     this.backendApiService.updateEntity(
-      this.target,
       this.entityConfig.plural,
       entity.id,
       update
@@ -237,7 +231,6 @@ export class EntitiesComponent implements OnInit {
     this.addedThisSave = 0;
     this.backendApiService
       .addEntities(
-        this.target,
         this.entityConfig.plural,
         this.addEntities.map((fg: FormGroup) => { return fg.value; })).toPromise()
       .then((result: any) => {
