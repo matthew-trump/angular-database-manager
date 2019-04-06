@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { ConfigSchemaService } from './config-schema.service';
@@ -9,17 +7,16 @@ import * as moment from "moment";
 import { BackendApiService } from './backend-api.service';
 
 const TARGETS: any = environment.targets;
-const DEFAULT_TARGET: any = environment.defaultTarget;
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  currentTarget: string = localStorage.getItem('target') || DEFAULT_TARGET;
+
   targetNames: string[] = Object.keys(TARGETS);
   constructor(
-    private router: Router,
     private backendApiService: BackendApiService,
     private configSchemaService: ConfigSchemaService) {
 
@@ -30,7 +27,7 @@ export class AuthService {
       .pipe(
         tap(res => this.setSession(res)),
         tap(_ => {
-          this.currentTarget = target;
+          //this.currentTarget = target;
           localStorage.setItem('target', target);
           this.configSchemaService.loadSchema(target);
         }),
@@ -47,9 +44,6 @@ export class AuthService {
     localStorage.removeItem("id_token");
     localStorage.removeItem("expires_at");
     localStorage.removeItem("username");
-  }
-  getThemeColor() {
-    return environment.targets[this.currentTarget].color;
   }
 
   public isLoggedIn() {
@@ -70,9 +64,6 @@ export class AuthService {
     const expiration = localStorage.getItem("expires_at");
     const expiresAt = JSON.parse(expiration);
     return moment(expiresAt);
-  }
-  getCurrentTarget() {
-    return this.currentTarget;
   }
   getTargetNames() {
     return this.targetNames;
