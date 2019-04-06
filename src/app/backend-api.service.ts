@@ -71,7 +71,7 @@ export class BackendApiService {
         return this.http.get<any>(this.getBaseApiPath(target) + 'current');
     }
     getCurrentScheduleInstance(target: string): Observable<any> {
-        return this.http.get<any>(this.getBaseApiPath(target) + '/round');
+        return this.http.get<any>(this.getBaseApiPath(target) + 'round');
     }
 
 
