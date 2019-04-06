@@ -66,7 +66,7 @@ export class CurrentComponent implements OnInit, OnDestroy {
     })
   }
   loadCurrentScheduleInstance() {
-    this.backendApiService.getCurrentScheduleInstance(this.target).toPromise().then((instance) => {
+    this.backendApiService.getCurrentScheduleInstance().toPromise().then((instance) => {
       this.scheduleInstance$.next(instance);
     })
   }
