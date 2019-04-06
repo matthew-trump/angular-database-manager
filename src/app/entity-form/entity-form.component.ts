@@ -1,7 +1,10 @@
-import { Component, Input, OnInit, NgZone } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { EntityConfig } from '../entity-config';
 import { EntitiesMap } from '../entities-map';
+import { EntityUpdate } from '../entity-update';
+import { Entity } from '../entity';
+import { BackendApiService } from '../backend-api.service';
 
 @Component({
   selector: 'app-entity-form',
@@ -10,19 +13,42 @@ import { EntitiesMap } from '../entities-map';
 })
 export class EntityFormComponent implements OnInit {
 
+  @Input() entity?: Entity;
   @Input() formGroup: FormGroup;
-  @Input() config: EntityConfig;
+  @Input() entityConfig: EntityConfig;
   @Input() foreignKeysEntitiesMap: EntitiesMap;
-  @Input() zone;
 
-  now;
+  @Output() done: EventEmitter<boolean> = new EventEmitter();
+  @Output() another: EventEmitter<boolean> = new EventEmitter();
+  @Output() remove: EventEmitter<boolean> = new EventEmitter();
 
-  constructor() { }
+  constructor(public backendApiService: BackendApiService) { }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  setLatestForeignKeyValueForAdd() { }
+
+  removeNew() {
+    this.remove.emit(true);
   }
-  setLatestForeignKeyValueForAdd() {
-
+  anotherNew() {
+    this.another.emit(true);
   }
+  cancel() {
+    this.done.emit(false);
+  }
+  save() {
+    try {
+      const entityUpdate: EntityUpdate = this.formGroup.value;
+      this.backendApiService.updateEntity(this.entityConfig.plural, this.entity.id, entityUpdate).toPromise().then((_) => {
+        this.done.emit(true)
+      }).catch(err => {
+        console.log(err);
+      })
+    } catch (err) {
+      window.alert(err.message);
+    }
+  }
+
 
 }
