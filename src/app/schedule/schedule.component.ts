@@ -10,11 +10,14 @@ import { EntitiesIdMap } from '../entities-id-map';
 import { ScheduleConfig } from '../schedule-config';
 import { ScheduleItem } from '../schedule-item';
 import { ScheduleQuery } from '../schedule-query';
+import { Pagination } from '../pagination';
+import { PaginationQuery } from '../pagination-query';
 import { environment } from 'src/environments/environment';
 import * as moment from 'moment';
 
 const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
 const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
+const DEFAULT_LIMIT: number = 7;
 
 @Component({
   selector: 'app-schedule',
@@ -25,44 +28,31 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 
   public DATE_FORMAT: string = DATE_FORMAT;
 
+  pagination: Pagination = new Pagination({
+    limit: DEFAULT_LIMIT,
+    offset: 0
+  })
+
   now$: BehaviorSubject<moment.Moment>;
+
   current$: BehaviorSubject<any> = new BehaviorSubject(null);
   current: any;
-  limit: number = 6;//DEFAULT_LIMIT;
-  offset: number = 0;
 
   loadingList: boolean = false;
-  formGroups: Map<number, FormGroup>;
 
-  zone: any;
   zoneDisplay: string = (moment()).format('Z');
 
-  config: ScheduleConfig;
-  target: string;
-  adding: boolean = false;
-  editing: boolean = false;
-  result: any;
+  scheduleConfig: ScheduleConfig;
 
   items$: BehaviorSubject<ScheduleItem[]> = new BehaviorSubject(null);
 
   foreignKeysEntitiesMap: EntitiesMap;
   foreignKeysEntitiesIdMap: EntitiesIdMap;
+
   foreignKeyValueForAdd: Map<string, number> = new Map<string, number>();
 
-  loading: any = {};
-
   addScheduleItem: FormGroup;
-  added: number = 0;
-  addedThisSave: number = 0;
-
-  hours: any = Array(24).fill(1).map((_, index) => {
-    return index;
-  });
-
-  minutes: any = Array(60).fill(1).map((_, index) => {
-    return index;
-  });
-
+  editScheduleItem: Map<number, FormGroup>;
 
   schedule: any = {}
   timeFlags: any = {}
@@ -89,14 +79,11 @@ export class ScheduleComponent implements OnInit, OnDestroy {
                 if (this.foreignKeysEntitiesMap) {
                   this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
                 }
-
-                this.target = state.target;
-                this.config = this.configSchemaService.getScheduleConfig();
+                this.scheduleConfig = this.configSchemaService.getScheduleConfig();
                 this.resetFormGroups();
-                this.loadSchedule({});
+                this.loadSchedule(this.pagination.query);
                 this.loadCurrentScheduledItem();
 
-                this.zone = (moment()).utcOffset();
                 this.now$ = new BehaviorSubject(moment());
                 this.currentScheduleLoader = setInterval(() => {
                   this.now$.next(moment());
@@ -107,33 +94,37 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         }),
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
+
+    this.pagination.params$
+      .pipe(
+        tap((params: PaginationQuery) => {
+          if (params) {
+            this.loadSchedule(params);
+          }
+        }),
+        takeUntil(this.unsubscribe$)
+      ).subscribe(_ => { });
   }
 
   resetFormGroups() {
-    this.formGroups = new Map<number, FormGroup>();
+    this.editScheduleItem = new Map<number, FormGroup>();
   }
-  getQuery() {
-    return {};
-  }
-  loadSchedule(queryObj: any) {
+
+  loadSchedule(query: PaginationQuery) {
     console.log("LOADING SCHEDULE");
-    const query: ScheduleQuery = Object.assign({}, queryObj, {
-      offset: this.offset,
-      limit: this.limit
-    });
     this.loadingList = true;
-    this.backendApiService.getSchedule(this.target, query)
+    this.backendApiService.getSchedule(query)
       .toPromise().then((result: any) => {
         this.loadingList = false;
-        this.result = result;
-        const items = this.result.items.map(raw => {
+
+        const items = result.items.map(raw => {
           const item = {
             id: raw.id,
             start: moment.utc(raw.start).local(),
             number: raw['number'],
             pool: raw['pool']
           };
-          this.config.fields.map((field: any) => {
+          this.scheduleConfig.fields.map((field: any) => {
             if (typeof field.foreignKey !== 'undefined') {
               item[field.name] = raw[field.name];
             }
@@ -142,16 +133,16 @@ export class ScheduleComponent implements OnInit, OnDestroy {
         }).sort((a: any, b: any) => {
           return b.start.diff(a.start);
         })
-
         this.schedule = {
-          total: this.result.total,
-          returned: this.result.returned,
-          query: this.result.query,
           items: items
         }
         this.items$.next(items);
-        this.resetTimeFlags();
 
+        this.pagination.update(result.query);
+        this.pagination.setTotal(result.total);
+        this.pagination.setShowing(result.returned)
+
+        this.resetTimeFlags();
 
       }).catch((err) => {
         this.loadingList = false;
@@ -185,10 +176,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   }
   getFormConfig(item: any) {
     const fbconfig: any = {};
-    for (let i = 0, len = this.config.fields.length; i < len; i++) {
-      const field: any = this.config.fields[i];
+    for (let i = 0, len = this.scheduleConfig.fields.length; i < len; i++) {
+      const field: any = this.scheduleConfig.fields[i];
 
-      const time: any = item[this.config.start] ? item[this.config.start] : moment().add(this.config.defaultStartOffsetMinutes, 'minutes');
+      const time: any = item[this.scheduleConfig.start] ? item[this.scheduleConfig.start] : moment().add(this.scheduleConfig.defaultStartOffsetMinutes, 'minutes');
 
       fbconfig[field.name] = typeof item[field.name] !== 'undefined' ?
         [item[field.name]]
@@ -206,28 +197,23 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     return fbconfig;
   }
   add() {
-    this.adding = true;
     this.addScheduleItem = this.fb.group(this.getFormConfig({}));
   }
   edit(item: any) {
     this.resetFormGroups(); //edit only one at a time
-    this.editing = true;
-    this.formGroups[item.id] = this.fb.group(this.getFormConfig(item));
+    this.editScheduleItem[item.id] = this.fb.group(this.getFormConfig(item));
   }
 
-
   closeAddForm(reload: boolean) {
-    this.adding = false;
     delete this.addScheduleItem;
     if (reload) {
-      this.loadSchedule({});
+      this.loadSchedule(this.pagination.query);
     }
   }
   closeEditForm(id: number, reload: boolean) {
-    this.editing = false;
-    delete this.formGroups[id];
+    delete this.editScheduleItem[id];
     if (reload) {
-      this.loadSchedule({});
+      this.loadSchedule(this.pagination.query);
     }
   }
 
@@ -235,14 +221,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     this.foreignKeyValueForAdd[field.name] = formGroup.value[field.name];
   }
 
-  nextPage() {
-    this.offset = this.offset + this.limit;
-    this.loadSchedule(this.getQuery());
-  }
-  previousPage() {
-    this.offset = this.offset - this.limit;
-    this.loadSchedule(this.getQuery());
-  }
+
 
   ngOnDestroy() {
     clearInterval(this.currentScheduleLoader);
