@@ -9,7 +9,6 @@ import { EntitiesMap } from '../entities-map';
 import { EntitiesIdMap } from '../entities-id-map';
 import { ScheduleConfig } from '../schedule-config';
 import { ScheduleItem } from '../schedule-item';
-import { ScheduleQuery } from '../schedule-query';
 import { Pagination } from '../pagination';
 import { PaginationQuery } from '../pagination-query';
 import { environment } from 'src/environments/environment';
