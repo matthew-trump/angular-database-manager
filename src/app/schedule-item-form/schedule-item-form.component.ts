@@ -17,7 +17,6 @@ import * as moment from 'moment';
 export class ScheduleItemFormComponent implements OnInit {
 
   @Input() item?: ScheduleItem;
-  @Input() target: string;
   @Input() dateFormat: string;
   @Input() now$: Observable<moment.Moment>;
   @Input() scheduleConfig: ScheduleConfig;
@@ -43,7 +42,7 @@ export class ScheduleItemFormComponent implements OnInit {
   saveNewScheduleItem() {
     try {
       const scheduleItemUpdate: ScheduleItemUpdate = this.getScheduleItemUpdate();
-      this.backendApiService.addScheduleItems(this.target, [scheduleItemUpdate]).toPromise().then((_) => {
+      this.backendApiService.addScheduleItems([scheduleItemUpdate]).toPromise().then((_) => {
         this.done.emit(true);
       }).catch(err => {
         console.log(err);
@@ -55,7 +54,7 @@ export class ScheduleItemFormComponent implements OnInit {
 
   delete() {
     if (window.confirm("Delete this schedule item?")) {
-      this.backendApiService.deleteScheduleItem(this.target, this.item.id).toPromise().then(_ => {
+      this.backendApiService.deleteScheduleItem(this.item.id).toPromise().then(_ => {
         this.done.emit(true);
       }).catch(err => {
         console.log(err);
@@ -66,7 +65,7 @@ export class ScheduleItemFormComponent implements OnInit {
   save() {
     try {
       const scheduleItemUpdate: ScheduleItemUpdate = this.getScheduleItemUpdate();
-      this.backendApiService.updateScheduleItem(this.target, this.item.id, scheduleItemUpdate).toPromise().then((_) => {
+      this.backendApiService.updateScheduleItem(this.item.id, scheduleItemUpdate).toPromise().then((_) => {
         this.done.emit(true)
       }).catch(err => {
         console.log(err);
