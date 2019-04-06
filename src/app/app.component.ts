@@ -40,9 +40,9 @@ export class AppComponent {
         this.entities = null;
       }
     })
-    try {
-      this.configSchemaService.loadSchema(this.backendApiService.target);
-    } catch (err) { }
+
+    this.configSchemaService.loadSchema(this.backendApiService.target);
+
 
   }
 
