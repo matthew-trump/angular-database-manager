@@ -111,19 +111,9 @@
       </div>
 
       <ng-container *ngIf="pagination.numPages > 1">
-        <div>
-          <button mat-icon-button matTooltip="previous page" (click)="pagination.previousPage()"
-            [disabled]="pagination.atStart()">
-            <mat-icon>navigate_before</mat-icon>
-          </button>
-
-          <button mat-icon-button matTooltip="next page" (click)="pagination.nextPage()"
-            [disabled]="!pagination.hasMore()">
-            <mat-icon>navigate_next</mat-icon>
-          </button>
-        </div>
-
+        <app-pagination-controls [pagination]="pagination"></app-pagination-controls>
       </ng-container>
+
 
     </ng-container>
     <div *ngIf="(entities$|async) as entities">
