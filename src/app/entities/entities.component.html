@@ -110,14 +110,15 @@
 
       </div>
 
-      <ng-container *ngIf="result.total>result.returned">
+      <ng-container *ngIf="pagination.numPages > 1">
         <div>
-          <button mat-icon-button matTooltip="previous page" (click)="previousPage()"
-            [disabled]="1>result.query.offset">
+          <button mat-icon-button matTooltip="previous page" (click)="pagination.previousPage()"
+            [disabled]="pagination.atStart()">
             <mat-icon>navigate_before</mat-icon>
           </button>
-          <button mat-icon-button matTooltip="next page" (click)="nextPage()"
-            [disabled]="(result.query.offset+result.returned)>=result.total">
+
+          <button mat-icon-button matTooltip="next page" (click)="pagination.nextPage()"
+            [disabled]="!pagination.hasMore()">
             <mat-icon>navigate_next</mat-icon>
           </button>
         </div>
