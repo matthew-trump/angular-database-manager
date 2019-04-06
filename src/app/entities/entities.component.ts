@@ -125,7 +125,11 @@ export class EntitiesComponent implements OnInit {
       .toPromise().then((result: any) => {
         this.loadingList = false;
         this.result = result;
-        this.pagination.update(result.query);
+
+        this.pagination.update({
+          offset: result.query.offset,
+          limit: result.query.limit
+        });
         this.pagination.setTotal(result.total);
         this.pagination.setShowing(result.returned)
         this.entities$.next(this.result.entities);
@@ -139,7 +143,9 @@ export class EntitiesComponent implements OnInit {
   }
 
   getQuery() {
-    return Object.assign({}, this.pagination.query, this.filter, this.search);
+    const queryObj = Object.assign({}, this.pagination.query, this.filter, this.search);
+    console.log(queryObj);
+    return queryObj;
   }
 
   doFilter(field?: string, value?: any) {
