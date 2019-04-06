@@ -2,12 +2,13 @@ import { PaginationQuery } from './pagination-query';
 import { BehaviorSubject } from 'rxjs';
 export class Pagination {
     params$: BehaviorSubject<PaginationQuery> = new BehaviorSubject(null);
-
     total: number;
     showing: number;
     constructor(
         public params: PaginationQuery
-    ) { }
+    ) {
+
+    }
     nextPage() {
         this.params.offset = this.params.offset + this.params.limit;
         this.params$.next(this.params);
@@ -33,6 +34,9 @@ export class Pagination {
     }
     hasMore(): boolean {
         return (this.params.offset + this.showing) < this.total
+    }
+    reset() {
+        this.params.offset = 0;
     }
 
 }
