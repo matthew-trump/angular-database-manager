@@ -9,6 +9,7 @@ import { EntitiesMap } from '../entities-map';
 import { EntitiesIdMap } from '../entities-id-map';
 import { ScheduleConfig } from '../schedule-config';
 import { ScheduleItem } from '../schedule-item';
+import { ScheduleQuery } from '../schedule-query';
 import { Pagination } from '../pagination';
 import { PaginationQuery } from '../pagination-query';
 import { environment } from 'src/environments/environment';
@@ -80,7 +81,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
                 }
                 this.scheduleConfig = this.configSchemaService.getScheduleConfig();
                 this.resetFormGroups();
-                this.loadSchedule(this.pagination.query);
+                this.loadSchedule(this.getQuery());
                 this.loadCurrentScheduledItem();
 
                 this.now$ = new BehaviorSubject(moment());
@@ -98,7 +99,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       .pipe(
         tap((params: PaginationQuery) => {
           if (params) {
-            this.loadSchedule(params);
+            this.loadSchedule(this.getQuery());
           }
         }),
         takeUntil(this.unsubscribe$)
@@ -108,8 +109,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   resetFormGroups() {
     this.editScheduleItem = new Map<number, FormGroup>();
   }
-
-  loadSchedule(query: PaginationQuery) {
+  getQuery(): ScheduleQuery {
+    return Object.assign({} as ScheduleQuery, this.pagination.query);
+  }
+  loadSchedule(query: ScheduleQuery) {
     console.log("LOADING SCHEDULE");
     this.loadingList = true;
     this.backendApiService.getSchedule(query)
@@ -206,13 +209,13 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   closeAddForm(reload: boolean) {
     delete this.addScheduleItem;
     if (reload) {
-      this.loadSchedule(this.pagination.query);
+      this.loadSchedule(this.getQuery());
     }
   }
   closeEditForm(id: number, reload: boolean) {
     delete this.editScheduleItem[id];
     if (reload) {
-      this.loadSchedule(this.pagination.query);
+      this.loadSchedule(this.getQuery());
     }
   }
 
