@@ -10,8 +10,8 @@
       [foreignKeysEntitiesIdMap]="foreignKeysEntitiesIdMap"></app-schedule-item-details>
 
 
-    <button mat-raised-button (click)="loadCurrentScheduleInstance()">
-      reload instance
+    <button matTooltip="refresh instance" mat-icon-button (click)="loadCurrentScheduleInstance()">
+      <mat-icon>refresh</mat-icon>
     </button>
 
     <app-instance-display-basic [scheduleInstance$]="scheduleInstance$" [entityConfig]="config">
