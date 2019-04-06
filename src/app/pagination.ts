@@ -23,6 +23,12 @@ export class Pagination {
     get numPages(): number {
         return this.params.limit ? Math.floor(this.total / this.params.limit) + 1 : 0;
     }
+    get lower(): number {
+        return this.params.offset + 1;
+    }
+    get upper(): number {
+        return this.params.offset + this.params.limit;
+    }
     update(query: PaginationQuery) {
         this.params = Object.assign({}, query);
     }
@@ -38,5 +44,6 @@ export class Pagination {
     reset() {
         this.params.offset = 0;
     }
+
 
 }
