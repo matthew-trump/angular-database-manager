@@ -119,61 +119,60 @@
     <div *ngIf="(entities$|async) as entities">
       <ul>
         <ng-container *ngFor="let entity of entities; let i=index">
-          <ng-container *ngIf="100>i">
 
-            <li class="displaying"
-              [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement])}">
-              <div>
-                <div class="index">
-                  <span>{{result.query.offset+1+i}}</span>
+
+          <li class="displaying"
+            [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement])}">
+            <div>
+              <div class="index">
+                <span>{{result.query.offset+1+i}}</span>
+              </div>
+              <ng-container *ngIf="entityConfig.enablement">
+                <div class="status">
+
+                  <a
+                    (click)="toggle(entity,entityConfig.enablement)">{{entity[entityConfig.enablement] ? '&#x2713;' : '&times;'}}</a>
                 </div>
-                <ng-container *ngIf="entityConfig.enablement">
-                  <div class="status">
-
-                    <a
-                      (click)="toggle(entity,entityConfig.enablement)">{{entity[entityConfig.enablement] ? '&#x2713;' : '&times;'}}</a>
-                  </div>
-                </ng-container>
+              </ng-container>
 
 
-                <ng-container *ngIf="!editEntity[entity.id]">
-                  <ng-container *ngFor="let field of entityConfig.fields">
+              <ng-container *ngIf="!editEntity[entity.id]">
+                <ng-container *ngFor="let field of entityConfig.fields">
 
-                    <ng-container *ngIf="!field.foreignKey">
-                      <div class="field" [ngClass]="field.name">
-                        <span>{{entity[field.name]}}</span></div>
-                    </ng-container>
-
-                    <ng-container *ngIf="field.foreignKey">
-                      <ng-container *ngIf="foreignKeysEntitiesIdMap[field.foreignKey]">
-                        <div class="field foreignKey" [ngClass]="field.name">
-                          <span>{{foreignKeysEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}</span>
-                        </div>
-                      </ng-container>
-                    </ng-container>
-
+                  <ng-container *ngIf="!field.foreignKey">
+                    <div class="field" [ngClass]="field.name">
+                      <span>{{entity[field.name]}}</span></div>
                   </ng-container>
 
-
-                  <div class="edit">
-                    <a (click)="edit(entity)">edit</a>
-                  </div>
+                  <ng-container *ngIf="field.foreignKey">
+                    <ng-container *ngIf="foreignKeysEntitiesIdMap[field.foreignKey]">
+                      <div class="field foreignKey" [ngClass]="field.name">
+                        <span>{{foreignKeysEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}</span>
+                      </div>
+                    </ng-container>
+                  </ng-container>
 
                 </ng-container>
 
 
-                <ng-container *ngIf="editEntity[entity.id]">
-                  <app-entity-form [entity]="entity" [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
-                    [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="closeEditForm(entity.id,$event)">
-                  </app-entity-form>
-                </ng-container>
+                <div class="edit">
+                  <a (click)="edit(entity)">edit</a>
+                </div>
+
+              </ng-container>
 
 
-              </div>
+              <ng-container *ngIf="editEntity[entity.id]">
+                <app-entity-form [entity]="entity" [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
+                  [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="closeEditForm(entity.id,$event)">
+                </app-entity-form>
+              </ng-container>
 
-            </li>
 
-          </ng-container>
+            </div>
+
+          </li>
+
         </ng-container>
       </ul>
     </div>
