@@ -11,7 +11,7 @@ import { ConfigSchemaComponent } from './config-schema/config-schema.component';
 const routes: Routes = [
     { path: 'login', pathMatch: 'full', component: LoginComponent },
     { path: 'test-api', pathMatch: 'full', component: TestApiComponent },
-    { path: 'config-schema', pathMatch: 'full', canActivate: [AuthGuard], component: ConfigSchemaComponent },
+    { path: 'schema', pathMatch: 'full', canActivate: [AuthGuard], component: ConfigSchemaComponent },
     {
         path: 'entities', canActivate: [AuthGuard],
         children: [
