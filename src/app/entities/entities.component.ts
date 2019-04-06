@@ -41,7 +41,7 @@ export class EntitiesComponent implements OnInit {
 
   loading: any = {};
   loadingList: boolean = false;
-  formGroups: any = {};
+  editEntity: any = {};
 
   filter: any = {};
   search: any = {};
@@ -77,7 +77,7 @@ export class EntitiesComponent implements OnInit {
 
 
                 this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
-                this.formGroups = {};
+                this.editEntity = {};
                 this.addEntities = [];
                 this.loading = {};
                 this.added = 0;
@@ -156,7 +156,7 @@ export class EntitiesComponent implements OnInit {
   edit(entity: any) {
     const fbconfig: any = this.getFormConfig(entity);
     const group: FormGroup = this.fb.group(fbconfig);
-    this.formGroups[entity.id] = group;
+    this.editEntity[entity.id] = group;
   }
   getFormConfig(entity: any) {
     const fbconfig: any = {};
@@ -174,6 +174,7 @@ export class EntitiesComponent implements OnInit {
     }
     return fbconfig;
   }
+  /** 
   save(entity: any, index: number) {
     const update: any = this.formGroups[entity.id].value;
     this.loading[entity.id] = true;
@@ -194,9 +195,8 @@ export class EntitiesComponent implements OnInit {
         this.loading[entity.id] = false;
         delete this.formGroups[entity.id];
       });
-
-
   }
+  */
   showAdding(adding: boolean) {
     this.adding = adding;
 
@@ -245,7 +245,15 @@ export class EntitiesComponent implements OnInit {
       });
   }
   cancel(entity: any) {
-    delete this.formGroups[entity.id];
+    delete this.editEntity[entity.id];
+  }
+
+
+  closeEditForm(id: number, reload: boolean) {
+    delete this.editEntity[id];
+    if (reload) {
+      this.loadEntries(this.getQuery());
+    }
   }
 
   ngOnDestroy() {
