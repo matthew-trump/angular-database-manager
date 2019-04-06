@@ -174,29 +174,7 @@ export class EntitiesComponent implements OnInit {
     }
     return fbconfig;
   }
-  /** 
-  save(entity: any, index: number) {
-    const update: any = this.formGroups[entity.id].value;
-    this.loading[entity.id] = true;
-    this.backendApiService.updateEntity(
-      this.entityConfig.plural,
-      entity.id,
-      update
-    )
-      .toPromise()
-      .then((result: any) => {
-        this.loading[entity.id] = false;
-        this.result.entities[index] = Object.assign({}, { id: entity.id }, update);
-        this.entities$.next(this.result.entities);
-        delete this.formGroups[entity.id];
-      })
-      .catch(err => {
-        console.log("ERROR NOT UPDATED", err);
-        this.loading[entity.id] = false;
-        delete this.formGroups[entity.id];
-      });
-  }
-  */
+
   showAdding(adding: boolean) {
     this.adding = adding;
 
@@ -243,9 +221,6 @@ export class EntitiesComponent implements OnInit {
       .catch((err: any) => {
         console.log(err);
       });
-  }
-  cancel(entity: any) {
-    delete this.editEntity[entity.id];
   }
 
 
