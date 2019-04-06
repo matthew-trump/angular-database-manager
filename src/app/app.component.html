@@ -1,17 +1,28 @@
-<mat-toolbar *ngIf="authService.currentTarget">
-  <h1 style="margin-left: 1em;">{{TARGETS[authService.currentTarget].title}}</h1>
+<mat-toolbar *ngIf="backendApiService.target">
+
+  <h1 style="margin-left: 1em;">{{TARGETS[backendApiService.target].title}}</h1>
+
   <span class="environmentName" *ngIf="authService.getLoggedInUser()"
-    [ngStyle]="{'color': TARGETS[authService.currentTarget].color}">{{authService.getCurrentTarget()}}</span>
+    [ngStyle]="{'color': TARGETS[backendApiService.target].color}">{{backendApiService.target}}</span>
+
   <span class="example-fill-remaining-space"></span>
+
   <div class="login" style="display: flex; align-items: center;" *ngIf="authService.isLoggedIn()">
+
     <span style="display: flex; align-items: center; margin-right: 0.5em;">
       <mat-icon>person</mat-icon>
       {{authService.getLoggedInUser()}}
     </span>
-    <span style="margin-left: 0.5em;"><a (click)="logout()">Logout</a></span>
+
+    <span style="margin-left: 0.5em;"><a (click)="logout()">logout</a></span>
+
   </div>
-  <div class="login" *ngIf="authService.isLoggedOut()"><a [routerLink]="['login']">Login</a></div>
+
+  <div class="login" *ngIf="authService.isLoggedOut()"><a [routerLink]="['login']">login</a></div>
+
 </mat-toolbar>
+
+
 
 <div id="content">
   <div id="left" class="column">
@@ -37,12 +48,12 @@
           <a [routerLink]="['schedule']">Schedule</a>
         </li>
 
-        <ng-container *ngIf="(configSchemaService.entities$|async) as entities">
-          <ng-container *ngFor="let entity of entities">
+        <ng-container *ngIf="entities">
+          <ng-container *ngFor="let plural of entities">
             <li class="entity" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
                   true}">
               <span class='arrow'>&#9656;</span>
-              <a [routerLink]="['entities',entity.plural]">{{entity.plural}}</a>
+              <a [routerLink]="['entities',plural]">{{plural}}</a>
             </li>
           </ng-container>
         </ng-container>
@@ -52,7 +63,7 @@
         <li routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:
             true}">
           <span class='arrow'>&#9656;</span>
-          <a [routerLink]="['config-schema']">Config Schema</a>
+          <a [routerLink]="['schema']">Schema</a>
         </li>
 
 
