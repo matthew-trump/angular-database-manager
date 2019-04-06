@@ -17,11 +17,11 @@
 
       <li class="form-row">
         <label for="name">Username</label>
-        <input name="username" formControlName="username">
+        <input name="username" autocomplete="username" formControlName="username">
       </li>
       <li class="form-row">
         <label>Password</label>
-        <input name="password" formControlName="password" type="password">
+        <input name="password" autocomplete="current-password" formControlName="password" type="password">
       </li>
       <li class="form-row">
         <mat-spinner *ngIf="inProgress" diameter="30" strokeWidth="5" color="accent"></mat-spinner>
