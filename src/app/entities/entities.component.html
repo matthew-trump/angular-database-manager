@@ -42,70 +42,6 @@
               [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (another)="addAddEntity()"
               (remove)="removeAddEntity(i)">
             </app-entity-form>
-            <!--
-            <form [formGroup]="addEntity">
-
-              <div style="width: 1.5em;">
-                <span *ngIf="addEntity.valid" class="valid">&#x2713;</span>
-                <span *ngIf="!addEntity.valid">&nbsp;</span>
-              </div>
-
-
-
-              <ng-container *ngFor="let field of entityConfig.fields">
-
-                <ng-container *ngIf="!field.foreignKey">
-                  <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
-                    <div class="text">
-                      <mat-form-field>
-                        <mat-label>{{field.name}}</mat-label>
-                        <textarea matInput [formControlName]="field.name" [rows]="field.input.rows"
-                          [cols]="field.input.cols"></textarea>
-                      </mat-form-field>
-
-                    </div>
-                  </ng-container>
-                  <ng-template #textinput>
-                    <div class="textinput">
-                      <mat-form-field>
-                        <mat-label>{{field.name}}</mat-label>
-                        <input matInput type="text" [placeholder]="field.name" [formControlName]="field.name">
-                      </mat-form-field>
-                    </div>
-                  </ng-template>
-
-                </ng-container>
-
-                <ng-container *ngIf="field.foreignKey">
-                  <mat-form-field>
-                    <mat-label>{{field.name}}</mat-label>
-                    <mat-select [formControlName]="field.name"
-                      (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
-                      <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
-                        {{entity[field.label]}}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </ng-container>
-              </ng-container>
-
-
-
-              <span style="width: 8em; display: flex; justify-content: space-between;">
-
-                <button mat-icon-button matTooltip="add another entry" (click)="addAddEntity()">
-                  <mat-icon>add_outline</mat-icon>
-                </button>
-
-                <button mat-icon-button matTooltip="delete entry" (click)="removeAddEntity(i)">
-                  <mat-icon>delete_outline</mat-icon>
-                </button>
-
-              </span>
-
-            </form>
-            -->
-
           </li>
         </ng-container>
       </ul>
@@ -239,64 +175,6 @@
                   <app-entity-form [entity]="entity" [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
                     [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="closeEditForm(entity.id,$event)">
                   </app-entity-form>
-                  <!--
-                  <form [formGroup]="formGroups[entity.id]">
-
-
-                    <ng-container *ngFor="let field of entityConfig.fields">
-
-                      <ng-container *ngIf="!field.foreignKey">
-                        <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
-                          <div class="textarea">
-
-                            <mat-form-field>
-                              <mat-label>{{field.name}}</mat-label>
-                              <textarea matInput [formControlName]="field.name" [rows]="field.input.rows"></textarea>
-                            </mat-form-field>
-                          </div>
-                        </ng-container>
-                        <ng-template #textinput>
-                          <div class="textinput">
-                            <mat-form-field>
-                              <mat-label>{{field.name}}</mat-label>
-                              <input matInput type="text" [formControlName]="field.name">
-                            </mat-form-field>
-                          </div>
-                        </ng-template>
-
-                      </ng-container>
-
-                      <ng-container *ngIf="field.foreignKey">
-                        <mat-form-field>
-                          <mat-label>{{field.name}}</mat-label>
-                          <mat-select [formControlName]="field.name">
-                            <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]"
-                              [value]="entity.id">
-                              {{entity[field.label]}}
-                            </mat-option>
-                          </mat-select>
-                        </mat-form-field>
-                      </ng-container>
-
-
-                    </ng-container>
-
-                    <div class="buttons">
-                      <span>
-                        <button mat-icon-button matTooltip="save changes" (click)="save(entity,i)"
-                          [disabled]="formGroups[entity.id].pristine || loading[entity.id]">
-                          <mat-icon>save_alt</mat-icon>
-                        </button>
-                      </span>
-                      <span>
-                        <button mat-icon-button (click)="cancel(entity)" matTooltip="close"
-                          [disabled]="loading[entity.id]">
-                          <mat-icon>close</mat-icon>
-                        </button>
-                      </span>
-                    </div>
-                  </form>
-                  -->
                 </ng-container>
 
 
