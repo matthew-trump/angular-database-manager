@@ -1,0 +1,10 @@
+<div>
+  <button mat-icon-button matTooltip="previous page" (click)="pagination.previousPage()"
+    [disabled]="pagination.atStart()">
+    <mat-icon>navigate_before</mat-icon>
+  </button>
+
+  <button mat-icon-button matTooltip="next page" (click)="pagination.nextPage()" [disabled]="!pagination.hasMore()">
+    <mat-icon>navigate_next</mat-icon>
+  </button>
+</div>
