@@ -20,7 +20,7 @@ export class TestApiComponent implements OnInit, OnDestroy {
 
   ngOnInit() { }
   ping() {
-    this.backendApiService.ping(this.authService.getCurrentTarget())
+    this.backendApiService.ping()
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['message'], error: 0 })
@@ -36,7 +36,7 @@ export class TestApiComponent implements OnInit, OnDestroy {
 
   }
   protected() {
-    this.backendApiService.protected(this.authService.getCurrentTarget())
+    this.backendApiService.protected()
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['message'], error: 0 })
@@ -51,7 +51,7 @@ export class TestApiComponent implements OnInit, OnDestroy {
       .subscribe(_ => { })
   }
   databasePing() {
-    this.backendApiService.databasePing(this.authService.getCurrentTarget(), 'test')
+    this.backendApiService.databasePing('test')
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['message'], error: 0 })
@@ -66,7 +66,7 @@ export class TestApiComponent implements OnInit, OnDestroy {
       .subscribe(_ => { })
   }
   databasePings() {
-    this.backendApiService.databasePings(this.authService.getCurrentTarget())
+    this.backendApiService.databasePings()
       .pipe(
         tap(res => {
           this.output.unshift({ text: res['result'].length + " pings returned", error: 0 })
