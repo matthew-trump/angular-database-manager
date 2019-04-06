@@ -1,17 +1,16 @@
 <div style="display: flex; align-items: center">
   <h2>Schedule</h2>
-  <ng-container *ngIf="!adding">
+  <ng-container *ngIf="!addScheduleItem">
     <button matTooltip="add schedule item" mat-icon-button (click)="add()">
       <mat-icon>add_circle_outline</mat-icon>
     </button>
   </ng-container>
 </div>
 <ng-container *ngIf="(now$ | async) as now">
-  <ng-container *ngIf="config && adding && addScheduleItem">
+  <ng-container *ngIf="scheduleConfig && addScheduleItem">
 
     <app-schedule-item-form [formGroup]="addScheduleItem" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
-      [scheduleConfig]="config" [target]="target" [dateFormat]="DATE_FORMAT" [now$]="now$"
-      (done)="closeAddForm($event)">
+      [scheduleConfig]="scheduleConfig" [dateFormat]="DATE_FORMAT" [now$]="now$" (done)="closeAddForm($event)">
     </app-schedule-item-form>
 
   </ng-container>
@@ -19,17 +18,18 @@
 
 
 
-<div class="showing">Showing {{schedule.returned}} of {{schedule.total}} (start times are GMT{{zoneDisplay}})
+<div class="showing">Showing {{pagination.showing}} of {{pagination.total}} (start times are shown in
+  GMT{{zoneDisplay}})
 
 </div>
-<ng-container *ngIf="schedule.total>schedule.returned">
+<ng-container *ngIf="pagination.numPages > 1">
   <div>
-    <button mat-icon-button matTooltip="previous page" (click)="previousPage()" [disabled]="1>schedule.query.offset">
+    <button mat-icon-button matTooltip="previous page" (click)="pagination.previousPage()"
+      [disabled]="pagination.atStart()">
       <mat-icon>navigate_before</mat-icon>
     </button>
 
-    <button mat-icon-button matTooltip="next page" (click)="nextPage()"
-      [disabled]="(schedule.query.offset+schedule.returned)>=schedule.total">
+    <button mat-icon-button matTooltip="next page" (click)="pagination.nextPage()" [disabled]="!pagination.hasMore()">
       <mat-icon>navigate_next</mat-icon>
     </button>
   </div>
@@ -40,15 +40,15 @@
   <div *ngIf="(items$|async) as items, let i=index;">
     <ul>
       <ng-container *ngFor="let item of items; let i=index">
-        <ng-container *ngIf="!formGroups[item.id]">
+        <ng-container *ngIf="!editScheduleItem[item.id]">
 
           <li class="displaying"
             [ngClass]="{'future' : 0>timeFlags[item.id], 'current':0===timeFlags[item.id],  'completed':timeFlags[item.id]>0  }">
 
             <div class="index">
-              <span>{{schedule.query.offset+1+i}}</span>
+              <span>{{pagination.params.offset+1+i}}</span>
             </div>
-            <ng-container *ngFor="let field of config.fields">
+            <ng-container *ngFor="let field of scheduleConfig.fields">
 
               <ng-container *ngIf="field.foreignKey">
                 <ng-container *ngIf="foreignKeysEntitiesIdMap[field.foreignKey]">
@@ -76,9 +76,7 @@
               </ng-container>
 
               <ng-container *ngIf="field.type==='date'">
-
-                <div class="date">{{item.start.format('M/DD/YYYY HH:mm')}}</div>
-
+                <div class="date">{{item.start.format('MMM/DD/YYYY HH:mm')}}</div>
               </ng-container>
 
 
@@ -104,11 +102,11 @@
           </li>
 
         </ng-container>
-        <ng-container *ngIf="formGroups[item.id]">
+        <ng-container *ngIf="editScheduleItem[item.id]">
 
           <li>
-            <app-schedule-item-form [formGroup]="formGroups[item.id]" [item]="item" [scheduleConfig]="config"
-              [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" [now$]="now$" [target]="target"
+            <app-schedule-item-form [formGroup]="editScheduleItem[item.id]" [item]="item"
+              [scheduleConfig]="scheduleConfig" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" [now$]="now$"
               [dateFormat]="DATE_FORMAT" (done)="closeEditForm(item.id,$event)">
             </app-schedule-item-form>
 
