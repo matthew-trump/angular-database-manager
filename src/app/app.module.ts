@@ -44,6 +44,7 @@ import { InstanceDisplayBasicComponent } from './instance-display-basic/instance
 import { ScheduleItemDetailsComponent } from './schedule-item-details/schedule-item-details.component';
 import { EntityFormComponent } from './entity-form/entity-form.component';
 import { ScheduleItemFormComponent } from './schedule-item-form/schedule-item-form.component';
+import { PaginationControlsComponent } from './pagination-controls/pagination-controls.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import { ScheduleItemFormComponent } from './schedule-item-form/schedule-item-fo
     InstanceDisplayBasicComponent,
     ScheduleItemDetailsComponent,
     EntityFormComponent,
-    ScheduleItemFormComponent
+    ScheduleItemFormComponent,
+    PaginationControlsComponent
   ],
   imports: [
     BrowserModule,
