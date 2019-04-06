@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
@@ -90,8 +91,8 @@ import { ScheduleItemFormComponent } from './schedule-item-form/schedule-item-fo
     */
   ],
   providers: [
+    Title,
     {
-
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
