@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { Schema } from './schema';
 import { EntityConfig } from './entity-config';
 import { Store } from '@ngrx/store';
+import { Title } from '@angular/platform-browser';
 
 
 const DEFAULT_TITLE: string = 'Actions on Google Database Manager';
@@ -27,6 +28,7 @@ export class AppComponent {
     public configSchemaService: ConfigSchemaService,
     public backendApiService: BackendApiService,
     private store: Store<any>,
+    private titleService: Title,
     private router: Router) {
 
     this.store.select('config').subscribe((state: any) => {
@@ -34,6 +36,7 @@ export class AppComponent {
         this.entities = state.schema.entities.map((entityConfig: EntityConfig) => {
           return entityConfig.plural;
         });
+        this.titleService.setTitle(TARGETS[backendApiService.target].title)
       } else if (state.target) {
         console.log("LOGGING OUT");
         this.logout();
