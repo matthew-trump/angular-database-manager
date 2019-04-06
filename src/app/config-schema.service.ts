@@ -22,9 +22,8 @@ import * as moment from 'moment';
   providedIn: 'root'
 })
 export class ConfigSchemaService {
-  public target: string;
+
   public schema: Schema;
-  public entities$: BehaviorSubject<EntityConfig[]> = new BehaviorSubject(null);
 
   constructor(private backendApiService: BackendApiService,
     private store: Store<any>
@@ -41,25 +40,25 @@ export class ConfigSchemaService {
 
   async loadSchema(target: string): Promise<any> {
     if (environment.targets[target].schemaPath) {
-      const schemaResponse: SchemaResponse = await this.backendApiService.getSchema(target).toPromise();
-      this.schema = schemaResponse as Schema;
-      this.target = target;
+      //console.log("LOADING SCHEMA");
+      try {
+        const schemaResponse: SchemaResponse = await this.backendApiService.getSchema(target).toPromise();
+        this.schema = schemaResponse as Schema;
 
-      if (this.schema) {
-        this.entities$.next(this.schema.entities)
+
+        this.backendApiService.setTarget(target);
+        this.store.dispatch(new ConfigStateAction({
+          target: target,
+          schema: this.schema
+        }));
+        return Promise.resolve(this.schema);
+      } catch (err) {
+        Promise.resolve(null)
       }
-
-      this.store.dispatch(new ConfigStateAction({
-        target: this.target,
-        schema: this.schema
-      }));
-      console.log("RETURNING SCHEMA");
-      return Promise.resolve(this.schema);
-
     } else {
       console.log("ERROR: RETURING PROMISE no schema", target);
       this.store.dispatch(new ConfigStateAction({
-        target: this.target,
+        target: target,
         schema: null
       }));
       return Promise.resolve(null);
@@ -67,7 +66,7 @@ export class ConfigSchemaService {
   }
   async loadEntities(entityConfig: EntityConfig): Promise<Entity[]> {
     const plural: string = entityConfig.plural;
-    const retobj: EntitiesResponse = await this.backendApiService.getEntities(this.target, plural).toPromise();
+    const retobj: EntitiesResponse = await this.backendApiService.getEntities(plural).toPromise();
     const entities: Entity[] = retobj.entities;
     return Promise.resolve(entities);
   }
@@ -117,7 +116,7 @@ export class ConfigSchemaService {
 
   async loadCurrentScheduledItem(): Promise<any> {
     try {
-      const result: any = await this.backendApiService.getCurrentScheduleItem(this.target).toPromise();
+      const result: any = await this.backendApiService.getCurrentScheduleItem().toPromise();
       const current: any = Object.assign({}, result.item);
       delete current.start;
       if (result.item) {
