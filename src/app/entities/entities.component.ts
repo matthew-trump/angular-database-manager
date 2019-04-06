@@ -23,8 +23,9 @@ const TARGETS: any = environment.targets;
 export class EntitiesComponent implements OnInit {
 
   FILTER_ALL: string = "--FILTER_ALL--";
-  limit: number = DEFAULT_LIMIT;
-  offset: number = 0;
+
+
+
   adding: boolean = false;
   addEntities: FormGroup[];
   added: number = 0;
@@ -40,6 +41,10 @@ export class EntitiesComponent implements OnInit {
     limit: DEFAULT_LIMIT,
     offset: 0
   })
+
+  filters: any = {
+
+  }
 
 
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
@@ -90,8 +95,7 @@ export class EntitiesComponent implements OnInit {
                 this.loading = {};
                 this.added = 0;
                 this.addedThisSave = 0;
-                this.limit = (TARGETS[this.backendApiService.target].limits && TARGETS[this.backendApiService.target].limits[this.entityConfig.plural]) ? TARGETS[this.backendApiService.target].limits[this.entityConfig.plural] : DEFAULT_LIMIT;
-                this.offset = 0;
+
                 this.foreignKeyValueForAdd = {};
                 this.entities$.next(null);
                 this.loadEntries(this.getQuery());
@@ -139,16 +143,18 @@ export class EntitiesComponent implements OnInit {
   }
 
   doFilter(field?: string, value?: any) {
-    const query: any = (field && value !== this.FILTER_ALL) ? { [field]: value } : null;
-    this.filter = query;
-    this.offset = 0;
+    if (field && value !== this.FILTER_ALL) {
+      this.filter = Object.assign({}, this.filter, { [field]: value });
+    } else {
+      delete this.filter[field];
+    }
+    this.pagination.reset();
     this.loadEntries(this.getQuery())
   }
   doSearch() {
 
     const searchvalue: string = this.searchString ? this.searchString.trim() : this.searchString;
     this.search = searchvalue ? { search: searchvalue } : {};
-    this.offset = 0;
     this.loadEntries(this.getQuery())
   }
 
