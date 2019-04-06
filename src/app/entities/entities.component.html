@@ -38,8 +38,11 @@
       <ul class="addentries">
         <ng-container *ngFor="let addEntity of addEntities; let i=index">
           <li>
-
-
+            <app-entity-form [formGroup]="addEntity" [entityConfig]="entityConfig"
+              [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (another)="addAddEntity()"
+              (remove)="removeAddEntity(i)">
+            </app-entity-form>
+            <!--
             <form [formGroup]="addEntity">
 
               <div style="width: 1.5em;">
@@ -101,7 +104,7 @@
               </span>
 
             </form>
-
+            -->
 
           </li>
         </ng-container>
@@ -206,7 +209,7 @@
                 </ng-container>
 
 
-                <ng-container *ngIf="!formGroups[entity.id]">
+                <ng-container *ngIf="!editEntity[entity.id]">
                   <ng-container *ngFor="let field of entityConfig.fields">
 
                     <ng-container *ngIf="!field.foreignKey">
@@ -232,8 +235,11 @@
                 </ng-container>
 
 
-                <ng-container *ngIf="formGroups[entity.id]">
-
+                <ng-container *ngIf="editEntity[entity.id]">
+                  <app-entity-form [entity]="entity" [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
+                    [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="closeEditForm(entity.id,$event)">
+                  </app-entity-form>
+                  <!--
                   <form [formGroup]="formGroups[entity.id]">
 
 
@@ -290,7 +296,7 @@
                       </span>
                     </div>
                   </form>
-
+                  -->
                 </ng-container>
 
 
