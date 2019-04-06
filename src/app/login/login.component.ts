@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, tap, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { BackendApiService } from '../backend-api.service';
 
 
 @Component({
@@ -27,11 +28,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
+        private backendApiService: BackendApiService,
         private router: Router) {
         this.targetNames = this.authService.getTargetNames();
 
         this.loginform = this.fb.group({
-            target: [authService.getCurrentTarget(), Validators.required],
+            target: [this.backendApiService.target, Validators.required],
             username: ['', Validators.required],
             password: ['', Validators.required]
         });
