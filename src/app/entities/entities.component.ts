@@ -8,7 +8,10 @@ import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
 import { EntitiesMap } from '../entities-map';
 import { EntitiesIdMap } from '../entities-id-map';
+import { Pagination } from '../pagination';
+import { PaginationQuery } from '../pagination-query';
 import { environment } from 'src/environments/environment';
+import { EntitiesQuery } from '../entities-query';
 
 const DEFAULT_LIMIT: number = 50;
 const TARGETS: any = environment.targets;
@@ -33,9 +36,14 @@ export class EntitiesComponent implements OnInit {
 
   result: any;
 
+  pagination: Pagination = new Pagination({
+    limit: DEFAULT_LIMIT,
+    offset: 0
+  })
+
+
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
   foreignKeyEntityConfigMap: any = {};
-  //foreignKeys: any[];
   foreignKeysEntitiesMap: EntitiesMap;
   foreignKeysEntitiesIdMap: EntitiesIdMap;
 
@@ -86,7 +94,7 @@ export class EntitiesComponent implements OnInit {
                 this.offset = 0;
                 this.foreignKeyValueForAdd = {};
                 this.entities$.next(null);
-                this.loadEntries({});
+                this.loadEntries(this.getQuery());
               }).catch(err => {
                 console.log(err);
               })
@@ -96,17 +104,26 @@ export class EntitiesComponent implements OnInit {
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
 
+    this.pagination.params$
+      .pipe(
+        tap((params: PaginationQuery) => {
+          if (params) {
+            this.loadEntries(this.getQuery());
+          }
+        }),
+        takeUntil(this.unsubscribe$)
+      ).subscribe(_ => { });
   }
 
-  loadEntries(queryObj: any) {
-    const query = Object.assign({}, queryObj);
-    query.offset = this.offset;
-    query.limit = this.limit;
+  loadEntries(query: EntitiesQuery) {
     this.loadingList = true;
     this.backendApiService.getEntities(this.entityConfig.plural, query)
       .toPromise().then((result: any) => {
         this.loadingList = false;
         this.result = result;
+        this.pagination.update(result.query);
+        this.pagination.setTotal(result.total);
+        this.pagination.setShowing(result.returned)
         this.entities$.next(this.result.entities);
       }).catch((err) => {
         this.loadingList = false;
@@ -118,7 +135,7 @@ export class EntitiesComponent implements OnInit {
   }
 
   getQuery() {
-    return Object.assign({}, this.filter, this.search);
+    return Object.assign({}, this.pagination.query, this.filter, this.search);
   }
 
   doFilter(field?: string, value?: any) {
@@ -133,14 +150,6 @@ export class EntitiesComponent implements OnInit {
     this.search = searchvalue ? { search: searchvalue } : {};
     this.offset = 0;
     this.loadEntries(this.getQuery())
-  }
-  nextPage() {
-    this.offset = this.offset + this.limit;
-    this.loadEntries(this.getQuery());
-  }
-  previousPage() {
-    this.offset = this.offset - this.limit;
-    this.loadEntries(this.getQuery());
   }
 
   toggle(entity: any, field: string) {
@@ -177,7 +186,6 @@ export class EntitiesComponent implements OnInit {
 
   showAdding(adding: boolean) {
     this.adding = adding;
-
     if (adding) {
       this.addAddEntity();
       this.added = 0;
@@ -194,6 +202,8 @@ export class EntitiesComponent implements OnInit {
   clearAddEntities() {
     this.addEntities = [];
   }
+
+
   removeAddEntity(index: number) {
     this.addEntities.splice(index, 1);
     if (this.addEntities.length === 0) {
