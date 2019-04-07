@@ -1,0 +1,10 @@
+<div>
+  Showing {{pagination.showing}} results
+  <ng-container *ngIf="pagination.showing>0">
+    ({{pagination.lower}}&ndash;{{pagination.upper}})
+  </ng-container>
+  out of {{pagination.total}}
+  <ng-container *ngIf="search && search.search">
+    for &ldquo;{{search}}&rdquo;
+  </ng-container>
+</div>
