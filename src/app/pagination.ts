@@ -30,6 +30,9 @@ export class Pagination {
             return index * this.params.limit;
         })
     }
+    get page(): number {
+        return this.params.offset / this.params.limit;
+    }
     get numPages(): number {
         return this.params.limit ? Math.floor(this.total / this.params.limit) + 1 : 0;
     }
