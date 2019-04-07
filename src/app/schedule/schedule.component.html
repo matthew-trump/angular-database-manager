@@ -18,14 +18,21 @@
 
 
 
-<div class="showing">Showing {{pagination.showing}} of {{pagination.total}} (start times are shown in
-  GMT{{zoneDisplay}})
+<app-pagination-banner [pagination]="pagination"></app-pagination-banner>
+<div style="margin-top: 0.5em;"><span style="font-size: 0.8em; color: #666">start times are shown in
+    GMT{{zoneDisplay}}</span></div>
 
+<div style="display: flex; align-items: flex-start; margin-top: 0.5em;">
+  <ng-container *ngIf="pagination.numPages > 1">
+    <div style="margin-right:1em">
+      <app-pagination-controls [pagination]="pagination"></app-pagination-controls>
+    </div>
+    <div style="width: 40em;">
+      <app-pagination-pages [pagination]=" pagination">
+      </app-pagination-pages>
+    </div>
+  </ng-container>
 </div>
-
-<ng-container *ngIf="pagination.numPages > 1">
-  <app-pagination-controls [pagination]="pagination"></app-pagination-controls>
-</ng-container>
 
 <div *ngIf="(now$ | async) as now">
   <div *ngIf="(items$|async) as items, let i=index;">
