@@ -45,6 +45,8 @@ import { ScheduleItemDetailsComponent } from './schedule-item-details/schedule-i
 import { EntityFormComponent } from './entity-form/entity-form.component';
 import { ScheduleItemFormComponent } from './schedule-item-form/schedule-item-form.component';
 import { PaginationControlsComponent } from './pagination-controls/pagination-controls.component';
+import { PaginationBannerComponent } from './pagination-banner/pagination-banner.component';
+import { PaginationPagesComponent } from './pagination-pages/pagination-pages.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +61,9 @@ import { PaginationControlsComponent } from './pagination-controls/pagination-co
     ScheduleItemDetailsComponent,
     EntityFormComponent,
     ScheduleItemFormComponent,
-    PaginationControlsComponent
+    PaginationControlsComponent,
+    PaginationBannerComponent,
+    PaginationPagesComponent
   ],
   imports: [
     BrowserModule,
