@@ -164,6 +164,15 @@ export class EntitiesComponent implements OnInit {
     this.pagination.reset();
     this.loadEntries(this.getQuery())
   }
+  doEnablementFilter(checked: boolean) {
+    if (!checked) {
+      delete this.filter[this.entityConfig.enablement];
+    } else {
+      this.filter[this.entityConfig.enablement] = 1;
+    }
+    this.pagination.reset();
+    this.loadEntries(this.getQuery());
+  }
 
   toggle(entity: any, field: string) {
     const value: boolean = !entity[field];
