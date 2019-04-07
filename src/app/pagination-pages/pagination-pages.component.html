@@ -1,7 +1,8 @@
 <ul>
   <ng-container *ngFor="let offset of pagination.pages; let i=index">
     <li>
-      <input type="button" [value]="i+1" (click)="pagination.goToPage(i)">
+      <input type="button" style="border: none" [ngClass]="{'active':pagination.page==i}" [value]="i+1"
+        (click)="pagination.goToPage(i)">
     </li>
   </ng-container>
 </ul>
