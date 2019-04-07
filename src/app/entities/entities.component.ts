@@ -161,6 +161,7 @@ export class EntitiesComponent implements OnInit {
 
     const searchvalue: string = this.searchString ? this.searchString.trim() : this.searchString;
     this.search = searchvalue ? { search: searchvalue } : {};
+    this.pagination.reset();
     this.loadEntries(this.getQuery())
   }
 
