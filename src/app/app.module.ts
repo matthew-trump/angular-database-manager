@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 
 import { AuthInterceptor } from './auth.interceptor';
 import { AuthGuard } from './auth.guard';
@@ -83,6 +84,7 @@ import { PaginationPagesComponent } from './pagination-pages/pagination-pages.co
     MatFormFieldModule,
     MatDatepickerModule,
     MatMomentDateModule,
+    MatSlideToggleModule
     /** 
     MatCheckboxModule,
    
