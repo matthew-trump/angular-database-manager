@@ -53,6 +53,7 @@
 
     <div class="controls">
       <ng-container *ngIf="entityConfig.filter">
+
         <ng-container *ngFor="let filter of entityConfig.filter">
           <ng-container *ngIf="configSchemaService.getEntityConfig(filter.entity) as foreignKeyEntityConfig">
             <div class="filter">
@@ -75,6 +76,7 @@
       </ng-container>
 
       <ng-container *ngIf="entityConfig.search">
+
         <div class="search">
           <mat-form-field>
             <input matInput type="text" size="25" placeholder="search" [(ngModel)]="searchString">
@@ -84,6 +86,10 @@
           </button>
         </div>
 
+      </ng-container>
+
+      <ng-container *ngIf="entityConfig.enablement">
+        <mat-slide-toggle (change)="doEnablementFilter($event.checked)">enabled only</mat-slide-toggle>
       </ng-container>
 
       <ng-container *ngIf="false && entityConfig.add">
