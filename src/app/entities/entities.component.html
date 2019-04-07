@@ -100,23 +100,19 @@
     </div>
 
     <ng-container *ngIf="result">
-      <div class="showing">
-        Showing {{pagination.showing}} results
-        <ng-container *ngIf="pagination.showing>0">
-          ({{pagination.lower}}&ndash;{{pagination.upper}})
+
+      <app-pagination-banner [pagination]="pagination" [search]="search.search"></app-pagination-banner>
+
+      <div style="display: flex; align-items: flex-start; margin-top: 0.5em;">
+        <ng-container *ngIf="pagination.numPages > 1">
+          <div style="margin-right:1em">
+            <app-pagination-controls [pagination]="pagination"></app-pagination-controls>
+          </div>
+          <div style="width: 40em;">
+            <app-pagination-pages [pagination]="pagination"></app-pagination-pages>
+          </div>
         </ng-container>
-        out of {{pagination.total}}
-        <ng-container *ngIf="search && search.search">
-          for &ldquo;{{search.search}}&rdquo;
-        </ng-container>
-
-
-
       </div>
-
-      <ng-container *ngIf="pagination.numPages > 1">
-        <app-pagination-controls [pagination]="pagination"></app-pagination-controls>
-      </ng-container>
 
 
     </ng-container>
