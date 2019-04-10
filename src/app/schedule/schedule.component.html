@@ -8,11 +8,12 @@
 </div>
 <ng-container *ngIf="(now$ | async) as now">
   <ng-container *ngIf="scheduleConfig && addScheduleItem">
-
-    <app-schedule-item-form [formGroup]="addScheduleItem" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
-      [scheduleConfig]="scheduleConfig" [dateFormat]="DATE_FORMAT" [now$]="now$" (done)="closeAddForm($event)">
-    </app-schedule-item-form>
-
+    <div style="border: 1px solid greenyellow; margin-bottom: 2em;">
+      <h4 style="margin-left: 1em; color: #666;">Add Schedule Item</h4>
+      <app-schedule-item-form [formGroup]="addScheduleItem" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
+        [scheduleConfig]="scheduleConfig" [dateFormat]="DATE_FORMAT" [now$]="now$" (done)="closeAddForm($event)">
+      </app-schedule-item-form>
+    </div>
   </ng-container>
 </ng-container>
 
