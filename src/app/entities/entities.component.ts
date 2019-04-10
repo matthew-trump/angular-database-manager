@@ -24,8 +24,6 @@ export class EntitiesComponent implements OnInit {
 
   FILTER_ALL: string = "--FILTER_ALL--";
 
-
-
   adding: boolean = false;
   addEntities: FormGroup[];
   added: number = 0;
@@ -42,10 +40,7 @@ export class EntitiesComponent implements OnInit {
     offset: 0
   })
 
-  filters: any = {
-
-  }
-
+  filters: any = {}
 
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
   foreignKeyEntityConfigMap: any = {};
@@ -87,15 +82,12 @@ export class EntitiesComponent implements OnInit {
                 if (this.foreignKeysEntitiesMap) {
                   this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
                 }
-
-
                 this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
                 this.editEntity = {};
                 this.addEntities = [];
                 this.loading = {};
                 this.added = 0;
                 this.addedThisSave = 0;
-
                 this.foreignKeyValueForAdd = {};
                 this.entities$.next(null);
                 this.loadEntries(this.getQuery());
@@ -158,7 +150,6 @@ export class EntitiesComponent implements OnInit {
     this.loadEntries(this.getQuery())
   }
   doSearch() {
-
     const searchvalue: string = this.searchString ? this.searchString.trim() : this.searchString;
     this.search = searchvalue ? { search: searchvalue } : {};
     this.pagination.reset();
@@ -224,8 +215,6 @@ export class EntitiesComponent implements OnInit {
   clearAddEntities() {
     this.addEntities = [];
   }
-
-
   removeAddEntity(index: number) {
     this.addEntities.splice(index, 1);
     if (this.addEntities.length === 0) {
