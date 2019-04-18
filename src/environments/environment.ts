@@ -6,6 +6,7 @@ export const environment = {
   targets: {
     local: {
       url: "http://localhost:8082",
+      loginPath: "/login",
       apiPath: "/api/",
       schemaPath: 'config/schema',
       limits: {
@@ -18,6 +19,7 @@ export const environment = {
     },
     staging: {
       url: "http://localhost:8083",
+      loginPath: "/login",
       apiPath: "/api/",
       schemaPath: 'config/schema',
       limits: {
@@ -30,6 +32,7 @@ export const environment = {
     },
     production: {
       url: "http://localhost:8084",
+      loginPath: "/login",
       apiPath: "/api/",
       schemaPath: 'config/schema',
       limits: {
