@@ -31,8 +31,8 @@ export class BackendApiService {
     constructor(public http: HttpClient) { }
     login(target: string, username: string, password: string): Observable<any> {
         const url: string = TARGETS[target].url;
-        const apiPath: string = TARGETS[target].apiPath;
-        return this.http.post<any>(url + apiPath + 'login', { username, password });
+        const loginPath: string = TARGETS[target].loginPath;
+        return this.http.post<any>(url + loginPath, { username, password });
     }
     getSchema(target: string): Observable<SchemaResponse> {
         const url: string = TARGETS[target].url;
@@ -52,7 +52,6 @@ export class BackendApiService {
         const queryString = Object.keys(full).map(key => key + '=' + full[key]).join('&');
         return queryString;
     }
-
     getEntities(plural: string, query?: EntitiesQuery): Observable<EntitiesResponse> {
         const queryString: string = "?" + this.getQueryString(query);
         return this.http.get<EntitiesResponse>(this.getBaseApiPath() + 'entities/' + plural + queryString);
@@ -85,7 +84,8 @@ export class BackendApiService {
 
 
     ping(): Observable<TestApiResponse> {
-        return this.http.get<TestApiResponse>(this.getBaseApiPath() + 'ping');
+        const url: string = TARGETS[this.target].url;
+        return this.http.get<TestApiResponse>(url + '/ping');
     }
     protected(): Observable<TestApiResponse> {
         return this.http.get<TestApiResponse>(this.getBaseApiPath() + 'protected');
