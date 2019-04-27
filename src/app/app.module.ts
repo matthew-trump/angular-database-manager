@@ -48,6 +48,10 @@ import { ScheduleItemFormComponent } from './schedule-item-form/schedule-item-fo
 import { PaginationControlsComponent } from './pagination-controls/pagination-controls.component';
 import { PaginationBannerComponent } from './pagination-banner/pagination-banner.component';
 import { PaginationPagesComponent } from './pagination-pages/pagination-pages.component';
+import { EntityDisplayBasicComponent } from './entity-display-basic/entity-display-basic.component';
+import { EntityDisplayQuestionComponent } from './entity-display-question/entity-display-question.component';
+import { EntityDisplayEnablementToggleComponent } from './entity-display-enablement-toggle/entity-display-enablement-toggle.component';
+import { EntityListIndexComponent } from './entity-list-index/entity-list-index.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +68,11 @@ import { PaginationPagesComponent } from './pagination-pages/pagination-pages.co
     ScheduleItemFormComponent,
     PaginationControlsComponent,
     PaginationBannerComponent,
-    PaginationPagesComponent
+    PaginationPagesComponent,
+    EntityDisplayBasicComponent,
+    EntityDisplayQuestionComponent,
+    EntityDisplayEnablementToggleComponent,
+    EntityListIndexComponent
   ],
   imports: [
     BrowserModule,
