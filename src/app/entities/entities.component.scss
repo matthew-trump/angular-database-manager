@@ -43,13 +43,7 @@ ul{
     list-style-type: none;
     padding-left: 0em;
 }
-.disabled{
-    color: #999;
-    .field{
 
-        text-decoration: line-through;
-    }
-}
 li.displaying{
     margin-bottom: 0.5em;
     form{
@@ -68,59 +62,69 @@ li.displaying{
         }
      
     }
-    > div{
+    div.entity{
         display: flex;
         align-items: flex-start;
-        .index{
-            color: #999;
-            width: 2em;
-            padding-right: 0.5em;
-            text-align: right;
-            span{
-                font-size: 0.9em;
-            }
-        }
-        .status{
-            width: 1em;
-            margin-right: 0.5em;
-            a{
+        
+        ::ng-deep{
+        
+            .index{
                 color: #999;
-                cursor: default;
+                width: 2em;
+                padding-right: 0.5em;
+                text-align: right;
+                span{
+                    font-size: 0.9em;
+                }
             }
-        }
-        .text{
-            width: 25em;
-            margin-right: 0.5em;
-            span{
-                font-size: 0.9em;
+            .status{
+                width: 1em;
+                margin-right: 0.5em;
+                a{
+                    color: #999;
+                    cursor: default;
+                }
             }
-        }
-        
-        
-        .foreignKey{
-            width: 10em;
-            span{
-                font-size: 0.85em;
+            .text{
+               
+                width: 25em;
+                margin-right: 0.5em;
+                span{
+                    font-size: 0.9em;
+                }
             }
-        }
-           
-       
-        
+            .foreignKey{
+                width: 10em;
+                span{
+                    font-size: 0.85em;
+                }
+            }   
+        }     
     }
 }
-.edit{
-    margin-left: 0.5em;
-    color: #999;
-    font-size: 0.8em;
+::ng-deep{
+    .disabled{
+        color: #999;
+        .field{
+            text-decoration: line-through;
+        }
+    }
     
-    a{
-        cursor: default;
-    }
-    a:hover{
-        color: goldenrod;
-     
+    .edit{
+        margin-left: 0.5em;
+        color: #999;
+        font-size: 0.8em;
+        
+        a{
+            cursor: default;
+        }
+        a:hover{
+            color: goldenrod;
+         
+        }
     }
 }
+
 .valid{
     color: green;
 }
