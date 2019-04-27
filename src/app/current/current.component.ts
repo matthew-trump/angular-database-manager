@@ -9,7 +9,8 @@ import { EntitiesIdMap } from '../entities-id-map';
 import { environment } from 'src/environments/environment';
 
 const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
-const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
+//const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
+const TARGETS: any = environment.targets;
 
 @Component({
   selector: 'app-current',
@@ -47,10 +48,14 @@ export class CurrentComponent implements OnInit, OnDestroy {
                   this.target = state.target;
                   this.config = this.configSchemaService.getScheduleConfig();
                   this.loadCurrentScheduledItem();
-                  this.currentScheduleLoader = <any>setInterval(() => {
-                    this.loadCurrentScheduledItem();
-                  }, CURRENT_SCHEDULER_LOADER_INTERVAL);
-                  this.loadCurrentScheduleInstance();
+                  const currentScheduleLoaderInterval = TARGETS[state.target].currentScheduleLoaderInterval;
+                  if (currentScheduleLoaderInterval) {
+                    this.currentScheduleLoader = <any>setInterval(() => {
+                      this.loadCurrentScheduledItem();
+                    }, currentScheduleLoaderInterval);
+                    this.loadCurrentScheduleInstance();
+                  }
+
                 }
               })
           }
