@@ -24,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatMomentDateModule } from "@angular/material-moment-adapter";
+import { MatSliderModule } from '@angular/material/slider';
 /**
 import { MatCheckboxModule} from '@angular/material';
 import { MatSidenavModule} from '@angular/material/sidenav';
@@ -52,6 +53,7 @@ import { EntityDisplayBasicComponent } from './entity-display-basic/entity-displ
 import { EntityDisplayQuestionComponent } from './entity-display-question/entity-display-question.component';
 import { EntityDisplayEnablementToggleComponent } from './entity-display-enablement-toggle/entity-display-enablement-toggle.component';
 import { EntityListIndexComponent } from './entity-list-index/entity-list-index.component';
+import { EntityEditQuestionComponent } from './entity-edit-question/entity-edit-question.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +74,8 @@ import { EntityListIndexComponent } from './entity-list-index/entity-list-index.
     EntityDisplayBasicComponent,
     EntityDisplayQuestionComponent,
     EntityDisplayEnablementToggleComponent,
-    EntityListIndexComponent
+    EntityListIndexComponent,
+    EntityEditQuestionComponent
   ],
   imports: [
     BrowserModule,
@@ -92,7 +95,8 @@ import { EntityListIndexComponent } from './entity-list-index/entity-list-index.
     MatFormFieldModule,
     MatDatepickerModule,
     MatMomentDateModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatSliderModule
     /** 
     MatCheckboxModule,
    
