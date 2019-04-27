@@ -1,0 +1,59 @@
+<div class="display" [ngClass]="{'details':details}">
+
+  <div class="field text">
+    <span>{{question.text}}</span>
+  </div>
+
+  <div class="field answer">
+
+    <span>{{question.answer}}</span>
+
+    <ng-container *ngIf="details">
+      <span>{{question.false_1}}</span>
+      <span>{{question.false_2}}</span>
+      <span>{{question.false_3}}</span>
+      <span>{{question.false_4}}</span>
+      <span>{{question.false_5}}</span>
+      <span>{{question.false_6}}</span>
+    </ng-container>
+
+  </div>
+
+
+  <ng-container *ngIf="categoriesIdMap">
+    <div class="field foreignKey categories">
+
+      <ng-container *ngIf="multipleCategories">
+        <ng-container *ngFor="let value of question.categories">
+          <span>{{categoriesIdMap[value].name}}</span>&nbsp;
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="!multipleCategories">
+        <span>{{categoriesIdMap[question.category].name}}</span>
+
+      </ng-container>
+    </div>
+  </ng-container>
+
+  <div class="field type">
+    <span>{{questionType(question.type)}}</span>
+  </div>
+
+  <div class="field difficulty">
+    <span>{{question.difficulty}}</span>
+  </div>
+
+
+  <div class="buttons edit details">
+    <a (click)="toggleDetails()">
+      <span *ngIf="!details">details</span>
+      <span *ngIf="details">close</span>
+    </a>
+  </div>
+
+  <div class="buttons edit">
+    <a (click)="edit.next()">edit</a>
+  </div>
+
+</div>
