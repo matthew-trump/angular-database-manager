@@ -3,10 +3,17 @@
 
     <h2 style="color: #333;">{{entityConfig.plural}}</h2>
 
-    <ng-container *ngIf="entityConfig.add && !adding">
-      <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">
-        <mat-icon>add_circle_outline</mat-icon>
-      </button>
+    <ng-container *ngIf="entityConfig.add">
+      <ng-container *ngIf="!adding">
+        <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </ng-container>
+      <ng-container *ngIf="adding">
+        <button class="addbutton" mat-icon-button matTooltip="add another entry" (click)="addAddEntity()">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </ng-container>
     </ng-container>
 
   </div>
@@ -17,8 +24,8 @@
 
   <ng-container *ngIf="adding">
     <div class="adding">
-      <button mat-icon-button matTooltip="done" (click)="showAdding(false)">
-        <mat-icon>arrow_back</mat-icon>
+      <button mat-stroked-button matTooltip="done" (click)="showAdding(false)">
+        done
       </button>
 
       <button mat-stroked-button [disabled]="!addEntitiesValid()" matTooltip="save" (click)="saveAddEntities()">
@@ -38,10 +45,16 @@
       <ul class="addentries">
         <ng-container *ngFor="let addEntity of addEntities; let i=index">
           <li>
-            <app-entity-form [formGroup]="addEntity" [entityConfig]="entityConfig"
-              [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (another)="addAddEntity()"
-              (remove)="removeAddEntity(i)">
-            </app-entity-form>
+            <ng-container *ngIf="entityConfig.type==='question'">
+              ADD QUESTION
+            </ng-container>
+            <ng-container *ngIf="entityConfig.type!=='question'">
+              <app-entity-form [formGroup]="addEntity" [entityConfig]="entityConfig"
+                [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (another)="addAddEntity()"
+                (remove)="removeAddEntity(i)">
+              </app-entity-form>
+            </ng-container>
+
           </li>
         </ng-container>
       </ul>
@@ -59,8 +72,8 @@
             <div class="filter">
               <mat-form-field>
                 <mat-label>{{foreignKeyEntityConfig.name}}</mat-label>
-                <mat-select (selectionChange)="doFilter(filter.field, $event.value)">
-                  <mat-option *ngIf="filter.all" [value]="FILTER_ALL">
+                <mat-select (selectionChange)="doFilter(filter.field, $event.value)" [multiple]="filter.multiple">
+                  <mat-option *ngIf="!filter.multiple && filter.all" [value]="FILTER_ALL">
                     all
                   </mat-option>
 
@@ -73,6 +86,7 @@
             </div>
           </ng-container>
         </ng-container>
+
       </ng-container>
 
       <ng-container *ngIf="entityConfig.search">
@@ -129,49 +143,41 @@
 
           <li class="displaying"
             [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement])}">
-            <div>
-              <div class="index">
-                <span>{{result.query.offset+1+i}}</span>
-              </div>
-              <ng-container *ngIf="entityConfig.enablement">
-                <div class="status">
 
-                  <a
-                    (click)="toggle(entity,entityConfig.enablement)">{{entity[entityConfig.enablement] ? '&#x2713;' : '&times;'}}</a>
-                </div>
-              </ng-container>
+            <div class="entity">
 
+              <app-entity-list-index [index]="result.query.offset+1+i"></app-entity-list-index>
+
+              <app-entity-display-enablement-toggle *ngIf="entityConfig.enablement" [entity]="entity"
+                [entityConfig]="entityConfig" (toggle)="toggle(entity,entityConfig.enablement)">
+              </app-entity-display-enablement-toggle>
 
               <ng-container *ngIf="!editEntity[entity.id]">
-                <ng-container *ngFor="let field of entityConfig.fields">
 
-                  <ng-container *ngIf="!field.foreignKey">
-                    <div class="field" [ngClass]="field.name">
-                      <span>{{entity[field.name]}}</span></div>
-                  </ng-container>
+                <app-entity-display-basic *ngIf="entityConfig.type!=='question'"
+                  [enabled]="entity[entityConfig.enablement]" [foreignKeysEntitiesIdMap]="foreignKeysEntitiesIdMap"
+                  [entity]="entity" [entityConfig]="entityConfig" (edit)="edit(entity)">
+                </app-entity-display-basic>
 
-                  <ng-container *ngIf="field.foreignKey">
-                    <ng-container *ngIf="foreignKeysEntitiesIdMap[field.foreignKey]">
-                      <div class="field foreignKey" [ngClass]="field.name">
-                        <span>{{foreignKeysEntitiesIdMap[field.foreignKey][entity[field.name]][field.label]}}</span>
-                      </div>
-                    </ng-container>
-                  </ng-container>
-
-                </ng-container>
-
-
-                <div class="edit">
-                  <a (click)="edit(entity)">edit</a>
-                </div>
+                <app-entity-display-question *ngIf="entityConfig.type==='question'"
+                  [enabled]="entity[entityConfig.enablement]" [categoriesIdMap]="foreignKeysEntitiesIdMap.categories"
+                  [question]="entity" [entityConfig]="entityConfig" (edit)="edit(entity)">
+                </app-entity-display-question>
 
               </ng-container>
 
 
               <ng-container *ngIf="editEntity[entity.id]">
-                <app-entity-form [entity]="entity" [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
+
+                <ng-container *ngIf="entityConfig.type==='question'">
+                  EDIT QUESTION
+                </ng-container>
+
+                <app-entity-form *ngIf="entityConfig.type!=='question'" [entity]="entity"
+                  [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
                   [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="closeEditForm(entity.id,$event)">
                 </app-entity-form>
+
               </ng-container>
 
 
