@@ -40,11 +40,14 @@ export class EntityFormComponent implements OnInit {
   save() {
     try {
       const entityUpdate: EntityUpdate = this.formGroup.value;
+      console.log(entityUpdate);
+      /**
       this.backendApiService.updateEntity(this.entityConfig.plural, this.entity.id, entityUpdate).toPromise().then((_) => {
         this.done.emit(true)
       }).catch(err => {
         console.log(err);
       })
+       */
     } catch (err) {
       window.alert(err.message);
     }
