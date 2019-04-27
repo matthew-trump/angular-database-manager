@@ -142,7 +142,7 @@
 
 
           <li class="displaying"
-            [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement])}">
+            [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement] && !editEntity[entity.id])}">
 
             <div class="entity">
 
@@ -169,9 +169,11 @@
 
               <ng-container *ngIf="editEntity[entity.id]">
 
-                <ng-container *ngIf="entityConfig.type==='question'">
-                  EDIT QUESTION
-                </ng-container>
+                <app-entity-edit-question *ngIf="entityConfig.type==='question'" [formGroup]="editEntity[entity.id]"
+                  [adding]="false" [enabled]="entity[entityConfig.enablement]"
+                  [categories]="foreignKeysEntitiesMap.categories" [question]="entity" [entityConfig]="entityConfig"
+                  (cancel)="closeEditForm(entity.id,$event)">
+                </app-entity-edit-question>
 
                 <app-entity-form *ngIf="entityConfig.type!=='question'" [entity]="entity"
                   [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
