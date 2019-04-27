@@ -1,8 +1,6 @@
 <ng-container *ngIf="foreignKeysEntitiesMap!==undefined">
   <ng-container *ngIf="entityConfig">
-
     <div [ngClass]="{'adding':!entity,'editing':entity}">
-
       <form [formGroup]="formGroup">
 
         <ng-container *ngIf="!entity">
@@ -12,6 +10,7 @@
             <span *ngIf="formGroup.valid" class="valid">&#x2713;</span>
             <span *ngIf="!formGroup.valid">&nbsp;</span>
           </div>
+
         </ng-container>
 
 
@@ -23,13 +22,11 @@
             <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
 
               <div class="text">
-
                 <mat-form-field>
                   <mat-label>{{field.name}}</mat-label>
                   <textarea matInput [formControlName]="field.name" [rows]="field.input.rows"
                     [cols]="field.input.cols"></textarea>
                 </mat-form-field>
-
               </div>
 
             </ng-container>
@@ -37,12 +34,10 @@
             <ng-template #textinput>
 
               <div class="textinput">
-
                 <mat-form-field>
                   <mat-label>{{field.name}}</mat-label>
                   <input matInput type="text" [placeholder]="field.name" [formControlName]="field.name">
                 </mat-form-field>
-
               </div>
 
             </ng-template>
@@ -50,14 +45,21 @@
           </ng-container>
 
           <ng-container *ngIf="field.foreignKey">
+
             <mat-form-field>
               <mat-label>{{field.name}}</mat-label>
-              <mat-select [formControlName]="field.name" (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
+
+              <mat-select [formControlName]="field.name" [multiple]="field.multiple"
+                (change)="setLatestForeignKeyValueForAdd(addEntity,field)">
+
                 <mat-option *ngFor="let entity of foreignKeysEntitiesMap[field.foreignKey]" [value]="entity.id">
                   {{entity[field.label]}}
                 </mat-option>
+
               </mat-select>
+
             </mat-form-field>
+
           </ng-container>
 
         </ng-container>
@@ -76,20 +78,17 @@
               </button>
             </span>
           </div>
+
         </ng-container>
 
         <ng-container *ngIf="!entity">
+
           <span style="width: 8em; display: flex; justify-content: space-between;">
-
-            <button mat-icon-button matTooltip="add another entry" (click)="anotherNew()">
-              <mat-icon>add_outline</mat-icon>
-            </button>
-
             <button mat-icon-button matTooltip="delete entry" (click)="removeNew()">
               <mat-icon>delete_outline</mat-icon>
             </button>
-
           </span>
+
         </ng-container>
 
       </form>
