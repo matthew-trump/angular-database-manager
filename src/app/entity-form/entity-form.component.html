@@ -68,12 +68,13 @@
 
           <div class="buttons">
             <span>
-              <button mat-icon-button matTooltip="save changes" (click)="save()" [disabled]="formGroup.pristine">
+              <button mat-icon-button matTooltip="save changes" (click)="done.emit(true)"
+                [disabled]="formGroup.pristine">
                 <mat-icon>save_alt</mat-icon>
               </button>
             </span>
             <span>
-              <button mat-icon-button matTooltip="close" (click)="cancel()">
+              <button mat-icon-button matTooltip="close" (click)="done.emit(false)">
                 <mat-icon>close</mat-icon>
               </button>
             </span>
@@ -82,10 +83,14 @@
         </ng-container>
 
         <ng-container *ngIf="!entity">
-
-          <span style="width: 8em; display: flex; justify-content: space-between;">
-            <button mat-icon-button matTooltip="delete entry" (click)="removeNew()">
-              <mat-icon>delete_outline</mat-icon>
+          <span>
+            <button mat-icon-button matTooltip="save changes" (click)="done.emit(true)" [disabled]="formGroup.pristine">
+              <mat-icon>save_alt</mat-icon>
+            </button>
+          </span>
+          <span>
+            <button mat-icon-button matTooltip="delete entry" (click)="done.emit(false)">
+              <mat-icon>close</mat-icon>
             </button>
           </span>
 
