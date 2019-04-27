@@ -15,9 +15,11 @@ export class EntityEditQuestionComponent implements OnInit {
   @Input() categories: any;
   @Input() multipleCategories: boolean = true;
   @Input() adding: boolean;
+  @Input() inProgress: boolean;
 
-  @Output() cancel: EventEmitter<null> = new EventEmitter();
+  @Output() done: EventEmitter<boolean> = new EventEmitter();
 
+  spinnerDiameter: number = 20;
   text = "text";
 
   @Input() textCols: number = 15
@@ -25,7 +27,8 @@ export class EntityEditQuestionComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.categories);
+
   }
+
 
 }
