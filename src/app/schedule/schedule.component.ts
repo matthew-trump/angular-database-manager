@@ -15,7 +15,8 @@ import { PaginationQuery } from '../pagination-query';
 import { environment } from 'src/environments/environment';
 import * as moment from 'moment';
 
-const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
+//const CURRENT_SCHEDULER_LOADER_INTERVAL: number = environment.currentSchedulerLoaderInterval;
+const TARGETS: any = environment.targets;
 const DATE_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
 const DEFAULT_LIMIT: number = 7;
 
@@ -85,10 +86,22 @@ export class ScheduleComponent implements OnInit, OnDestroy {
                 this.loadCurrentScheduledItem();
 
                 this.now$ = new BehaviorSubject(moment());
-                this.currentScheduleLoader = setInterval(() => {
-                  this.now$.next(moment());
-                  this.loadCurrentScheduledItem();
-                }, CURRENT_SCHEDULER_LOADER_INTERVAL);
+                const currentScheduleLoaderInterval = TARGETS[state.target].currentScheduleLoaderInterval;
+                if (this.currentScheduleLoader) {
+                  console.log("CLEARING CURRENT SCHEDULE LOADER");
+                  try {
+                    clearInterval(this.currentScheduleLoader);
+                  } catch (err) {
+                    console.log(err);
+                  }
+                }
+                if (currentScheduleLoaderInterval > 0) {
+                  console.log("SETTING CURRENT SCHEDULE LOADER WITH INTERVAL", currentScheduleLoaderInterval, state.target);
+                  this.currentScheduleLoader = setInterval(() => {
+                    this.now$.next(moment());
+                    this.loadCurrentScheduledItem();
+                  }, currentScheduleLoaderInterval);
+                }
               })
           }
         }),
