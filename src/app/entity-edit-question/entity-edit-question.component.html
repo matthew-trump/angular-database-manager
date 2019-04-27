@@ -22,30 +22,24 @@
 
         <ng-container>
           <div>
-
-
-            <input matInput [value]="formGroup.value.false_1">
-
+            <input matInput [formControlName]="'false_1'">
           </div>
           <div>
-            <input matInput [value]="formGroup.value.false_2">
+            <input matInput [formControlName]="'false_2'">
           </div>
           <div>
-            <input matInput [value]="formGroup.value.false_3">
+            <input matInput [formControlName]="'false_3'">
           </div>
           <div>
-            <input matInput [value]="formGroup.value.false_4">
+            <input matInput [formControlName]="'false_4'">
           </div>
           <div>
-
-            <input matInput [value]="formGroup.value.false_5">
-
+            <input matInput [formControlName]="'false_5'">
           </div>
           <div>
-
-            <input matInput [value]="formGroup.value.false_6">
-
+            <input matInput [formControlName]="'false_6'">
           </div>
+
         </ng-container>
 
       </div>
@@ -88,18 +82,26 @@
 
       <div class="buttons">
 
-        <button mat-icon-button *ngIf="!adding">
+        <button mat-icon-button *ngIf="!adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
           <mat-icon>save_alt</mat-icon>
         </button>
 
-        <button mat-icon-button *ngIf="!adding" (click)="cancel.next()">
+        <button mat-icon-button *ngIf="!adding" (click)="done.next(false)">
           <mat-icon>close</mat-icon>
         </button>
 
-        <button mat-icon-button *ngIf="adding" (click)="deleteAdd()">
+
+        <button mat-icon-button *ngIf="adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
+          <mat-icon>save_alt</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="adding" (click)="done.next(false)">
           <mat-icon>close</mat-icon>
         </button>
 
+        <div *ngIf="inProgress">
+          <mat-spinner [diameter]="spinnerDiameter"></mat-spinner>
+        </div>
       </div>
 
 
