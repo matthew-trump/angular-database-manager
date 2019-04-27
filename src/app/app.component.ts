@@ -22,6 +22,7 @@ export class AppComponent {
   public TARGETS = TARGETS;
   public title: string = DEFAULT_TITLE;
   public entities: string[];
+  public schedule: any;
 
   constructor(
     public authService: AuthService,
@@ -30,9 +31,10 @@ export class AppComponent {
     private store: Store<any>,
     private titleService: Title,
     private router: Router) {
-
+    console.log("TARGETS", this.TARGETS);
     this.store.select('config').subscribe((state: any) => {
       if (state.schema) {
+        this.schedule = state.schema.schedule;
         this.entities = state.schema.entities.map((entityConfig: EntityConfig) => {
           return entityConfig.plural;
         });
