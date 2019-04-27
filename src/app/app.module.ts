@@ -79,6 +79,7 @@ import { EntityEditQuestionComponent } from './entity-edit-question/entity-edit-
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     StoreModule.forRoot({ config: ConfigStateReducer }),
     FormsModule,
