@@ -1,9 +1,19 @@
 
+.top{
+    display: flex; align-items: center;
+}
 h2{
     text-transform: capitalize;
 }
+.entityPlural{
+    color: #333;
+}
 .adding{
     margin-top: 1em;
+
+    .showing{
+        margin-top: 1em;
+    }
 }
 .addentries{
     
@@ -38,7 +48,18 @@ h2{
         margin-right: 5em;
     }
 }
+.pagination{
+    display: flex; 
+    align-items: flex-start; 
+    margin-top: 0.5em;
 
+    .pagination-controls{
+        margin-right:1em
+    }
+    .pagination-pages{
+        width: 40em;
+    }
+}
 ul{
     list-style-type: none;
     padding-left: 0em;
@@ -101,6 +122,9 @@ li.displaying{
             }   
         }     
     }
+}
+app-entity-edit-question{
+    border: 2px solid gold;
 }
 ::ng-deep{
     .disabled{
