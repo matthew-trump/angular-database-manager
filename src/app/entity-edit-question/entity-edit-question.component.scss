@@ -1,0 +1,76 @@
+.field{
+    border: none
+}
+
+
+div.details{
+    display: flex;
+    border: 2px solid gold;
+    padding: 0.5em;
+
+
+    .text{
+        padding-top: 0em;
+        margin-top: 0em;
+        width: 15em;
+   
+
+        mat-form-field{
+
+            padding-top: 0em;
+            width: 100%;
+       
+            textarea{
+                font-size: 0.85em;
+                margin-top: 0em;
+          
+            }
+        }
+    }
+
+    .answer{
+       
+        display: flex;
+        flex-direction: column;
+        font-size: 0.85em;
+        margin-top: 0.5em;
+        div{
+            display: inline-block;
+            margin-bottom: 0.5em;
+            width: 15em;
+            mat-form-field{
+                width: 100%;
+            }
+            input{
+                border-bottom: 1px solid #666;
+            }
+           
+        }
+        div.correct{
+            margin-top: 0em;
+            margin-bottom: 1em;
+            input{
+                border-bottom: none;
+            }
+            
+        }
+    }
+    .midcolumn{
+        font-size: 0.8em;
+        margin-left: 0.5em;
+        padding-right: 2em; 
+        margin-top: 0.4em;
+    }
+
+    .difficulty{
+        div{
+            font-size: 0.8em;
+            color: #999;
+        }
+      
+    }
+
+}
+.buttons{
+    margin-left: 1em;
+}

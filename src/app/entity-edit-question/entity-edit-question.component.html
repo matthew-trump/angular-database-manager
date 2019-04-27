@@ -1,0 +1,109 @@
+<ng-container *ngIf="formGroup">
+  <form [formGroup]="formGroup">
+    <div class="display details">
+
+
+      <div class="field text">
+        <mat-form-field>
+          <mat-label>text</mat-label>
+          <textarea matInput [formControlName]="text" [cols]="textCols" [rows]="textRows"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="field answer">
+
+        <div class="correct">
+          <mat-form-field>
+            <mat-label>answers</mat-label>
+            <input matInput [formControlName]="'answer'">
+          </mat-form-field>
+
+        </div>
+
+        <ng-container>
+          <div>
+
+
+            <input matInput [value]="formGroup.value.false_1">
+
+          </div>
+          <div>
+            <input matInput [value]="formGroup.value.false_2">
+          </div>
+          <div>
+            <input matInput [value]="formGroup.value.false_3">
+          </div>
+          <div>
+            <input matInput [value]="formGroup.value.false_4">
+          </div>
+          <div>
+
+            <input matInput [value]="formGroup.value.false_5">
+
+          </div>
+          <div>
+
+            <input matInput [value]="formGroup.value.false_6">
+
+          </div>
+        </ng-container>
+
+      </div>
+
+      <div class="midcolumn">
+
+        <div *ngIf="categories" class="categories">
+
+          <mat-form-field>
+            <mat-label>categories</mat-label>
+            <mat-select [formControlName]="'categories'" [multiple]="true">
+              <mat-option *ngFor="let category of categories" [value]="category.id">
+                {{category.name}}
+              </mat-option>
+            </mat-select>
+
+          </mat-form-field>
+
+        </div>
+
+        <div class="type">
+          <mat-form-field>
+            <mat-label>type</mat-label>
+            <mat-select [formControlName]="'type'">
+              <mat-option *ngFor="let type of entityConfig.enums.questionType" [value]="type.value">
+                {{type.name}}
+              </mat-option>
+            </mat-select>
+
+          </mat-form-field>
+        </div>
+
+        <div class="difficulty">
+          <div>difficulty</div>
+          <mat-slider [thumbLabel]="true" [formControlName]="'difficulty'"></mat-slider>
+          <span>{{formGroup.value.difficulty}}</span>
+        </div>
+      </div>
+
+
+      <div class="buttons">
+
+        <button mat-icon-button *ngIf="!adding">
+          <mat-icon>save_alt</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="!adding" (click)="cancel.next()">
+          <mat-icon>close</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="adding" (click)="deleteAdd()">
+          <mat-icon>close</mat-icon>
+        </button>
+
+      </div>
+
+
+    </div>
+
+  </form>
+</ng-container>
