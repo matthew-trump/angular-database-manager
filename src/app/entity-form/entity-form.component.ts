@@ -19,8 +19,6 @@ export class EntityFormComponent implements OnInit {
   @Input() foreignKeysEntitiesMap: EntitiesMap;
 
   @Output() done: EventEmitter<boolean> = new EventEmitter();
-  @Output() another: EventEmitter<boolean> = new EventEmitter();
-  @Output() remove: EventEmitter<boolean> = new EventEmitter();
 
   constructor(public backendApiService: BackendApiService) { }
 
@@ -28,30 +26,10 @@ export class EntityFormComponent implements OnInit {
 
   setLatestForeignKeyValueForAdd() { }
 
-  removeNew() {
-    this.remove.emit(true);
-  }
-  anotherNew() {
-    this.another.emit(true);
-  }
-  cancel() {
-    this.done.emit(false);
-  }
-  save() {
-    try {
-      const entityUpdate: EntityUpdate = this.formGroup.value;
-      console.log(entityUpdate);
-      /**
-      this.backendApiService.updateEntity(this.entityConfig.plural, this.entity.id, entityUpdate).toPromise().then((_) => {
-        this.done.emit(true)
-      }).catch(err => {
-        console.log(err);
-      })
-       */
-    } catch (err) {
-      window.alert(err.message);
-    }
-  }
+
+
+
+
 
 
 }
