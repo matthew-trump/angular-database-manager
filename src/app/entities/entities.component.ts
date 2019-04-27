@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 import { ActivatedRoute } from '@angular/router';
 import { tap, takeUntil, switchMap, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
@@ -7,6 +8,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { ConfigSchemaService } from '../config-schema.service';
 import { BackendApiService } from '../backend-api.service';
 import { EntitiesMap } from '../entities-map';
+import { EntityUpdate } from '../entity-update';
 import { EntitiesIdMap } from '../entities-id-map';
 import { Pagination } from '../pagination';
 import { PaginationQuery } from '../pagination-query';
@@ -18,11 +20,21 @@ const TARGETS: any = environment.targets;
 @Component({
   selector: 'app-entities',
   templateUrl: './entities.component.html',
-  styleUrls: ['./entities.component.scss']
+  styleUrls: ['./entities.component.scss'],
+  animations: [
+    trigger('edittrigger', [
+      transition(':enter', [
+        style({ height: '0px', opacity: 0 }),
+        animate('200ms', style({ height: '*', opacity: 1 })),
+      ])
+    ]),
+  ]
 })
 export class EntitiesComponent implements OnInit {
 
   FILTER_ALL: string = "--FILTER_ALL--";
+
+  targetConfig: any;
 
   adding: boolean = false;
   addEntities: FormGroup[];
@@ -40,6 +52,7 @@ export class EntitiesComponent implements OnInit {
     offset: 0
   })
 
+
   filters: any = {}
 
   entities$: BehaviorSubject<any[]> = new BehaviorSubject(null);
@@ -55,6 +68,8 @@ export class EntitiesComponent implements OnInit {
   search: any = {};
   searchString: string = null;
 
+  updating: any = {};
+
   unsubscribe$: Subject<null> = new Subject();
 
   constructor(private route: ActivatedRoute,
@@ -69,10 +84,14 @@ export class EntitiesComponent implements OnInit {
       .select("config")
       .pipe(
         filter((state: any) => {
+          if (state) {
+            this.targetConfig = TARGETS[state.target];
+          }
           return state.target !== null;
         }),
         switchMap((_: any) => {
           return this.route.params
+
         }),
         tap((params: any) => {
           if (params.id) {
@@ -83,6 +102,12 @@ export class EntitiesComponent implements OnInit {
                   this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
                 }
                 this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
+
+                const paginationLimit: number = (this.targetConfig.limits && this.targetConfig.limits[this.entityConfig.plural]) ?
+                  this.targetConfig.limits[this.entityConfig.plural] : DEFAULT_LIMIT;
+
+                this.pagination.params.limit = paginationLimit;
+
                 this.editEntity = {};
                 this.addEntities = [];
                 this.loading = {};
@@ -181,6 +206,8 @@ export class EntitiesComponent implements OnInit {
     const group: FormGroup = this.fb.group(fbconfig);
     this.editEntity[entity.id] = group;
   }
+
+
   getFormConfig(entity: any) {
     const fbconfig: any = {};
     for (let i = 0, len = this.entityConfig.fields.length; i < len; i++) {
@@ -216,6 +243,13 @@ export class EntitiesComponent implements OnInit {
   clearAddEntities() {
     this.addEntities = [];
   }
+  addEntityDone(index: number, save: boolean) {
+    if (!save) {
+      this.removeAddEntity(index);
+    } else {
+      this.saveAddEntities([this.addEntities[index]], index);
+    }
+  }
   removeAddEntity(index: number) {
     this.addEntities.splice(index, 1);
     if (this.addEntities.length === 0) {
@@ -227,18 +261,26 @@ export class EntitiesComponent implements OnInit {
       return fg.valid;
     }).length === this.addEntities.length;
   }
-  saveAddEntities() {
+  saveAllEntities() {
+    this.saveAddEntities(this.addEntities, 0)
+  }
+  saveAddEntities(entitiesToAdd, clearIndex) {
     this.addedThisSave = 0;
-
     this.backendApiService
       .addEntities(
         this.entityConfig.plural,
-        this.addEntities.map((fg: FormGroup) => { return fg.value; })).toPromise()
+        entitiesToAdd.map((fg: FormGroup) => { return fg.value; })).toPromise()
       .then((result: any) => {
-        console.log(result);
-        this.addedThisSave = this.addEntities.length;
-        this.addEntities = null;
-        this.addAddEntity();
+        this.addedThisSave = entitiesToAdd.length;
+        if (clearIndex) {
+          this.removeAddEntity(clearIndex);
+          if (this.addEntities.length === 0) {
+            this.addAddEntity();
+          }
+        } else {
+          this.addEntities = null;
+          this.addAddEntity();
+        }
         this.added = this.added + this.addedThisSave;
       })
       .catch((err: any) => {
@@ -247,11 +289,24 @@ export class EntitiesComponent implements OnInit {
   }
 
 
-  closeEditForm(id: number, reload: boolean) {
-    delete this.editEntity[id];
-    if (reload) {
-      this.loadEntries(this.getQuery());
+  closeEditForm(id: number, save: boolean) {
+    if (!save) {
+      delete this.editEntity[id];
+    } else {
+      const entityUpdate: EntityUpdate = this.editEntity[id].value;
+      this.updating[id] = true;
+      this.backendApiService.updateEntity(this.entityConfig.plural, id, entityUpdate).toPromise().then((_) => {
+        delete this.editEntity[id];
+        delete this.updating[id];
+        this.loadEntries(this.getQuery())
+      }).catch(err => {
+        delete this.updating[id];
+        delete this.editEntity[id];
+        console.log(err);
+      })
     }
+
+
   }
 
   ngOnDestroy() {
