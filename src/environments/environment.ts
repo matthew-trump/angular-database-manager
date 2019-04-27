@@ -1,11 +1,12 @@
 export const environment = {
 
   production: false,
-  currentSchedulerLoaderInterval: 30000,
+
   defaultTarget: "local",
   targets: {
     local: {
       url: "http://localhost:8082",
+      currentSchedulerLoaderInterval: 30000,
       loginPath: "/login",
       apiPath: "/api/",
       schemaPath: 'config/schema',
@@ -19,6 +20,7 @@ export const environment = {
     },
     staging: {
       url: "http://localhost:8083",
+      currentSchedulerLoaderInterval: 30000,
       loginPath: "/login",
       apiPath: "/api/",
       schemaPath: 'config/schema',
@@ -30,8 +32,10 @@ export const environment = {
       color: "green",
       title: "Trivia Bank Database Manager"
     },
+    /** 
     production: {
       url: "http://localhost:8084",
+      currentSchedulerLoaderInterval: 30000,
       loginPath: "/login",
       apiPath: "/api/",
       schemaPath: 'config/schema',
@@ -43,6 +47,21 @@ export const environment = {
       color: "maroon",
       title: "Trivia Bank Database Manager"
     },
+    */
+    production: {
+      url: "http://localhost:8085",
+      currentSchedulerLoaderInterval: 0,
+      loginPath: "/login",
+      apiPath: "/api/",
+      schemaPath: 'config/schema',
+      limits: {
+        categories: 40,
+        questions: 5
+      },
+      color: "dodgerblue",
+      title: "Quizzes Deluxe"
+    }
+
   }
 
 
