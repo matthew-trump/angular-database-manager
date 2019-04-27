@@ -22,6 +22,7 @@ export class Pagination {
         this.params$.next(this.params);
     }
     get query(): PaginationQuery {
+
         return this.params;
     }
     get pages(): number[] {
