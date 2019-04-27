@@ -90,6 +90,7 @@ export class EntitiesComponent implements OnInit {
                 this.addedThisSave = 0;
                 this.foreignKeyValueForAdd = {};
                 this.entities$.next(null);
+                this.showAdding(false)
                 this.loadEntries(this.getQuery());
               }).catch(err => {
                 console.log(err);
@@ -228,6 +229,7 @@ export class EntitiesComponent implements OnInit {
   }
   saveAddEntities() {
     this.addedThisSave = 0;
+
     this.backendApiService
       .addEntities(
         this.entityConfig.plural,
