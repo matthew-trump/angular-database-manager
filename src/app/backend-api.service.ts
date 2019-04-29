@@ -20,18 +20,21 @@ import { ScheduleQuery } from './schedule-query';
 
 import { TestApiResponse } from './test-api-response';
 const DEFAULT_TARGET: any = environment.defaultTarget;
-console.log("DEFAULT TARGET", DEFAULT_TARGET);
+
 const TARGETS: any = environment.targets;
 const TARGET_PARAM: string = "__target__";
-console.log("TARGET", TARGETS[DEFAULT_TARGET]);
+
 @Injectable({
     providedIn: 'root'
 })
 export class BackendApiService {
     public target: string = localStorage.getItem('target') || DEFAULT_TARGET;
+
     constructor(public http: HttpClient) {
-
-
+        if (this.target && typeof TARGETS[this.target] === 'undefined') {
+            localStorage.removeItem("target");
+            this.target = DEFAULT_TARGET;
+        }
     }
     login(target: string, username: string, password: string): Observable<any> {
         const url: string = TARGETS[target].url;
