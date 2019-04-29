@@ -17,7 +17,7 @@
 
         <ng-container *ngFor="let field of entityConfig.fields">
 
-          <ng-container *ngIf="!field.foreignKey">
+          <ng-container *ngIf="!field.foreignKey && field.editable">
 
             <ng-container *ngIf="field.input && field.input.type==='textarea'; else textinput">
 
@@ -44,7 +44,7 @@
 
           </ng-container>
 
-          <ng-container *ngIf="field.foreignKey">
+          <ng-container *ngIf="field.foreignKey && field.editable">
 
             <mat-form-field>
               <mat-label>{{field.name}}</mat-label>
