@@ -41,23 +41,30 @@
 
     <ng-container *ngIf="addEntities">
       <ul class="addentries">
-        <ng-container *ngFor="let addEntity of addEntities; let i=index">
-          <li class="displaying">
-            <div class="entity">
-              <ng-container *ngIf="entityConfig.type==='question'">
-                <app-entity-edit-question [formGroup]="addEntity" [adding]="true"
-                  [categories]="foreignKeysEntitiesMap.categories" [entityConfig]="entityConfig"
-                  (done)="addEntityDone(i,$event)">
-                </app-entity-edit-question>
-              </ng-container>
-              <ng-container *ngIf="entityConfig.type!=='question'">
-                <app-entity-form [formGroup]="addEntity" [entityConfig]="entityConfig"
-                  [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="addEntityDone(i,$event)">
-                </app-entity-form>
-              </ng-container>
-            </div>
-          </li>
-        </ng-container>
+
+        <li class="displaying" *ngFor="let addEntity of addEntities; let i=index">
+
+          <div class="entity" [ngSwitch]="entityConfig.type">
+
+            <entity-literary-work-form *ngSwitchCase="ENTITY_TYPES.LITERARY_WORK" [formGroup]="addEntity"
+              [adding]="true" [authorsIdMap]="foreignKeysEntitiesMap.authors" [entityConfig]="entityConfig"
+              [foreignKeysReloaded$]="foreignKeysReloaded$" (addAuthor)="addForeignKey('authors',$event)"
+              (done)="addEntityDone(i,$event)">
+            </entity-literary-work-form>
+
+            <entity-question-form *ngSwitchCase="ENTITY_TYPES.QUESTION" [formGroup]="addEntity" [adding]="true"
+              [categories]="foreignKeysEntitiesMap.categories" [entityConfig]="entityConfig"
+              (done)="addEntityDone(i,$event)">
+            </entity-question-form>
+
+            <entity-basic-form *ngSwitchDefault [formGroup]="addEntity" [entityConfig]="entityConfig"
+              [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="addEntityDone(i,$event)">
+            </entity-basic-form>
+
+          </div>
+
+        </li>
+
       </ul>
     </ng-container>
   </ng-container>
@@ -90,110 +97,120 @@
 
       </ng-container>
 
-      <ng-container *ngIf="entityConfig.search">
 
-        <div class="search">
-          <mat-form-field>
-            <input matInput type="text" size="25" placeholder="search" [(ngModel)]="searchString">
-          </mat-form-field>
-          <button mat-icon-button (click)="doSearch()">
-            <mat-icon>search</mat-icon>
-          </button>
-        </div>
 
-      </ng-container>
+      <div *ngIf="entityConfig.search" class="search">
+        <mat-form-field>
+          <input matInput type="text" size="25" placeholder="search" [(ngModel)]="searchString">
+        </mat-form-field>
+        <button mat-icon-button (click)="doSearch()">
+          <mat-icon>search</mat-icon>
+        </button>
+      </div>
 
-      <ng-container *ngIf="entityConfig.enablement">
-        <mat-slide-toggle (change)="doEnablementFilter($event.checked)">enabled only</mat-slide-toggle>
-      </ng-container>
+
+
+      <mat-slide-toggle *ngIf="entityConfig.enablement" (change)="doEnablementFilter($event.checked)">enabled only
+      </mat-slide-toggle>
+
 
       <ng-container *ngIf="false && entityConfig.add">
-
-
         <button class="addbutton" mat-icon-button matTooltip="add entry" (click)="showAdding(true)">
           <mat-icon>add_circle_outline</mat-icon>
         </button>
-
-
       </ng-container>
 
 
     </div>
 
-    <ng-container *ngIf="result">
-
-      <ng-container *ngIf="pagination">
+    <ng-container *ngIf="result && pagination">
 
 
-        <app-pagination-banner [pagination]="pagination" [search]="search.search"></app-pagination-banner>
+      <app-pagination-banner [pagination]="pagination" [search]="search.search"></app-pagination-banner>
 
-        <div class="pagination">
-          <ng-container *ngIf="pagination.numPages > 1">
-            <div class="pagination-controls">
-              <app-pagination-controls [pagination]="pagination"></app-pagination-controls>
-            </div>
-            <div class="pagination-pages">
-              <app-pagination-pages [pagination]="pagination"></app-pagination-pages>
-            </div>
-          </ng-container>
+      <div class="pagination" *ngIf="pagination.numPages > 1">
+        <div class="pagination-controls">
+          <app-pagination-controls [pagination]="pagination"></app-pagination-controls>
         </div>
-      </ng-container>
+        <div class="pagination-pages">
+          <app-pagination-pages [pagination]="pagination"></app-pagination-pages>
+        </div>
+      </div>
 
     </ng-container>
+
     <div *ngIf="(entities$|async) as entities">
       <ul>
-        <ng-container *ngFor="let entity of entities; let i=index">
 
+        <li class="displaying" *ngFor="let entity of entities; let i=index"
+          [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement] && !editEntity[entity.id])}">
 
-          <li class="displaying"
-            [ngClass]="{'enabled' : entity[entityConfig.enablement], 'disabled' : (entityConfig.enablement && !entity[entityConfig.enablement] && !editEntity[entity.id])}">
+          <div class="entity">
 
-            <div class="entity">
+            <app-entity-list-index [index]="result.query.offset+1+i"></app-entity-list-index>
 
-              <app-entity-list-index [index]="result.query.offset+1+i"></app-entity-list-index>
-
-              <app-entity-display-enablement-toggle *ngIf="entityConfig.enablement" [entity]="entity"
-                [entityConfig]="entityConfig" (toggle)="toggle(entity,entityConfig.enablement)">
-              </app-entity-display-enablement-toggle>
+            <app-entity-display-enablement-toggle *ngIf="entityConfig.enablement" [entity]="entity"
+              [entityConfig]="entityConfig" (toggle)="toggle(entity,entityConfig.enablement)">
+            </app-entity-display-enablement-toggle>
 
 
 
 
-              <ng-container *ngIf="editEntity[entity.id]">
+            <ng-container *ngIf="editEntity[entity.id]">
+              <ng-container [ngSwitch]="entityConfig.type">
 
-                <app-entity-edit-question *ngIf="entityConfig.type==='question'" @edittrigger
+                <entity-literary-work-form *ngSwitchCase="ENTITY_TYPES.LITERARY_WORK" @edittrigger
+                  [formGroup]="editEntity[entity.id]" [adding]="false" [enabled]="entity[entityConfig.enablement]"
+                  [authorsIdMap]="foreignKeysEntitiesMap.authors" [work]="entity" [entityConfig]="entityConfig"
+                  [foreignKeysReloaded$]="foreignKeysReloaded$" [inProgress]="updating[entity.id]"
+                  (addAuthor)="addForeignKey('authors',$event)" (done)=" closeEditForm(entity.id,$event)">
+                </entity-literary-work-form>
+
+                <entity-question-form *ngSwitchCase="ENTITY_TYPES.QUESTION" @edittrigger
                   [formGroup]="editEntity[entity.id]" [adding]="false" [enabled]="entity[entityConfig.enablement]"
                   [categories]="foreignKeysEntitiesMap.categories" [question]="entity" [entityConfig]="entityConfig"
                   [inProgress]="updating[entity.id]" (done)="closeEditForm(entity.id,$event)">
-                </app-entity-edit-question>
+                </entity-question-form>
 
-                <app-entity-form *ngIf="entityConfig.type!=='question'" [entity]="entity"
-                  [formGroup]="editEntity[entity.id]" [entityConfig]="entityConfig"
-                  [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (done)="closeEditForm(entity.id,$event)">
-                </app-entity-form>
+                <entity-basic-form *ngSwitchDefault [entity]="entity" [formGroup]="editEntity[entity.id]"
+                  [entityConfig]="entityConfig" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
+                  (done)="closeEditForm(entity.id,$event)">
+                </entity-basic-form>
 
               </ng-container>
+            </ng-container>
 
-              <ng-container *ngIf="!editEntity[entity.id]">
+            <ng-container *ngIf="!editEntity[entity.id]">
+              <ng-container [ngSwitch]="entityConfig.type">
 
-                <app-entity-display-basic *ngIf="entityConfig.type!=='question'"
+                <entity-question *ngSwitchCase="ENTITY_TYPES.QUESTION" [enabled]="entity[entityConfig.enablement]"
+                  [categoriesIdMap]="foreignKeysEntitiesIdMap.categories" [question]="entity"
+                  [entityConfig]="entityConfig" (edit)="edit(entity)">
+                </entity-question>
+
+                <entity-literary-work *ngSwitchCase="ENTITY_TYPES.LITERARY_WORK"
+                  [enabled]="entity[entityConfig.enablement]" [authorsIdMap]="foreignKeysEntitiesIdMap.authors"
+                  [work]="entity" [entityConfig]="entityConfig" (edit)="edit(entity)">
+                </entity-literary-work>
+
+                <entity-literary-quote *ngSwitchCase="ENTITY_TYPES.LITERARY_QUOTE"
                   [enabled]="entity[entityConfig.enablement]" [foreignKeysEntitiesIdMap]="foreignKeysEntitiesIdMap"
                   [entity]="entity" [entityConfig]="entityConfig" (edit)="edit(entity)">
-                </app-entity-display-basic>
+                </entity-literary-quote>
 
-                <app-entity-display-question *ngIf="entityConfig.type==='question'"
-                  [enabled]="entity[entityConfig.enablement]" [categoriesIdMap]="foreignKeysEntitiesIdMap.categories"
-                  [question]="entity" [entityConfig]="entityConfig" (edit)="edit(entity)">
-                </app-entity-display-question>
+                <entity-basic *ngSwitchDefault [enabled]="entity[entityConfig.enablement]"
+                  [foreignKeysEntitiesIdMap]="foreignKeysEntitiesIdMap" [entity]="entity" [entityConfig]="entityConfig"
+                  (edit)="edit(entity)">
+                </entity-basic>
+
 
               </ng-container>
+            </ng-container>
 
 
-            </div>
+          </div>
 
-          </li>
-
-        </ng-container>
+        </li>
       </ul>
     </div>
 
