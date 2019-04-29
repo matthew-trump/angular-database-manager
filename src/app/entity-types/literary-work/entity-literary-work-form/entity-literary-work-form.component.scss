@@ -1,0 +1,33 @@
+div.display{
+    display: flex;
+
+    .title{
+        width: 15em;
+       
+
+        mat-form-field{
+
+            padding-top: 0em;
+            width: 100%;
+       
+            textarea{
+                font-style: italic;
+                font-size: 0.85em;
+                margin-top: 0em;
+          
+            }
+        }
+    }
+    .authors{
+        input{
+            padding: 0.3em;
+            border: 1px solid #ccc;
+        }
+        .authorNotFound{
+            font-size: 0.9em;
+            border: 1px gold;
+            width: 13em;
+        }
+    }
+   
+}
