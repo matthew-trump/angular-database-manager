@@ -12,7 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
-
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AuthInterceptor } from './auth.interceptor';
 import { AuthGuard } from './auth.guard';
 import { AppRoutingModule } from './app-routing.module';
@@ -44,16 +44,22 @@ import { ScheduleComponent } from './schedule/schedule.component';
 import { CurrentComponent } from './current/current.component';
 import { InstanceDisplayBasicComponent } from './instance-display-basic/instance-display-basic.component';
 import { ScheduleItemDetailsComponent } from './schedule-item-details/schedule-item-details.component';
-import { EntityFormComponent } from './entity-form/entity-form.component';
+import { EntityBasicComponent } from './entity-types/basic/entity-basic/entity-basic.component';
+import { EntityBasicFormComponent } from './entity-types/basic/entity-basic-form/entity-basic-form.component';
 import { ScheduleItemFormComponent } from './schedule-item-form/schedule-item-form.component';
 import { PaginationControlsComponent } from './pagination-controls/pagination-controls.component';
 import { PaginationBannerComponent } from './pagination-banner/pagination-banner.component';
 import { PaginationPagesComponent } from './pagination-pages/pagination-pages.component';
-import { EntityDisplayBasicComponent } from './entity-display-basic/entity-display-basic.component';
-import { EntityDisplayQuestionComponent } from './entity-display-question/entity-display-question.component';
+
+import { EntityQuestionComponent } from './entity-types/question/entity-question/entity-question.component';
+import { EntityQuestionFormComponent } from './entity-types/question/entity-question-form/entity-question-form.component';
 import { EntityDisplayEnablementToggleComponent } from './entity-display-enablement-toggle/entity-display-enablement-toggle.component';
 import { EntityListIndexComponent } from './entity-list-index/entity-list-index.component';
-import { EntityEditQuestionComponent } from './entity-edit-question/entity-edit-question.component';
+
+import { EntityLiteraryWorkComponent } from './entity-types/literary-work/entity-literary-work/entity-literary-work.component';
+import { EntityLiteraryWorkFormComponent } from './entity-types/literary-work/entity-literary-work-form/entity-literary-work-form.component';
+import { EntityLiteraryQuoteComponent } from './entity-types/literary-quote/entity-literary-quote/entity-literary-quote.component';
+import { EntityLiteraryQuoteFormComponent } from './entity-types/literary-quote/entity-literary-quote-form/entity-literary-quote-form.component';
 
 @NgModule({
   declarations: [
@@ -66,16 +72,22 @@ import { EntityEditQuestionComponent } from './entity-edit-question/entity-edit-
     CurrentComponent,
     InstanceDisplayBasicComponent,
     ScheduleItemDetailsComponent,
-    EntityFormComponent,
+    EntityBasicComponent,
+    EntityBasicFormComponent,
     ScheduleItemFormComponent,
     PaginationControlsComponent,
     PaginationBannerComponent,
     PaginationPagesComponent,
-    EntityDisplayBasicComponent,
-    EntityDisplayQuestionComponent,
+
+    EntityQuestionComponent,
+    EntityQuestionFormComponent,
     EntityDisplayEnablementToggleComponent,
     EntityListIndexComponent,
-    EntityEditQuestionComponent
+
+    EntityLiteraryWorkComponent,
+    EntityLiteraryWorkFormComponent,
+    EntityLiteraryQuoteComponent,
+    EntityLiteraryQuoteFormComponent
   ],
   imports: [
     BrowserModule,
@@ -97,7 +109,8 @@ import { EntityEditQuestionComponent } from './entity-edit-question/entity-edit-
     MatDatepickerModule,
     MatMomentDateModule,
     MatSlideToggleModule,
-    MatSliderModule
+    MatSliderModule,
+    MatAutocompleteModule
     /** 
     MatCheckboxModule,
    
