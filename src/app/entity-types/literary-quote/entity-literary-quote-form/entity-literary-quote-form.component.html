@@ -1,3 +1,67 @@
-<p>
-  entity-literary-quote-form works!
-</p>
+<form *ngIf="formGroup" [formGroup]="formGroup">
+  <div class="display">
+
+    <div class="field text">
+      <mat-form-field>
+        <mat-label>text</mat-label>
+        <textarea matInput [formControlName]="'text'" [cols]="textCols" [rows]="textRows"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="work">
+
+      <input type="text" matInput class="autocomplete" [value]="getForeignKeyValue('work')" [matAutocomplete]="autoWork"
+        (input)="onChange('work',$event.target.value)" (blur)="checkOptionAfterBlur('work',$event.target.value)"
+        #autoComplInputWork>
+      <!-- [disabled]="adding['work']"  #autoComplInputWork  -->
+
+
+      <mat-autocomplete #autoWork="matAutocomplete" [displayWith]="getDisplayWith('work')">
+        <mat-option *ngFor="let option of filteredOptions['work'] | async" [value]="option"
+          (onSelectionChange)="selectionChange('work',option)">
+          {{ option['title']}}
+        </mat-option>
+      </mat-autocomplete>
+
+      <div class="optionNotFound" *ngIf="optionNotFound['work']">
+        <span>
+          "{{optionNotFound['work']}}"" is not currently in the database.
+          Would you like to add this entry?</span>
+        <div>
+          <button mat-raised-button (click)="addNewEntry('work',optionNotFound['work'])"
+            [disabled]="addingEntry['work']">add</button>
+          &nbsp;
+          <button mat-raised-button (click)="cancelAddNew('work')" [disabled]="addingEntry['work']">cancel</button>
+        </div>
+        <div *ngIf="addingEntry['work']">
+          <mat-spinner diameter="10"></mat-spinner>
+        </div>
+      </div>
+
+    </div>
+    <div class="buttons">
+
+      <button mat-icon-button *ngIf="!adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
+        <mat-icon>save_alt</mat-icon>
+      </button>
+
+      <button mat-icon-button *ngIf="!adding" (click)="done.next(false)">
+        <mat-icon>close</mat-icon>
+      </button>
+
+
+      <button mat-icon-button *ngIf="adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
+        <mat-icon>save_alt</mat-icon>
+      </button>
+
+      <button mat-icon-button *ngIf="adding" (click)="done.next(false)">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div *ngIf="inProgress">
+        <mat-spinner [diameter]="spinnerDiameter"></mat-spinner>
+      </div>
+    </div>
+
+  </div>
+</form>
