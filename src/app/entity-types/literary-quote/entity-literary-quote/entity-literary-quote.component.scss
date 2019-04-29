@@ -1,0 +1,20 @@
+div.display{
+    display: flex;
+
+    .work{
+        margin-left: 1em;
+        width: 10em;
+        span{
+            font-style: italic;
+            font-size: 0.85em;
+        }
+    }
+    .author{
+        margin-left: 1em;
+        width: 10em;
+        span{
+            font-size: 0.85em;
+        }
+    }
+   
+}

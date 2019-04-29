@@ -1,0 +1,34 @@
+<div class="display">
+
+
+  <div class="text">
+    <span>{{entity.text}}</span>
+  </div>
+
+  <ng-container *ngIf="foreignKeysEntitiesIdMap">
+
+    <div class="author">
+
+      <span *ngIf="entity.author">{{foreignKeysEntitiesIdMap.authors[entity.author].name}}</span>
+
+    </div>
+
+
+    <div class="work">
+
+      <span *ngIf="entity.work">{{foreignKeysEntitiesIdMap.works[entity.work].title}}</span>
+
+    </div>
+
+
+
+
+  </ng-container>
+
+
+  <div class="buttons edit">
+    <a (click)="edit.next()">edit</a>
+  </div>
+
+
+</div>
