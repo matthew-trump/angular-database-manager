@@ -1,0 +1,16 @@
+form{
+    display: flex;
+    align-items: flex-start;
+
+    .text{
+        width: 25em;
+        margin-right: 1.5em;
+        mat-form-field {
+            width: 100%;
+        }
+    }
+    .buttons{
+        margin-left: 2em;
+    }
+ 
+}
