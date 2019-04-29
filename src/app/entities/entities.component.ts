@@ -17,6 +17,12 @@ import { EntitiesQuery } from '../entities-query';
 
 const DEFAULT_LIMIT: number = 50;
 const TARGETS: any = environment.targets;
+enum ENTITY_TYPES {
+  BASIC = "basic",
+  QUESTION = "question",
+  LITERARY_WORK = "literary-work",
+  LITERARY_QUOTE = "literary-quote"
+}
 @Component({
   selector: 'app-entities',
   templateUrl: './entities.component.html',
@@ -31,9 +37,11 @@ const TARGETS: any = environment.targets;
   ]
 })
 export class EntitiesComponent implements OnInit {
+  public ENTITY_TYPES = ENTITY_TYPES;
 
   FILTER_ALL: string = "--FILTER_ALL--";
 
+  id: string;
   targetConfig: any;
 
   adding: boolean = false;
@@ -59,6 +67,7 @@ export class EntitiesComponent implements OnInit {
   foreignKeyEntityConfigMap: any = {};
   foreignKeysEntitiesMap: EntitiesMap;
   foreignKeysEntitiesIdMap: EntitiesIdMap;
+  foreignKeysReloaded$: Subject<any> = new Subject();
 
   loading: any = {};
   loadingList: boolean = false;
@@ -95,33 +104,11 @@ export class EntitiesComponent implements OnInit {
         }),
         tap((params: any) => {
           if (params.id) {
-            this.configSchemaService.loadEntityForeignKeys(params.id)
-              .then((foreignKeysEntitiesMap: EntitiesMap) => {
-                this.foreignKeysEntitiesMap = foreignKeysEntitiesMap;
-                if (this.foreignKeysEntitiesMap) {
-                  this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
-                }
-                this.entityConfig = this.configSchemaService.getEntityConfig(params.id);
-
-                const paginationLimit: number = (this.targetConfig.limits && this.targetConfig.limits[this.entityConfig.plural]) ?
-                  this.targetConfig.limits[this.entityConfig.plural] : DEFAULT_LIMIT;
-
-                this.pagination.params.limit = paginationLimit;
-
-                this.editEntity = {};
-                this.addEntities = [];
-                this.loading = {};
-                this.added = 0;
-                this.addedThisSave = 0;
-                this.foreignKeyValueForAdd = {};
-                this.entities$.next(null);
-                this.showAdding(false)
-                this.loadEntries(this.getQuery());
-              }).catch(err => {
-                console.log(err);
-              })
+            this.id = params.id;
+            this.loadForeignKeys().then(_ => {
+              this.loadEntity(this.id);
+            });
           }
-
         }),
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { })
@@ -136,7 +123,36 @@ export class EntitiesComponent implements OnInit {
         takeUntil(this.unsubscribe$)
       ).subscribe(_ => { });
   }
+  loadForeignKeys() {
+    return this.configSchemaService.loadEntityForeignKeys(this.id)
+      .then((foreignKeysEntitiesMap: EntitiesMap) => {
+        this.foreignKeysEntitiesMap = foreignKeysEntitiesMap;
+        if (this.foreignKeysEntitiesMap) {
+          this.foreignKeysEntitiesIdMap = this.configSchemaService.getEntitiesIdMap(this.foreignKeysEntitiesMap);
+        }
+      }).catch(err => {
+        console.log(err);
+      })
+  }
 
+  loadEntity(id: string) {
+    this.entityConfig = this.configSchemaService.getEntityConfig(id);
+
+    const paginationLimit: number = (this.targetConfig.limits && this.targetConfig.limits[this.entityConfig.plural]) ?
+      this.targetConfig.limits[this.entityConfig.plural] : DEFAULT_LIMIT;
+
+    this.pagination.params.limit = paginationLimit;
+
+    this.editEntity = {};
+    this.addEntities = [];
+    this.loading = {};
+    this.added = 0;
+    this.addedThisSave = 0;
+    this.foreignKeyValueForAdd = {};
+    this.entities$.next(null);
+    this.showAdding(false)
+    this.loadEntries(this.getQuery());
+  }
   loadEntries(query: EntitiesQuery) {
     this.loadingList = true;
     this.backendApiService.getEntities(this.entityConfig.plural, query)
@@ -228,6 +244,7 @@ export class EntitiesComponent implements OnInit {
   showAdding(adding: boolean) {
     this.adding = adding;
     if (adding) {
+      this.editEntity = [];
       this.addAddEntity();
       this.added = 0;
       this.addedThisSave = 0;
@@ -285,6 +302,34 @@ export class EntitiesComponent implements OnInit {
       })
       .catch((err: any) => {
         console.log(err);
+      });
+  }
+  addForeignKey(plural, entity) {
+    this.backendApiService
+      .addEntities(plural, [entity]).toPromise()
+      .then((result: any) => {
+        this.loadForeignKeys().then(_ => {
+          this.foreignKeysReloaded$.next({
+            status: 1,
+            plural: plural,
+            entity: entity
+          });
+        }).catch((err: any) => {
+          console.log(err);
+          this.foreignKeysReloaded$.next({
+            status: 1,
+            plural: plural,
+            entity: entity
+          });
+        });
+      })
+      .catch((err: any) => {
+        console.log(err);
+        this.foreignKeysReloaded$.next({
+          status: 0,
+          plural: plural,
+          entity: entity
+        });
       });
   }
 
