@@ -166,6 +166,12 @@
                   (addAuthor)="addForeignKey('authors',$event)" (done)=" closeEditForm(entity.id,$event)">
                 </entity-literary-work-form>
 
+                <entity-literary-quote-form *ngSwitchCase="ENTITY_TYPES.LITERARY_QUOTE" @edittrigger
+                  [formGroup]="editEntity[entity.id]" [adding]="false" [entity]="entity" [entityConfig]="entityConfig"
+                  [foreignKeysReloaded$]="foreignKeysReloaded$" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
+                  (addEntry)="addForeignKey($event)" (done)="closeEditForm(entity.id,$event)">
+                </entity-literary-quote-form>
+
                 <entity-question-form *ngSwitchCase="ENTITY_TYPES.QUESTION" @edittrigger
                   [formGroup]="editEntity[entity.id]" [adding]="false" [enabled]="entity[entityConfig.enablement]"
                   [categories]="foreignKeysEntitiesMap.categories" [question]="entity" [entityConfig]="entityConfig"
