@@ -1,0 +1,15 @@
+<div class="display">
+
+  <div class="title">
+    <span>{{work.title}}</span>
+  </div>
+
+
+  <div class="author">
+    <span *ngIf="authorsIdMap">{{authorsIdMap[work.author]?.name}}</span>
+  </div>
+
+  <div class="buttons edit">
+    <a (click)="edit.next()">edit</a>
+  </div>
+</div>
