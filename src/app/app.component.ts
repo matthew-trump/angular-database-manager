@@ -31,7 +31,7 @@ export class AppComponent {
     private store: Store<any>,
     private titleService: Title,
     private router: Router) {
-    console.log("TARGETS", this.TARGETS);
+
     this.store.select('config').subscribe((state: any) => {
       if (state.schema) {
         this.schedule = state.schema.schedule;
@@ -40,7 +40,7 @@ export class AppComponent {
         });
         this.titleService.setTitle(TARGETS[backendApiService.target].title)
       } else if (state.target) {
-        console.log("LOGGING OUT");
+
         this.logout();
         this.entities = null;
       }
