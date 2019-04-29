@@ -2,23 +2,22 @@ export const environment = {
 
   production: false,
 
-  defaultTarget: "local",
+  defaultTarget: "authorQuotes",
   targets: {
-    local: {
+    authorQuotes: {
       url: "http://localhost:8082",
-      currentSchedulerLoaderInterval: 30000,
+      currentSchedulerLoaderInterval: 0,
       loginPath: "/login",
       apiPath: "/api/",
       schemaPath: 'config/schema',
       limits: {
         authors: 40,
-        quotes: 20,
-        schedule: 6
+        works: 15
       },
-      color: "dodgerblue",
-      title: "Author Quotes Database Manager"
+      color: "maroon",
+      title: "Author Quotes"
     },
-    staging: {
+    quizzes: {
       url: "http://localhost:8083",
       currentSchedulerLoaderInterval: 30000,
       loginPath: "/login",
@@ -30,25 +29,9 @@ export const environment = {
         schedule: 5
       },
       color: "green",
-      title: "Trivia Bank Database Manager"
+      title: "Quizzes Database Manager"
     },
-    /** 
-    production: {
-      url: "http://localhost:8084",
-      currentSchedulerLoaderInterval: 30000,
-      loginPath: "/login",
-      apiPath: "/api/",
-      schemaPath: 'config/schema',
-      limits: {
-        categories: 40,
-        questions: 15,
-        schedule: 5
-      },
-      color: "maroon",
-      title: "Trivia Bank Database Manager"
-    },
-    */
-    production: {
+    quizzesDeluxe: {
       url: "http://localhost:8085",
       currentSchedulerLoaderInterval: 0,
       loginPath: "/login",
