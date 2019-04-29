@@ -304,10 +304,16 @@ export class EntitiesComponent implements OnInit {
         console.log(err);
       });
   }
-  addForeignKey(plural, entity) {
+  addForeignKey(request: any) {
+    const plural = request.plural;
+    const entity = Object.assign({}, request.entity);
     this.backendApiService
       .addEntities(plural, [entity]).toPromise()
       .then((result: any) => {
+        if (result.result) {
+
+          entity.id = result.result[0];
+        }
         this.loadForeignKeys().then(_ => {
           this.foreignKeysReloaded$.next({
             status: 1,
