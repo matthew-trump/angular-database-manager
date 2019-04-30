@@ -1,0 +1,25 @@
+<input type="text" matInput class="autocomplete" [value]="getForeignKeyValue('work')" [matAutocomplete]="autoWork"
+  (input)="onChange('work',$event.target.value)" (blur)="checkOptionAfterBlur('work',$event.target.value)"
+  [disabled]="addingEntry['work']" #autoComplInputWork>
+
+<mat-autocomplete #autoWork="matAutocomplete" [displayWith]="getDisplayWith('work')">
+  <mat-option *ngFor="let option of filteredOptions['work'] | async" [value]="option"
+    (onSelectionChange)="selectionChange('work',option)">
+    {{getOptionValue('work',option)}}
+  </mat-option>
+</mat-autocomplete>
+
+<div class="optionNotFound" *ngIf="optionNotFound['work']">
+  <span>
+    "{{optionNotFound['work']}}"" is not currently in the database.
+    Would you like to add this entry?</span>
+  <div>
+    <button mat-raised-button (click)="addNewEntry('work',optionNotFound['work'])"
+      [disabled]="addingEntry['work']">add</button>
+    &nbsp;
+    <button mat-raised-button (click)="cancelAddNew('work')" [disabled]="addingEntry['work']">cancel</button>
+  </div>
+  <div *ngIf="addingEntry['work']">
+    <mat-spinner diameter="10"></mat-spinner>
+  </div>
+</div>
