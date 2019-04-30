@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 @Component({
@@ -12,8 +12,6 @@ export class EntityLiteraryQuoteFormComponent implements OnInit {
   @Input() formGroup: FormGroup;
   @Input() inProgress: boolean;
   @Input() adding: boolean;
-  @Input() textCols: number = 15
-  @Input() textRows: number = 3;
 
   constructor() { }
 
