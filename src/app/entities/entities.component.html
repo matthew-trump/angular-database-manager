@@ -52,6 +52,16 @@
               (done)="addEntityDone(i,$event)">
             </entity-literary-work-form>
 
+            <entity-literary-quote-form *ngSwitchCase="ENTITY_TYPES.LITERARY_QUOTE" @edittrigger [formGroup]="addEntity"
+              [adding]="true" (done)="addEntityDone(i,$event)">
+              <entity-form-input-autocomplete class="work" [formGroup]="addEntity" [entityConfig]="entityConfig"
+                [foreignKeysReloaded$]="foreignKeysReloaded$" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
+                (addEntry)="addForeignKey($event)">
+              </entity-form-input-autocomplete>
+              <entity-form-buttons class="buttons" [formGroup]="addEntity" [adding]="true"
+                (done)="addEntityDone(i,$event)"></entity-form-buttons>
+            </entity-literary-quote-form>
+
             <entity-question-form *ngSwitchCase="ENTITY_TYPES.QUESTION" [formGroup]="addEntity" [adding]="true"
               [categories]="foreignKeysEntitiesMap.categories" [entityConfig]="entityConfig"
               (done)="addEntityDone(i,$event)">
@@ -163,13 +173,18 @@
                   [formGroup]="editEntity[entity.id]" [adding]="false" [enabled]="entity[entityConfig.enablement]"
                   [authorsIdMap]="foreignKeysEntitiesMap.authors" [work]="entity" [entityConfig]="entityConfig"
                   [foreignKeysReloaded$]="foreignKeysReloaded$" [inProgress]="updating[entity.id]"
-                  (addAuthor)="addForeignKey('authors',$event)" (done)=" closeEditForm(entity.id,$event)">
+                  (addAuthor)="addForeignKey('authors',$event)">
                 </entity-literary-work-form>
 
+
                 <entity-literary-quote-form *ngSwitchCase="ENTITY_TYPES.LITERARY_QUOTE" @edittrigger
-                  [formGroup]="editEntity[entity.id]" [adding]="false" [entity]="entity" [entityConfig]="entityConfig"
-                  [foreignKeysReloaded$]="foreignKeysReloaded$" [foreignKeysEntitiesMap]="foreignKeysEntitiesMap"
-                  (addEntry)="addForeignKey($event)" (done)="closeEditForm(entity.id,$event)">
+                  [formGroup]="editEntity[entity.id]" [adding]="false" (done)="closeEditForm(entity.id,$event)">
+                  <entity-form-input-autocomplete class="work" [formGroup]="editEntity[entity.id]" [entity]="entity"
+                    [entityConfig]="entityConfig" [foreignKeysReloaded$]="foreignKeysReloaded$"
+                    [foreignKeysEntitiesMap]="foreignKeysEntitiesMap" (addEntry)="addForeignKey($event)">
+                  </entity-form-input-autocomplete>
+                  <entity-form-buttons class="buttons" [formGroup]="editEntity[entity.id]" [adding]="false"
+                    (done)=" closeEditForm(entity.id,$event)"></entity-form-buttons>
                 </entity-literary-quote-form>
 
                 <entity-question-form *ngSwitchCase="ENTITY_TYPES.QUESTION" @edittrigger
