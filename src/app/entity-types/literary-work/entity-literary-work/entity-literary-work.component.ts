@@ -11,6 +11,7 @@ export class EntityLiteraryWorkComponent implements OnInit {
   @Input() work: any;
   @Input() entityConfig: any;
   @Input() authorsIdMap: any;
+  @Input() multipleAuthor: boolean = true;
   @Output() edit: EventEmitter<null> = new EventEmitter();
 
   constructor() { }
