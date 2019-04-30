@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { startWith, map, takeUntil } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { EntitiesMap } from 'src/app/entities-map';
 })
 export class EntityFormInputAutocompleteComponent implements OnInit {
 
-
+  @Input() field: string;
   @Input() formGroup: FormGroup;
   @Input() enabled: boolean;
   @Input() entity: any;
@@ -20,36 +20,47 @@ export class EntityFormInputAutocompleteComponent implements OnInit {
   @Input() adding: boolean;
   @Input() inProgress: boolean;
 
+
   @Output() done: EventEmitter<boolean> = new EventEmitter();
   @Output() addEntry: EventEmitter<any> = new EventEmitter();
 
   @Input() foreignKeysReloaded$: Observable<any>;
 
+  /** 
   foreignKeyEntities: Map<string, any> = new Map();
   foreignKeyEntities$: Map<string, Observable<string[]>> = new Map();
   filteredOptions: Map<string, Observable<string[]>> = new Map();
   optionNotFound: Map<string, string> = new Map();
   addingEntry: Map<string, any> = new Map();
+*/
+
+  foreignKeyEntities: any;
+  foreignKeyEntities$: BehaviorSubject<any> = new BehaviorSubject('');
+  filteredOptions: Observable<string[]>;
+  optionNotFound: string;
+  addingEntry: any;
 
   unsubscribe$: Subject<null> = new Subject();
 
-  @ViewChild('autoComplInputWork') autoComplInputWork: ElementRef;
+  fieldConfig: any;
+  current: string;
+  original: string;
+
+
 
   constructor() { }
 
   ngOnInit() {
-    this.entityConfig.fields.filter(field => field.foreignKey)
-      .map(field => {
-        this.foreignKeyEntities$[field.name] = new BehaviorSubject('');
+    this.fieldConfig = this.entityConfig.fields.find(field => field.name === this.field);
+    this.original = this.getForeignKeyValue();
+    this.current = this.original;
+    const _filter = this.getFilterFunction();
 
-        const _filter = this.getFilterFunction(field);
-
-        this.filteredOptions[field.name] = this.foreignKeyEntities$[field.name]
-          .pipe(
-            startWith(''),
-            map(value => _filter(value))
-          );
-      });
+    this.filteredOptions = this.foreignKeyEntities$
+      .pipe(
+        startWith(''),
+        map(value => _filter(value))
+      );
 
     this.foreignKeysReloaded$
       .pipe(
@@ -57,82 +68,78 @@ export class EntityFormInputAutocompleteComponent implements OnInit {
       )
       .subscribe((result: any) => {
         if (result) {
-          const plural = result.plural;
-          const fieldConfig: any = this.entityConfig.fields.find(field => field.foreignKey === plural);
           if (result.status === 1) {
-            this.selectionChange(fieldConfig.name, result.entity);
-            this.addingEntry[fieldConfig.name] = null;
-            this.optionNotFound[fieldConfig.name] = null;
+            this.selectionChange(result.entity);
+            this.addingEntry = null;
+            this.optionNotFound = null;
           } else if (result.status === 0) {
-            this.addingEntry[fieldConfig.name] = null;
+            this.addingEntry = null;
           }
         }
       })
   }
-  getForeignKeyValue(field: string, index?: number) {
+  getForeignKeyValue(index?: number) {
     if (this.entity) {
-      const fieldConfig = this.getForeignKeyFieldConfig(field);
-      const entity = this.getForeignKeyEntity(fieldConfig, this.entity[field]);
-      return entity ? entity[fieldConfig.label] : '';
+      const entity = this.getForeignKeyEntity(this.entity[this.field]);
+      const ret = entity ? entity[this.fieldConfig.label] : '';
+      return ret;
     }
     return '';
   }
-  getForeignKeyFieldConfig(fieldName: string) {
-    return this.entityConfig.fields.find(field => field.name === fieldName);
+
+  getForeignKeyEntity(id: number) {
+    return this.foreignKeysEntitiesMap[this.fieldConfig.foreignKey].find(entity => entity.id === id);
   }
-  getForeignKeyEntity(fieldConfig: any, id: number) {
-    return this.foreignKeysEntitiesMap[fieldConfig.foreignKey].find(entity => entity.id === id);
+  getOptionValue(option: any): string {
+    return option[this.fieldConfig.label];
   }
-  getOptionValue(fieldName: string, option: any): string {
-    const config = this.getForeignKeyFieldConfig(fieldName);
-    return option[config.label];
-  }
-  getDisplayWith(fieldName: string): Function {
-    const fieldConfig = this.getForeignKeyFieldConfig(fieldName);
+  getDisplayWith(): Function {
+    const fieldConfig = this.fieldConfig;
     return (value?: any): string | undefined => {
       return value ? value[fieldConfig.label] : undefined;
     }
   }
-  onChange(fieldName: string, value: string) {
-    this.optionNotFound[fieldName] = null;
-    this.foreignKeyEntities$[fieldName].next(value);
+  onChange(value: string) {
+    this.current = value;
+    this.optionNotFound = null;
+    this.foreignKeyEntities$.next(value);
   }
-  private getFilterFunction(field: any): Function {
+  private getFilterFunction(): Function {
     return (value: string): any[] => {
       const filterValue = value.toLowerCase();
-      return this.foreignKeysEntitiesMap[field.foreignKey]
-        .filter(option => option[field.label].toLowerCase().indexOf(filterValue) !== -1);
+      return this.foreignKeysEntitiesMap[this.fieldConfig.foreignKey]
+        .filter(option => {
+          return option[this.fieldConfig.label].toLowerCase().indexOf(filterValue) !== -1
+        });
     }
   }
-  selectionChange(fieldName: string, value: any) {
-    this.optionNotFound[fieldName] = null;
+  selectionChange(value: any) {
+    this.optionNotFound = null;
     if (value) {
-      if (this.formGroup.value[fieldName] !== value.id) {
-        this.formGroup.patchValue({ [fieldName]: value.id });
+      if (this.formGroup.value[this.field] !== value.id) {
+        this.formGroup.patchValue({ [this.field]: value.id });
         this.formGroup.markAsDirty();
       }
     }
   }
-  checkOptionAfterBlur(fieldName: string, value: string) {
-    const fieldConfig = this.getForeignKeyFieldConfig(fieldName);
-    const found = this.foreignKeysEntitiesMap[fieldConfig.foreignKey].find(item => item[fieldConfig.label] === value);
+  checkOptionAfterBlur(value: string) {
+    const found = this.foreignKeysEntitiesMap[this.fieldConfig.foreignKey].find(item => item[this.fieldConfig.label] === value);
     if (!found) {
-      this.optionNotFound[fieldName] = value;
+      this.optionNotFound = value;
     }
   }
-  cancelAddNew(fieldName: string) {
-    if (this.addingEntry[fieldName]) {
+  cancelAddNew() {
+    if (this.addingEntry) {
       return;
     }
-    this.optionNotFound[fieldName] = null;
-    this.autoComplInputWork.nativeElement.value = this.getForeignKeyValue(fieldName);
+    this.optionNotFound = null;
+    this.current = this.original;
   }
-  addNewEntry(fieldName: string) {
-    const fieldConfig = this.getForeignKeyFieldConfig(fieldName);
-    this.addingEntry[fieldName] = this.optionNotFound[fieldName];
+  addNewEntry() {
+    this.addingEntry = this.optionNotFound;
     this.addEntry.next({
-      plural: fieldConfig.foreignKey,
-      entity: { [fieldConfig.label]: this.addingEntry[fieldName] }
+      plural: this.fieldConfig.foreignKey,
+      entity: { [this.fieldConfig.label]: this.addingEntry }
     });
   }
 
