@@ -2,16 +2,11 @@
   <div class="display">
 
     <div class="field text">
-
-      <mat-form-field>
-        <mat-label>text</mat-label>
-        <textarea matInput [formControlName]="'text'" [cols]="textCols" [rows]="textRows"></textarea>
-      </mat-form-field>
-
+      <ng-content select="[field='text']"></ng-content>
     </div>
 
     <div class="work">
-      <ng-content select=".work"></ng-content>
+      <ng-content select="[field='work']"></ng-content>
     </div>
 
     <div class="buttons">
