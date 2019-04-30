@@ -1,0 +1,24 @@
+<div>
+
+  <button mat-icon-button *ngIf="!adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
+    <mat-icon>save_alt</mat-icon>
+  </button>
+
+  <button mat-icon-button *ngIf="!adding" (click)="done.next(false)">
+    <mat-icon>close</mat-icon>
+  </button>
+
+
+  <button mat-icon-button *ngIf="adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
+    <mat-icon>save_alt</mat-icon>
+  </button>
+
+  <button mat-icon-button *ngIf="adding" (click)="done.next(false)">
+    <mat-icon>close</mat-icon>
+  </button>
+
+  <div *ngIf="inProgress">
+    <mat-spinner [diameter]="spinnerDiameter"></mat-spinner>
+  </div>
+
+</div>
