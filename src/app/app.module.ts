@@ -60,6 +60,8 @@ import { EntityLiteraryWorkComponent } from './entity-types/literary-work/entity
 import { EntityLiteraryWorkFormComponent } from './entity-types/literary-work/entity-literary-work-form/entity-literary-work-form.component';
 import { EntityLiteraryQuoteComponent } from './entity-types/literary-quote/entity-literary-quote/entity-literary-quote.component';
 import { EntityLiteraryQuoteFormComponent } from './entity-types/literary-quote/entity-literary-quote-form/entity-literary-quote-form.component';
+import { EntityFormInputAutocompleteComponent } from './entity-form-input-autocomplete/entity-form-input-autocomplete.component';
+import { EntityFormButtonsComponent } from './entity-form-buttons/entity-form-buttons.component';
 
 @NgModule({
   declarations: [
@@ -87,7 +89,9 @@ import { EntityLiteraryQuoteFormComponent } from './entity-types/literary-quote/
     EntityLiteraryWorkComponent,
     EntityLiteraryWorkFormComponent,
     EntityLiteraryQuoteComponent,
-    EntityLiteraryQuoteFormComponent
+    EntityLiteraryQuoteFormComponent,
+    EntityFormInputAutocompleteComponent,
+    EntityFormButtonsComponent
   ],
   imports: [
     BrowserModule,
