@@ -2,66 +2,15 @@
   <div class="display">
 
     <div class="field title">
-      <mat-form-field>
-        <mat-label>title</mat-label>
-        <textarea matInput [formControlName]="'title'" [cols]="textCols" [rows]="textRows"></textarea>
-      </mat-form-field>
+      <ng-content select="[field='title']"></ng-content>
     </div>
 
     <div class="authors">
-      <input type="text" matInput [value]="getAuthorName(0)" (input)="onChange($event.target.value)"
-        [matAutocomplete]="auto" [disabled]="addingAuthor" (blur)="checkOptionAfterBlur($event.target.value)"
-        #autoComplInput>
-
-      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-        <mat-option *ngFor="let author of filteredOptions | async" [value]="author"
-          (onSelectionChange)="selectionChange(author)">
-          {{ author.name }}
-        </mat-option>
-      </mat-autocomplete>
-
-
-      <div class="authorNotFound" *ngIf="authorNotFound">
-        <span>
-          "{{authorNotFound}}"" is not currently in the database.
-          Would you like to add this entry?</span>
-        <div>
-          <button mat-raised-button (click)="addNewAuthor(authorNotFound)" [disabled]="addingAuthor">add</button>
-          &nbsp;
-          <button mat-raised-button (click)="cancelAddNewAuthor()" [disabled]="addingAuthor">cancel</button>
-        </div>
-        <div *ngIf="addingAuthor">
-          <mat-spinner diameter="10"></mat-spinner>
-        </div>
-      </div>
-
+      <ng-content select="[field='author']"></ng-content>
     </div>
 
-
-
-
     <div class="buttons">
-
-      <button mat-icon-button *ngIf="!adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
-        <mat-icon>save_alt</mat-icon>
-      </button>
-
-      <button mat-icon-button *ngIf="!adding" (click)="done.next(false)">
-        <mat-icon>close</mat-icon>
-      </button>
-
-
-      <button mat-icon-button *ngIf="adding" (click)="done.next(true)" [disabled]="formGroup.pristine">
-        <mat-icon>save_alt</mat-icon>
-      </button>
-
-      <button mat-icon-button *ngIf="adding" (click)="done.next(false)">
-        <mat-icon>close</mat-icon>
-      </button>
-
-      <div *ngIf="inProgress">
-        <mat-spinner [diameter]="spinnerDiameter"></mat-spinner>
-      </div>
+      <ng-content select=".buttons"></ng-content>
     </div>
 
   </div>
