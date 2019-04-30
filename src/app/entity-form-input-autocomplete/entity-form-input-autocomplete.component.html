@@ -1,25 +1,23 @@
-<input type="text" matInput class="autocomplete" [value]="getForeignKeyValue('work')" [matAutocomplete]="autoWork"
-  (input)="onChange('work',$event.target.value)" (blur)="checkOptionAfterBlur('work',$event.target.value)"
-  [disabled]="addingEntry['work']" #autoComplInputWork>
+<input type="text" matInput class="autocomplete" [value]="current" [matAutocomplete]="auto"
+  (input)="onChange($event.target.value)" (blur)="checkOptionAfterBlur($event.target.value)" [disabled]="addingEntry">
 
-<mat-autocomplete #autoWork="matAutocomplete" [displayWith]="getDisplayWith('work')">
-  <mat-option *ngFor="let option of filteredOptions['work'] | async" [value]="option"
-    (onSelectionChange)="selectionChange('work',option)">
-    {{getOptionValue('work',option)}}
+<mat-autocomplete #auto="matAutocomplete" [displayWith]="getDisplayWith()">
+  <mat-option *ngFor="let option of filteredOptions | async" [value]="option"
+    (onSelectionChange)="selectionChange(option)">
+    {{getOptionValue(option)}}
   </mat-option>
 </mat-autocomplete>
 
-<div class="optionNotFound" *ngIf="optionNotFound['work']">
+<div class="optionNotFound" *ngIf="optionNotFound">
   <span>
-    "{{optionNotFound['work']}}"" is not currently in the database.
+    "{{optionNotFound}}" is not currently in the database.
     Would you like to add this entry?</span>
   <div>
-    <button mat-raised-button (click)="addNewEntry('work',optionNotFound['work'])"
-      [disabled]="addingEntry['work']">add</button>
+    <button mat-raised-button (click)="addNewEntry(optionNotFound)" [disabled]="addingEntry">add</button>
     &nbsp;
-    <button mat-raised-button (click)="cancelAddNew('work')" [disabled]="addingEntry['work']">cancel</button>
+    <button mat-raised-button (click)="cancelAddNew()" [disabled]="addingEntry">cancel</button>
   </div>
-  <div *ngIf="addingEntry['work']">
+  <div *ngIf="addingEntry">
     <mat-spinner diameter="10"></mat-spinner>
   </div>
 </div>
