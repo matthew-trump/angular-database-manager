@@ -1,0 +1,6 @@
+<div *ngIf="formGroup" [formGroup]="formGroup">
+  <mat-form-field>
+    <mat-label>{{field}}</mat-label>
+    <textarea matInput [formControlName]="field" [cols]="textCols" [rows]="textRows"></textarea>
+  </mat-form-field>
+</div>
