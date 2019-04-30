@@ -6,7 +6,17 @@
 
 
   <div class="author">
-    <span *ngIf="authorsIdMap">{{authorsIdMap[work.author]?.name}}</span>
+    <ng-container *ngIf="authorsIdMap">
+      <ng-container *ngIf="multipleAuthor">
+        <ng-container *ngFor="let author of work.author">
+          <span>{{authorsIdMap[author]?.name}}</span>&nbsp;
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="!multipleAuthor">
+        <span>{{authorsIdMap[work.author]?.name}}</span>
+      </ng-container>
+    </ng-container>
+
   </div>
 
   <div class="buttons edit">
