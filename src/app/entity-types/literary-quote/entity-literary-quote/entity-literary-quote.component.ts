@@ -17,7 +17,7 @@ export class EntityLiteraryQuoteComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log("foreignKeysEntitiesIdMap", this.foreignKeysEntitiesIdMap);
+    //console.log("foreignKeysEntitiesIdMap", this.foreignKeysEntitiesIdMap);
   }
 
 }
