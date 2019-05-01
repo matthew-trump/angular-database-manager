@@ -8,8 +8,10 @@
   <ng-container *ngIf="foreignKeysEntitiesIdMap">
 
     <div class="author">
+      <ng-container *ngFor="let author of entity.author">
+        <span>{{foreignKeysEntitiesIdMap.authors[author].name}}</span>&nbsp;
+      </ng-container>
 
-      <span *ngIf="entity.author">{{foreignKeysEntitiesIdMap.authors[entity.author].name}}</span>
 
     </div>
 
