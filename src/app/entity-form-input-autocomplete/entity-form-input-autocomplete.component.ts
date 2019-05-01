@@ -1,15 +1,16 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject, merge } from 'rxjs';
 import { startWith, map, takeUntil } from 'rxjs/operators';
 import { EntitiesMap } from 'src/app/entities-map';
+import { EntityInputAutocomplete } from 'src/app/entity-input-autocomplete';
 
 @Component({
   selector: 'entity-form-input-autocomplete',
   templateUrl: './entity-form-input-autocomplete.component.html',
   styleUrls: ['./entity-form-input-autocomplete.component.scss']
 })
-export class EntityFormInputAutocompleteComponent implements OnInit {
+export class EntityFormInputAutocompleteComponent implements OnInit, OnDestroy {
 
   @Input() field: string;
   @Input() formGroup: FormGroup;
@@ -26,13 +27,8 @@ export class EntityFormInputAutocompleteComponent implements OnInit {
 
   @Input() foreignKeysReloaded$: Observable<any>;
 
-  /** 
-  foreignKeyEntities: Map<string, any> = new Map();
-  foreignKeyEntities$: Map<string, Observable<string[]>> = new Map();
-  filteredOptions: Map<string, Observable<string[]>> = new Map();
-  optionNotFound: Map<string, string> = new Map();
-  addingEntry: Map<string, any> = new Map();
-*/
+
+  autocomplete: EntityInputAutocomplete[];
 
   foreignKeyEntities: any;
   foreignKeyEntities$: BehaviorSubject<any> = new BehaviorSubject('');
@@ -41,26 +37,28 @@ export class EntityFormInputAutocompleteComponent implements OnInit {
   addingEntry: any;
 
   unsubscribe$: Subject<null> = new Subject();
+  resetObservables$: Subject<null>;
 
   fieldConfig: any;
   current: string;
-  original: string;
+  original: string[];
+  multiple: boolean;
 
-
+  updated$: Observable<any>;
+  addEntry$: Observable<any>;
 
   constructor() { }
 
   ngOnInit() {
     this.fieldConfig = this.entityConfig.fields.find(field => field.name === this.field);
-    this.original = this.getForeignKeyValue();
-    this.current = this.original;
-    const _filter = this.getFilterFunction();
+    this.multiple = this.fieldConfig.multiple;
+    this.original = this.getOriginal();
+    console.log("ORIGINAL", this.original);
+    this.autocomplete = this.original.map((value, index) => {
+      return new EntityInputAutocomplete(this.fieldConfig, this.foreignKeysEntitiesMap, value, index)
+    });
+    this.resetMergeObservables();
 
-    this.filteredOptions = this.foreignKeyEntities$
-      .pipe(
-        startWith(''),
-        map(value => _filter(value))
-      );
 
     this.foreignKeysReloaded$
       .pipe(
@@ -68,79 +66,93 @@ export class EntityFormInputAutocompleteComponent implements OnInit {
       )
       .subscribe((result: any) => {
         if (result) {
-          if (result.status === 1) {
-            this.selectionChange(result.entity);
-            this.addingEntry = null;
-            this.optionNotFound = null;
-          } else if (result.status === 0) {
-            this.addingEntry = null;
+          console.log("foreignKeysReloaded$", result);
+          if (result && typeof result.index !== 'undefined') {
+            this.autocomplete[result.index].updateFromResult(result);
           }
         }
+      });
+
+
+  }
+  addAutocomplete() {
+    console.log("ADD AUTOCOMPLETE");
+    this.autocomplete.push(new EntityInputAutocomplete(this.fieldConfig, this.foreignKeysEntitiesMap, '', this.autocomplete.length));
+    this.resetMergeObservables();
+  }
+  resetMergeObservables() {
+    if (this.resetObservables$) {
+      this.resetObservables$.next(),
+        this.resetObservables$.complete();
+    }
+    this.resetObservables$ = new Subject();
+
+    this.updated$ = merge(...this.autocomplete.map(autocomplete => autocomplete.update$));
+    this.addEntry$ = merge(...this.autocomplete.map(autocomplete => autocomplete.addEntry$));
+
+    this.updated$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        takeUntil(this.resetObservables$)
+      )
+      .subscribe(update => {
+        if (update && typeof update.value) {
+          const index = update.index;
+          const value = update.value.id;
+
+
+
+          if (this.multiple) {
+            const current = this.formGroup.value[this.field] ? this.formGroup.value[this.field] : [''];
+            const currentValue = current[index];
+            if (value !== currentValue) {
+              console.log("UPDATE", index, currentValue, "->", value);
+              current[index] = value;
+              //if (this.formGroup.value[this.field] !== value.id) {
+              this.formGroup.patchValue({ [this.field]: current });
+              this.formGroup.markAsDirty();
+              //}
+
+            }
+          } else {
+            const current = this.formGroup.value[this.field]
+            const currentValue = current;
+            if (value !== currentValue) {
+              console.log("UPDATE", currentValue, "->", value);
+              this.formGroup.patchValue({ [this.field]: value });
+              this.formGroup.markAsDirty();
+            }
+          }
+        }
+      });
+
+    this.addEntry$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        takeUntil(this.resetObservables$)
+      )
+      .subscribe(request => {
+        console.log("ADD ENTRY REQUEST", request);
+        this.addEntry.next(request);
       })
   }
-  getForeignKeyValue(index?: number) {
+  getOriginal() {
     if (this.entity) {
-      const entity = this.getForeignKeyEntity(this.entity[this.field]);
-      const ret = entity ? entity[this.fieldConfig.label] : '';
+      const values: any = Array.isArray(this.entity[this.field]) ? this.entity[this.field] : [this.entity[this.field]];
+      const entities = values.map(id => {
+        return this.foreignKeysEntitiesMap[this.fieldConfig.foreignKey].find(entity => entity.id === id)
+      });
+      console.log("ENTITIES", entities);
+      const ret = entities.map(entity => {
+        return entity ? entity[this.fieldConfig.label] : '';
+      })
       return ret;
     }
-    return '';
+    return [''];
   }
-
-  getForeignKeyEntity(id: number) {
-    return this.foreignKeysEntitiesMap[this.fieldConfig.foreignKey].find(entity => entity.id === id);
-  }
-  getOptionValue(option: any): string {
-    return option[this.fieldConfig.label];
-  }
-  getDisplayWith(): Function {
-    const fieldConfig = this.fieldConfig;
-    return (value?: any): string | undefined => {
-      return value ? value[fieldConfig.label] : undefined;
-    }
-  }
-  onChange(value: string) {
-    this.current = value;
-    this.optionNotFound = null;
-    this.foreignKeyEntities$.next(value);
-  }
-  private getFilterFunction(): Function {
-    return (value: string): any[] => {
-      const filterValue = value.toLowerCase();
-      return this.foreignKeysEntitiesMap[this.fieldConfig.foreignKey]
-        .filter(option => {
-          return option[this.fieldConfig.label].toLowerCase().indexOf(filterValue) !== -1
-        });
-    }
-  }
-  selectionChange(value: any) {
-    this.optionNotFound = null;
-    if (value) {
-      if (this.formGroup.value[this.field] !== value.id) {
-        this.formGroup.patchValue({ [this.field]: value.id });
-        this.formGroup.markAsDirty();
-      }
-    }
-  }
-  checkOptionAfterBlur(value: string) {
-    const found = this.foreignKeysEntitiesMap[this.fieldConfig.foreignKey].find(item => item[this.fieldConfig.label] === value);
-    if (!found) {
-      this.optionNotFound = value;
-    }
-  }
-  cancelAddNew() {
-    if (this.addingEntry) {
-      return;
-    }
-    this.optionNotFound = null;
-    this.current = this.original;
-  }
-  addNewEntry() {
-    this.addingEntry = this.optionNotFound;
-    this.addEntry.next({
-      plural: this.fieldConfig.foreignKey,
-      entity: { [this.fieldConfig.label]: this.addingEntry }
-    });
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
 }
