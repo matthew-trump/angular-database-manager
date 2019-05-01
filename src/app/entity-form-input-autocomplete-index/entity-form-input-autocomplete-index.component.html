@@ -1,0 +1,26 @@
+<input type="text" matInput class="autocomplete" [value]="autocomplete.current" [matAutocomplete]="auto"
+  (input)="autocomplete.onChange($event.target.value)" (blur)="autocomplete.checkOptionAfterBlur($event)"
+  [disabled]="autocomplete.addingEntry">
+
+<mat-autocomplete #auto="matAutocomplete" [displayWith]="autocomplete.getDisplayWith()">
+  <mat-option *ngFor="let option of autocomplete.filteredOptions | async" [value]="option"
+    (onSelectionChange)="autocomplete.selectionChange($event)">
+    {{autocomplete.getOptionValue(option)}}
+  </mat-option>
+</mat-autocomplete>
+
+<div class="optionNotFound" *ngIf="autocomplete.optionNotFound">
+  <span>
+    "{{autocomplete.optionNotFound}}" is not currently in the database.
+    Would you like to add this entry?</span>
+  <div>
+    <button mat-raised-button (click)="autocomplete.addNewEntry(autocomplete.optionNotFound)"
+      [disabled]="autocomplete.addingEntry">add</button>
+    &nbsp;
+    <button mat-raised-button (click)="autocomplete.cancelAddNew()"
+      [disabled]="autocomplete.addingEntry">cancel</button>
+  </div>
+  <div *ngIf="autocomplete.addingEntry">
+    <mat-spinner diameter="10"></mat-spinner>
+  </div>
+</div>
