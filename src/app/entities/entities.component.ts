@@ -305,38 +305,45 @@ export class EntitiesComponent implements OnInit {
       });
   }
   addForeignKey(request: any) {
-    const plural = request.plural;
-    const entity = Object.assign({}, request.entity);
-    this.backendApiService
-      .addEntities(plural, [entity]).toPromise()
-      .then((result: any) => {
-        if (result.result) {
+    if (request) {
+      const plural = request.plural;
+      const index = request.index;
+      const entity = Object.assign({}, request.entity);
+      this.backendApiService
+        .addEntities(plural, [entity]).toPromise()
+        .then((result: any) => {
+          if (result.result) {
 
-          entity.id = result.result[0];
-        }
-        this.loadForeignKeys().then(_ => {
-          this.foreignKeysReloaded$.next({
-            status: 1,
-            plural: plural,
-            entity: entity
+            entity.id = result.result[0];
+          }
+          this.loadForeignKeys().then(_ => {
+            this.foreignKeysReloaded$.next({
+              status: 1,
+              index: index,
+              plural: plural,
+              entity: entity
+            });
+          }).catch((err: any) => {
+            console.log(err);
+            this.foreignKeysReloaded$.next({
+              status: 1,
+              index: index,
+              plural: plural,
+              entity: entity
+            });
           });
-        }).catch((err: any) => {
+        })
+        .catch((err: any) => {
           console.log(err);
           this.foreignKeysReloaded$.next({
-            status: 1,
+            status: 0,
+            index: index,
             plural: plural,
             entity: entity
           });
         });
-      })
-      .catch((err: any) => {
-        console.log(err);
-        this.foreignKeysReloaded$.next({
-          status: 0,
-          plural: plural,
-          entity: entity
-        });
-      });
+    }
+
   }
 
 
