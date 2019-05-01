@@ -64,6 +64,7 @@ import { EntityFormInputAutocompleteComponent } from './entity-form-input-autoco
 import { EntityFormButtonsComponent } from './entity-form-buttons/entity-form-buttons.component';
 import { EntityFormInputTextareaComponent } from './entity-form-input-textarea/entity-form-input-textarea.component';
 import { EntityFormInputAutocompleteMultipleComponent } from './entity-form-input-autocomplete-multiple/entity-form-input-autocomplete-multiple.component';
+import { EntityFormInputAutocompleteIndexComponent } from './entity-form-input-autocomplete-index/entity-form-input-autocomplete-index.component';
 
 @NgModule({
   declarations: [
@@ -95,7 +96,8 @@ import { EntityFormInputAutocompleteMultipleComponent } from './entity-form-inpu
     EntityFormInputAutocompleteComponent,
     EntityFormButtonsComponent,
     EntityFormInputTextareaComponent,
-    EntityFormInputAutocompleteMultipleComponent
+    EntityFormInputAutocompleteMultipleComponent,
+    EntityFormInputAutocompleteIndexComponent
   ],
   imports: [
     BrowserModule,
